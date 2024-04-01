@@ -10,7 +10,7 @@ namespace Networking
         [SerializeField]
         private bool online;
 
-        public bool Online => online;
+        public bool IsOnline => online;
 
         private void Awake()
         {

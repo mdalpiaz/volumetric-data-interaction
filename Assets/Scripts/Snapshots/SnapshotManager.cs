@@ -59,8 +59,6 @@ namespace Snapshots
 
         private List<Snapshot> Snapshots { get; } = new();
 
-        private bool _online;
-
         private ulong _offlineSnapshotID;
 
         private Snapshot? _preCreatedSnapshot;
@@ -77,11 +75,6 @@ namespace Snapshots
             {
                 Destroy(this);
             }
-        }
-
-        private void Start()
-        {
-            _online = OnlineState.Instance.Online;
         }
 
         public Snapshot? GetSnapshot(ulong id) => Snapshots.FirstOrDefault(s => s.ID == id);
@@ -104,7 +97,7 @@ namespace Snapshots
             var currRot = tracker.transform.rotation;
             var newPosition = currPos + Quaternion.AngleAxis(angle + currRot.eulerAngles.y + CenteringRotation, Vector3.up) * Vector3.back * SnapshotDistance;
 
-            if (_online)
+            if (OnlineState.Instance.IsOnline)
             {
                 var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
                 if (snapshot == null)
@@ -129,7 +122,7 @@ namespace Snapshots
         
         public Snapshot? CreateSnapshot(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            if (_online && _preCreatedSnapshot != null)
+            if (OnlineState.Instance.IsOnline && _preCreatedSnapshot != null)
             {
                 // If we are online, this method is called as some sort of callback where the snapshot is
                 // already created and we only need to synchronize its ID.
