@@ -160,7 +160,7 @@ namespace Networking
                 case MenuMode.None:
                     if (_menuMode == MenuMode.Analysis)
                     {
-                        slicer.DeactivateTemporaryCuttingPlane();
+                        slicer.SetTemporaryCuttingPlaneActive(false);
                         SnapshotManager.Instance.DeactivateAllSnapshots();
                     }
                     else
@@ -183,7 +183,7 @@ namespace Networking
                     isSnapshotSelected = Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
-                    slicer.ActivateTemporaryCuttingPlane();
+                    slicer.SetTemporaryCuttingPlaneActive(true);
                     break;
                 case MenuMode.Mapping:
                 default:

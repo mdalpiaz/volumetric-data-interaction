@@ -102,23 +102,30 @@ namespace Slicing
                 var lowerHull = slicedObject.CreateUpperHull(objectToBeSliced.gameObject, materialBlack);
                 ModelManager.Instance.CurrentModel.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
                 Destroy(lowerHull);
-                ActivateTemporaryCuttingPlane();
+                SetTemporaryCuttingPlaneActive(true);
                 SetIntersectionMesh(ModelManager.Instance.CurrentModel, sliceMaterial);
             }
         }
         
-        public void ActivateTemporaryCuttingPlane()
+        public void SetTemporaryCuttingPlaneActive(bool active)
         {
-            temporaryCuttingPlane.SetActive(true);
-            ModelManager.Instance.CurrentModel.ActivateCuttingPlane(temporaryCuttingPlane);
-            ModelManager.Instance.CurrentModel.SetModelMaterial(materialTemporarySlice, materialShader);
-        }
+            temporaryCuttingPlane.SetActive(active);
 
-        public void DeactivateTemporaryCuttingPlane()
-        {
-            temporaryCuttingPlane.SetActive(false);
-            ModelManager.Instance.CurrentModel.DeactivateCuttingPlane();
-            ModelManager.Instance.CurrentModel.SetModelMaterial(materialWhite);
+            if (active)
+            {
+                ModelManager.Instance.CurrentModel.SetCuttingPlane(temporaryCuttingPlane);
+            }
+
+            ModelManager.Instance.CurrentModel.SetCuttingPlaneActive(active);
+
+            if (active)
+            {
+                ModelManager.Instance.CurrentModel.SetModelMaterial(materialTemporarySlice, materialShader);
+            }
+            else
+            {
+                ModelManager.Instance.CurrentModel.SetModelMaterial(materialWhite);
+            }
         }
 
         private bool CalculateIntersectionImage([NotNullWhen(true)] out Material? sliceMaterial, InterpolationType interpolation = InterpolationType.Nearest)

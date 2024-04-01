@@ -172,16 +172,9 @@ namespace Model
             _renderer.material.shader = shader;
         }
         
-        public void ActivateCuttingPlane(GameObject plane)
-        {
-            _onePlaneCuttingController.enabled = true;
-            _onePlaneCuttingController.plane = plane;
-        }
+        public void SetCuttingPlaneActive(bool active) => _onePlaneCuttingController.enabled = active;
 
-        public void DeactivateCuttingPlane()
-        {
-            _onePlaneCuttingController.enabled = false;
-        }
+        public void SetCuttingPlane(GameObject plane) => _onePlaneCuttingController.plane = plane;
         
         public void ResetMesh()
         {
