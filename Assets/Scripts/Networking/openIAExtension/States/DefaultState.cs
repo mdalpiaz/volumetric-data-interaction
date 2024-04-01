@@ -28,7 +28,7 @@ namespace Networking.openIAExtension.States
                 case Categories.Datasets.Reset:
                 {
                     ModelManager.Instance.ResetState();
-                    SnapshotManager.Instance.ResetState();
+                    SnapshotManager.Instance.DeleteAllSnapshots();
                     return this;
                 }
                 case Categories.Datasets.LoadDataset:
@@ -136,7 +136,7 @@ namespace Networking.openIAExtension.States
                 }
                 case Categories.Snapshots.Clear:
                 {
-                    SnapshotManager.Instance.ResetState();
+                    SnapshotManager.Instance.DeleteAllSnapshots();
                     break;
                 }
                 case Categories.Snapshots.SlicePosition:

@@ -217,11 +217,6 @@ namespace Snapshots
             return DeleteSnapshot(snapshot);   
         }
 
-        public void ResetState()
-        {
-            DeleteAllSnapshots();
-        }
-
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
