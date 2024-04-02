@@ -111,7 +111,7 @@ Any Android based device will suffice (tested with Android 12 and 13), but for d
 
 ## Installation
 
-SteamVR needs to be installed and running. In Unity inside the `Host` scene, a model has to be setup (see section [`Change model`](#section-4.2)).  
+SteamVR needs to be installed and running. In Unity inside the `Host` scene, a model has to be setup (see section [`Change model`](#change-model)).  
 The tablet needs to run the client APK.
 
 ### Building Client APK
