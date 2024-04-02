@@ -1,4 +1,4 @@
-namespace Networking.screens
+namespace Networking.Screens
 {
     public static class Constants
     {
