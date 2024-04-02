@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Networking.screenExtension
+namespace Networking.screens
 {
     [Serializable]
     public struct Screen

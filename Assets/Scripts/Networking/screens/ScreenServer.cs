@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Networking.screenExtension
+namespace Networking.screens
 {
     public class ScreenServer : MonoBehaviour
     {

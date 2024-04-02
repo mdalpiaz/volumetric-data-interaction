@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Networking.screenExtension
+namespace Networking.screens
 {
     public class ScreenClient : MonoBehaviour
     {
