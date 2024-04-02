@@ -1,4 +1,4 @@
-namespace Networking
+namespace Networking.Tablet
 {
     public static class Categories
     {

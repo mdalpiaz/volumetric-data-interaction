@@ -10,7 +10,7 @@ using Snapshots;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Networking
+namespace Networking.Tablet
 {
     public class TabletServer : MonoBehaviour
     {

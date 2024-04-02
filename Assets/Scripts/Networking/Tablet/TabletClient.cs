@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Client;
 using UnityEngine;
 
-namespace Networking
+namespace Networking.Tablet
 {
     public class TabletClient : MonoBehaviour
     {

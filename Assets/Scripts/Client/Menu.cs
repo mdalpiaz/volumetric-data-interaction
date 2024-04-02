@@ -11,7 +11,7 @@ namespace Client
     public class Menu : MonoBehaviour
     {
         [SerializeField]
-        private Networking.TabletClient tabletClient;
+        private Networking.Tablet.TabletClient tabletClient;
         [SerializeField]
         private GameObject mainMenu;
         [SerializeField]
@@ -59,7 +59,7 @@ namespace Client
 
         private async Task HandleObjectSelected()
         {
-            // set object as gameobject in a specific script?
+            // set object as game object in a specific script?
             await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
         }
         
