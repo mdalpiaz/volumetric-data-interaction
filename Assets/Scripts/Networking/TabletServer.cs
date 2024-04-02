@@ -316,8 +316,8 @@ namespace Networking
             }
 
             var trackerTransform = tracker.transform;
-            var threshold = 20.0f;
-            var downAngle = 90.0f;
+            const float threshold = 20.0f;
+            const float downAngle = 90.0f;
 
             if (trackerTransform.eulerAngles.x <= downAngle + threshold && trackerTransform.eulerAngles.x >= downAngle - threshold)
             {
