@@ -1,11 +1,12 @@
-using System;
+#nullable enable
+
 using UnityEngine;
 
 namespace Networking
 {
     public class OnlineState : MonoBehaviour
     {
-        public static OnlineState Instance { get; private set; }
+        public static OnlineState Instance { get; private set; } = null!;
         
         [SerializeField]
         private bool isOnline;
