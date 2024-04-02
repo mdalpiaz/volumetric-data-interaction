@@ -24,12 +24,17 @@ namespace Client
 
         private void Start()
         {
-            _shakeTracker = new InputTracker();
-            _shakeTracker.Threshold = 5f;
+            _shakeTracker = new InputTracker
+            {
+                Threshold = 5f
+            };
 
-            _tiltTracker = new InputTracker();
-            _tiltTracker.Threshold = 1.3f;
-            _tiltTracker.TimeSinceLast = Time.unscaledTime;
+            _tiltTracker = new InputTracker
+            {
+                Threshold = 1.3f,
+                TimeSinceLast = Time.unscaledTime
+            };
+            
             _deviceGyroscope = Input.gyro;
             _deviceGyroscope.enabled = true;
         }
