@@ -3,16 +3,12 @@
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Client;
 using UnityEngine;
 
 namespace Networking.Tablet
 {
     public class TabletClient : MonoBehaviour
     {
-        [SerializeField]
-        private Menu menu = null!;
-        
         [SerializeField]
         private string ip = "127.0.0.1";
 
@@ -37,8 +33,6 @@ namespace Networking.Tablet
 
         private async void Start()
         {
-            menu.SwitchToMainMenu();
-            
             // the only command which can be received is "changing menu mode"
             var buffer = new byte[2];
             while (true)
@@ -83,16 +77,7 @@ namespace Networking.Tablet
             Buffer.BlockCopy(BitConverter.GetBytes(endPointX), 0, buffer, 2, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(endPointY), 0, buffer, 6, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(angle), 0, buffer, 10, sizeof(float));
-            var writeTask = _stream.WriteAsync(buffer);
-            
-            if (!inward)
-            {
-                return;
-            }
-            Debug.Log("Inward swipe, cancelling menu");
-
-            var cancelTask = menu.Cancel();
-            await Task.WhenAll(cancelTask, writeTask.AsTask());
+            await _stream.WriteAsync(buffer);
         }
 
         public async Task SendScaleMessage(float scale)
@@ -139,18 +124,7 @@ namespace Networking.Tablet
             buffer[1] = (byte)type;
             Buffer.BlockCopy(BitConverter.GetBytes(x), 0, buffer, 2, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(y), 0, buffer, 6, sizeof(float));
-            var writeTask = _stream.WriteAsync(buffer);
-            
-            if (TapType.HoldStart == type)
-            {
-                await menu.StartMapping();
-            }
-            else if (TapType.HoldEnd == type)
-            {
-                await menu.StopMapping();
-            }
-
-            await writeTask;
+            await _stream.WriteAsync(buffer);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Client
 {
@@ -10,9 +9,8 @@ namespace Client
     /// </summary>
     public class SpatialInput : MonoBehaviour
     {
-        [FormerlySerializedAs("client")]
-        [SerializeField]
-        private Networking.TabletClient tabletClient;
+        public event Action<int> Shook;
+        public event Action<bool> Tilted;
         
         private const float MinInputInterval = 0.2f; // 0.2sec - to avoid detecting multiple shakes per shake
         private int _shakeCounter;
@@ -65,7 +63,7 @@ namespace Client
         private void HandleShakeInput()
         {
             _shakeTracker.TimeSinceLast = Time.unscaledTime;
-            tabletClient.SendShakeMessage(_shakeCounter);
+            Shook?.Invoke(_shakeCounter);
         }
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace Client
 
                 _tiltTracker.TimeSinceLast = Time.unscaledTime;
 
-                tabletClient.SendTiltMessage(horizontalTilt > 0);
+                Tilted?.Invoke(horizontalTilt > 0);
             }
         }
     }

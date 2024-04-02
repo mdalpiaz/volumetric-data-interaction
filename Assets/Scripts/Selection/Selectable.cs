@@ -1,6 +1,6 @@
 ﻿using System;
 using Constants;
-using Networking;
+using Networking.Tablet;
 using UnityEngine;
 
 namespace Selection

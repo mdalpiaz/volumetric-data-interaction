@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Networking.Tablet;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,24 +12,51 @@ namespace Client
     public class Menu : MonoBehaviour
     {
         [SerializeField]
-        private Networking.Tablet.TabletClient tabletClient;
+        private TabletClient tabletClient;
+
+        [SerializeField]
+        private TouchInput touchInput;
+
+        [SerializeField]
+        private SpatialInput spatialInput;
+        
         [SerializeField]
         private GameObject mainMenu;
+        
         [SerializeField]
         private GameObject interactionMenu;
+        
         [SerializeField]
         private GameObject networkConfigMenu;
+        
         [SerializeField]
         private Text headerText;
+
+        private void Awake()
+        {
+            SwitchToMainMenu();
+        }
 
         private void OnEnable()
         {
             tabletClient.MenuModeChanged += HandleMenuModeChanged;
+            touchInput.Swiped += OnSwipe;
+            touchInput.Scaled += OnScale;
+            touchInput.Rotated += OnRotate;
+            touchInput.Tapped += OnTap;
+            spatialInput.Shook += OnShake;
+            spatialInput.Tilted += OnTilt;
         }
 
         private void OnDisable()
         {
             tabletClient.MenuModeChanged -= HandleMenuModeChanged;
+            touchInput.Swiped -= OnSwipe;
+            touchInput.Scaled -= OnScale;
+            touchInput.Rotated -= OnRotate;
+            touchInput.Tapped -= OnTap;
+            spatialInput.Shook -= OnShake;
+            spatialInput.Tilted -= OnTilt;
         }
 
         public async void OnSelectionClick()
@@ -46,7 +74,7 @@ namespace Client
             switch (mode)
             {
                 case MenuMode.Selected:
-                    await HandleObjectSelected();
+                    await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
                     break;
                 case MenuMode.None:
                     await Cancel();
@@ -56,14 +84,8 @@ namespace Client
                     break;
             }
         }
-
-        private async Task HandleObjectSelected()
-        {
-            // set object as game object in a specific script?
-            await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
-        }
         
-        public void SwitchToMainMenu()
+        private void SwitchToMainMenu()
         {
             mainMenu.SetActive(true);
             interactionMenu.SetActive(false);
@@ -77,17 +99,17 @@ namespace Client
             SwitchToInteractionMenu("Selection Mode");
         }
 
-        public async Task StartMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
-
-        public async Task StopMapping() => await HandleObjectSelected();
-
         private async Task StartAnalysis()
         {
             await tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
             SwitchToInteractionMenu("Analysis Mode");
         }
+        
+        private async Task StartMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
 
-        public async Task Cancel()
+        private async Task StopMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
+
+        private async Task Cancel()
         {
             await tabletClient.SendMenuChangedMessage(MenuMode.None);
             SwitchToMainMenu();
@@ -100,5 +122,32 @@ namespace Client
             networkConfigMenu.SetActive(false);
             headerText.text = header;
         }
+
+        private async void OnSwipe(bool inward, float endPointX, float endPointY, float angle)
+        {
+            var netTask = tabletClient.SendSwipeMessage(inward, endPointX, endPointY, angle);
+            var cancelTask = inward ? Cancel() : Task.CompletedTask;
+            await Task.WhenAll(netTask, cancelTask);
+        }
+
+        private async void OnScale(float scale) => await tabletClient.SendScaleMessage(scale);
+
+        private async void OnRotate(float angle) => await tabletClient.SendRotateMessage(angle);
+
+        private async void OnTap(TapType type, float x, float y)
+        {
+            if (TapType.HoldStart == type)
+            {
+                await StartMapping();
+            }
+            else if (TapType.HoldEnd == type)
+            {
+                await StopMapping();
+            }
+        }
+
+        private async void OnShake(int shakeCount) => await tabletClient.SendShakeMessage(shakeCount);
+
+        private async void OnTilt(bool isLeft) => await tabletClient.SendTiltMessage(isLeft);
     }
 }
