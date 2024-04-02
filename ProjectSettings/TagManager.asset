@@ -6,7 +6,6 @@ TagManager:
   tags:
   - Ray
   - Snapshot
-  - SnapshotNeighbour
   - Model
   layers:
   - Default
