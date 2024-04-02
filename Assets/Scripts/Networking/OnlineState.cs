@@ -8,9 +8,9 @@ namespace Networking
         public static OnlineState Instance { get; private set; }
         
         [SerializeField]
-        private bool online;
+        private bool isOnline;
 
-        public bool IsOnline => online;
+        public bool IsOnline => isOnline;
 
         private void Awake()
         {

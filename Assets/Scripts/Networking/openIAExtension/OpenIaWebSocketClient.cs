@@ -27,7 +27,7 @@ namespace Networking.openIAExtension
 
         private async void Start()
         {
-            if (!OnlineState.Instance.Online)
+            if (!OnlineState.Instance.IsOnline)
             {
                 return;
             }
@@ -61,7 +61,7 @@ namespace Networking.openIAExtension
 
         private void OnDestroy()
         {
-            if (!OnlineState.Instance.Online)
+            if (!OnlineState.Instance.IsOnline)
             {
                 return;
             }
