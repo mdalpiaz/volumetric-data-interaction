@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using UnityEngine;
 
 namespace Client
@@ -9,16 +11,16 @@ namespace Client
     /// </summary>
     public class SpatialInput : MonoBehaviour
     {
-        public event Action<int> Shook;
-        public event Action<bool> Tilted;
+        public event Action<int>? Shook;
+        public event Action<bool>? Tilted;
         
         private const float MinInputInterval = 0.2f; // 0.2sec - to avoid detecting multiple shakes per shake
         private int _shakeCounter;
 
-        private InputTracker _shakeTracker;
-        private InputTracker _tiltTracker;
+        private InputTracker _shakeTracker = null!;
+        private InputTracker _tiltTracker = null!;
 
-        private Gyroscope _deviceGyroscope;
+        private Gyroscope _deviceGyroscope = null!;
 
         private void Start()
         {
