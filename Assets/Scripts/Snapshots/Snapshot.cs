@@ -136,7 +136,7 @@ namespace Snapshots
             PlaneCoordinates = slicePlane.SlicePlaneCoordinates;
 
             // value is unity coordinates
-            var boxColliderSize = model.GetComponent<BoxCollider>().size;
+            var boxColliderSize = model.BoxCollider.size;
             var gameDimensionKey = boxColliderSize.z / model.XCount;
             var scaledValue = model.transform.localScale.x * value * gameDimensionKey;
             var originPosition = OriginPlane.transform.position;
