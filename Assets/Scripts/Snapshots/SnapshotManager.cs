@@ -8,8 +8,8 @@ using Constants;
 using Helper;
 using Model;
 using Networking;
-using Networking.openIAExtension;
-using Networking.openIAExtension.Commands;
+using Networking.openIA;
+using Networking.openIA.Commands;
 using UnityEngine;
 
 namespace Snapshots
