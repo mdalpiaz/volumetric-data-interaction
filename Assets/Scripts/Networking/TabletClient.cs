@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Networking
 {
-    public class Client : MonoBehaviour
+    public class TabletClient : MonoBehaviour
     {
         [SerializeField]
         private Menu menu = null!;

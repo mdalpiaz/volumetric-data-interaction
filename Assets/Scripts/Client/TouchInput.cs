@@ -1,6 +1,6 @@
-﻿using System;
-using DigitalRubyShared;
+﻿using DigitalRubyShared;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Client
 {
@@ -10,8 +10,9 @@ namespace Client
     /// </summary>
     public class TouchInput : MonoBehaviour
     {
+        [FormerlySerializedAs("client")]
         [SerializeField]
-        private Networking.Client client;
+        private Networking.TabletClient tabletClient;
 
         private TapGestureRecognizer tapGesture;
         private TapGestureRecognizer doubleTapGesture;
@@ -69,7 +70,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                client.SendTapMessage(TapType.Single, gesture.FocusX, gesture.FocusY);
+                tabletClient.SendTapMessage(TapType.Single, gesture.FocusX, gesture.FocusY);
             }
         }
 
@@ -77,7 +78,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                client.SendTapMessage(TapType.Double, gesture.FocusX, gesture.FocusY);
+                tabletClient.SendTapMessage(TapType.Double, gesture.FocusX, gesture.FocusY);
             }
         }
 
@@ -96,7 +97,7 @@ namespace Client
                     //var angle = Math.Atan2(Screen.height / 2.0 - gesture.FocusY, gesture.FocusX -  Screen.width / 2.0) * Mathf.Rad2Deg;
                     var angle = Mathf.Atan2(gesture.StartFocusY - gesture.FocusY, gesture.FocusX - gesture.StartFocusX) * Mathf.Rad2Deg;
                     Debug.Log($"Swipe angle: {angle}, is inward: {isInwardSwipe}");
-                    client.SendSwipeMessage(isInwardSwipe, gesture.FocusX, gesture.FocusY, angle);
+                    tabletClient.SendSwipeMessage(isInwardSwipe, gesture.FocusX, gesture.FocusY, angle);
                 //}
             }
         }
@@ -105,7 +106,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Executing)
             {
-                client.SendScaleMessage(scaleGesture.ScaleMultiplier);
+                tabletClient.SendScaleMessage(scaleGesture.ScaleMultiplier);
             }
         }
 
@@ -113,7 +114,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Executing)
             {
-                client.SendRotateMessage(rotateGesture.RotationRadiansDelta * -1);
+                tabletClient.SendRotateMessage(rotateGesture.RotationRadiansDelta * -1);
             }
         }
 
@@ -128,10 +129,10 @@ namespace Client
             switch (gesture.State)
             {
                 case GestureRecognizerState.Began:
-                    client.SendTapMessage(TapType.HoldStart, xUV, yUV);
+                    tabletClient.SendTapMessage(TapType.HoldStart, xUV, yUV);
                     break;
                 case GestureRecognizerState.Ended:
-                    client.SendTapMessage(TapType.HoldEnd, xUV, yUV);
+                    tabletClient.SendTapMessage(TapType.HoldEnd, xUV, yUV);
                     break;
             }
         }

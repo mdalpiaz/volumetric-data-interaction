@@ -12,7 +12,7 @@ namespace Selection.Editor
 
         private void OnEnable()
         {
-            _method = typeof(Host).GetMethod("HandleTap", BindingFlags.NonPublic | BindingFlags.Instance);
+            _method = typeof(TabletServer).GetMethod("HandleTap", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public override void OnInspectorGUI()
@@ -23,8 +23,8 @@ namespace Selection.Editor
 
             if (GUILayout.Button("Select"))
             {
-                Host.Instance.Highlighted = (Selectable)serializedObject.targetObject;
-                _method.Invoke(Host.Instance, new object[] { TapType.Double, 0.0f, 0.0f });
+                TabletServer.Instance.Highlighted = (Selectable)serializedObject.targetObject;
+                _method.Invoke(TabletServer.Instance, new object[] { TapType.Double, 0.0f, 0.0f });
             }
 
             serializedObject.ApplyModifiedProperties();

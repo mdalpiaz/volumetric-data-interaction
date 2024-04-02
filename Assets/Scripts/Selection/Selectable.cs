@@ -67,12 +67,12 @@ namespace Selection
         /// </summary>
         private void OnTriggerEnter(Collider other)
         {
-            if (Host.Instance.Highlighted != null || !other.CompareTag(Tags.Ray))
+            if (TabletServer.Instance.Highlighted != null || !other.CompareTag(Tags.Ray))
             {
                 return;
             }
 
-            Host.Instance.Highlighted = this;
+            TabletServer.Instance.Highlighted = this;
             IsHighlighted = true;
         }
 
@@ -83,7 +83,7 @@ namespace Selection
                 return;
             }
 
-            Host.Instance.Highlighted = null;
+            TabletServer.Instance.Highlighted = null;
             IsHighlighted = false;
         }
 

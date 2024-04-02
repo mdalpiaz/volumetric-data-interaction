@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Client
@@ -9,8 +10,9 @@ namespace Client
     /// </summary>
     public class Menu : MonoBehaviour
     {
+        [FormerlySerializedAs("client")]
         [SerializeField]
-        private Networking.Client client;
+        private Networking.TabletClient tabletClient;
         [SerializeField]
         private GameObject mainMenu;
         [SerializeField]
@@ -22,12 +24,12 @@ namespace Client
 
         private void OnEnable()
         {
-            client.MenuModeChanged += HandleMenuModeChanged;
+            tabletClient.MenuModeChanged += HandleMenuModeChanged;
         }
 
         private void OnDisable()
         {
-            client.MenuModeChanged -= HandleMenuModeChanged;
+            tabletClient.MenuModeChanged -= HandleMenuModeChanged;
         }
 
         private void HandleMenuModeChanged(MenuMode mode)
@@ -49,7 +51,7 @@ namespace Client
         private void HandleObjectSelected()
         {
             // set object as gameobject in a specific script?
-            client.SendMenuChangedMessage(MenuMode.Selected);
+            tabletClient.SendMenuChangedMessage(MenuMode.Selected);
         }
         
         public void SwitchToMainMenu()
@@ -62,27 +64,27 @@ namespace Client
         public void StartSelection()
         {
             Debug.Log("Selection");
-            client.SendMenuChangedMessage(MenuMode.Selection);
+            tabletClient.SendMenuChangedMessage(MenuMode.Selection);
             SwitchToInteractionMenu("Selection Mode");
         }
 
-        public void StartMapping() => client.SendMenuChangedMessage(MenuMode.Mapping);
+        public void StartMapping() => tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
 
         public void StopMapping()
         {
-            client.SendTextMessage("Stopped mapping");
+            tabletClient.SendTextMessage("Stopped mapping");
             HandleObjectSelected();
         }
 
         public void StartAnalysis()
         {
-            client.SendMenuChangedMessage(MenuMode.Analysis);
+            tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
             SwitchToInteractionMenu("Analysis Mode");
         }
 
         public void Cancel()
         {
-            client.SendMenuChangedMessage(MenuMode.None);
+            tabletClient.SendMenuChangedMessage(MenuMode.None);
             SwitchToMainMenu();
         }
 

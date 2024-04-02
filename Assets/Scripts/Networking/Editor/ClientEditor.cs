@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Networking.Editor
 {
-    [CustomEditor(typeof(Client))]
+    [CustomEditor(typeof(TabletClient))]
     public class ClientEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
-            var client = (Client)target;
+            var client = (TabletClient)target;
 
             DrawDefaultInspector();
 

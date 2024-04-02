@@ -12,9 +12,9 @@ using UnityEngine;
 
 namespace Networking
 {
-    public class Host : MonoBehaviour
+    public class TabletServer : MonoBehaviour
     {
-        public static Host Instance { get; private set; } = null!;
+        public static TabletServer Instance { get; private set; } = null!;
         
         [SerializeField]
         private InterfaceController ui = null!;
