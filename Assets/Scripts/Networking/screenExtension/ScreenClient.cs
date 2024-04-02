@@ -12,7 +12,7 @@ namespace Networking.screenExtension
         private string ip = "127.0.0.1";
 
         [SerializeField]
-        private short port = 8642;
+        private int port = Ports.ScreenPort;
 
         [SerializeField]
         private int id = 1;

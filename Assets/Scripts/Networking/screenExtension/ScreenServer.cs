@@ -13,7 +13,7 @@ namespace Networking.screenExtension
         private const float ConeAngleDegree = 30.0f;
         
         [SerializeField]
-        private int port = 8642;
+        private int port = Ports.ScreenPort;
 
         [SerializeField]
         private List<Screen> screens = new();
