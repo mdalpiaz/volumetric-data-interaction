@@ -130,6 +130,9 @@ To run the client, you need to know the hosts IP-address.
 To show the IPv4 addresses on an Windows PC, open up any command line (Win + R and type `cmd`) and run `ipconfig`. Choose the address which belongs to the network where both the host and the client are connected to.  
 Enter the address in the client to connect.
 
+> [!IMPORTANT]
+> Make sure in the OnlineState object, you enable `IsOnline`, as other components use this flag to check if the openIA service should be used.
+
 ### Change Model
 
 The default sewing machine model will serve as a template for new models.  
