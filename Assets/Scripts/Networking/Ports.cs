@@ -2,7 +2,7 @@ namespace Networking
 {
     public static class Ports
     {
-        public const ushort TabletPort = 8642;
-        public const ushort ScreenPort = 8643;
+        public const int TabletPort = 8642;
+        public const int ScreenPort = 8643;
     }
 }
