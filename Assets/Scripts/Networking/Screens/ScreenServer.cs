@@ -18,8 +18,6 @@ namespace Networking.Screens
         [SerializeField]
         private List<Screen> screens = new();
 
-        private bool _running;
-        
         private TcpListener _server;
 
         private readonly Dictionary<int, (TcpClient, NetworkStream)> _clients = new();
@@ -32,25 +30,30 @@ namespace Networking.Screens
 
         private async void Start()
         {
-            _running = true;
             _server.Start();
             Debug.Log($"Screen server started on port {port}.");
 
-            while (_running)
+            while (true)
             {
-                var client = await _server.AcceptTcpClientAsync();
-                var stream = client.GetStream();
-                var buffer = new byte[4];
-                _ = await stream.ReadAsync(buffer, 0, 4);
-                var id = BitConverter.ToInt32(buffer);
-                _clients.Add(id, (client, stream));
-                Debug.Log($"Client {id} connected");
+                try
+                {
+                    var client = await _server.AcceptTcpClientAsync();
+                    var stream = client.GetStream();
+                    var buffer = new byte[4];
+                    _ = await stream.ReadAsync(buffer, 0, 4);
+                    var id = BitConverter.ToInt32(buffer);
+                    _clients.Add(id, (client, stream));
+                    Debug.Log($"Client {id} connected");
+                }
+                catch
+                {
+                    break;
+                }
             }
         }
 
         private void OnDestroy()
         {
-            _running = false;
             foreach (var (_, (c, _)) in _clients)
             {
                 c.Close();
