@@ -23,6 +23,7 @@ Keywords: `Augmented Reality`, `Volumetric Data`, `Surface Data`, `Touch Input`,
     - [Change Model](#change-model)
     - [Change Cutting Plane Image Path](#change-cutting-plane-image-path)
     - [Change Tablet Sensitivity](#change-tablet-sensitivity)
+  - [Setup for Debugging](#setup-for-debugging)
 
 The basis of this application was developed in the course of a master thesis which is available at the HIVE website: [Link](https://hive.fh-hagenberg.at/wp-content/uploads/2022/10/Master-Thesis_v.1.23.pdf)
 
@@ -147,3 +148,18 @@ Set the path of the folder to the model prefab as described in section [`Change 
 ### Change Tablet Sensitivity
 
 The thresholds for the configuration of the tablet sensitivities can be changed in the `SpatialInput` and `TouchInput` scripts. To do this either an input field can be implemented on the client UI to change the threshold during run time. The other option is the trial and error way. After the thresholds are changed, the application needs to be rebuilt and redeployed to the tablet. This process can be bothersome as multiple configurations need to be tried.
+
+## Setup for Debugging
+
+The prototype should enable simple debugging.
+
+Find the `ViewModeSetter` in the hierarchy and set the `View Mode` to Display.  
+Find the `Tracker` in the hierarchy and disable the `Tracked Pose Driver`. You can now freely move the tracker.
+
+You can now start interacting with the prototype without a VR/AR Headset.  
+Every gameobject needed was supplied with custom editor buttons to trigger actions.
+
+- Host: This is the networking component, which handles connections between the tablet and the prototype. The buttons in the editor can be used to simulate its actions.
+- SnapshotManager: This gameobject handles snapshots and can be used to toggle attachment of snapshots to the tablet.
+
+Selection can be done with the objects themselves. Every object which contains the `Selectable` component (Snapshots, Model) have a custom button to select them.
