@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Serialization;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Client
@@ -10,7 +10,6 @@ namespace Client
     /// </summary>
     public class Menu : MonoBehaviour
     {
-        [FormerlySerializedAs("client")]
         [SerializeField]
         private Networking.TabletClient tabletClient;
         [SerializeField]
@@ -32,15 +31,25 @@ namespace Client
             tabletClient.MenuModeChanged -= HandleMenuModeChanged;
         }
 
-        private void HandleMenuModeChanged(MenuMode mode)
+        public async void OnSelectionClick()
+        {
+            await StartSelection();
+        }
+        
+        public async void OnAnalysisClick()
+        {
+            await StartAnalysis();
+        }
+        
+        private async void HandleMenuModeChanged(MenuMode mode)
         {
             switch (mode)
             {
                 case MenuMode.Selected:
-                    HandleObjectSelected();
+                    await HandleObjectSelected();
                     break;
                 case MenuMode.None:
-                    Cancel();
+                    await Cancel();
                     break;
                 default:
                     Debug.Log($"{nameof(HandleMenuModeChanged)} received unknown menu mode: {mode}");
@@ -48,10 +57,10 @@ namespace Client
             }
         }
 
-        private void HandleObjectSelected()
+        private async Task HandleObjectSelected()
         {
             // set object as gameobject in a specific script?
-            tabletClient.SendMenuChangedMessage(MenuMode.Selected);
+            await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
         }
         
         public void SwitchToMainMenu()
@@ -61,30 +70,26 @@ namespace Client
             networkConfigMenu.SetActive(false);
         }
         
-        public void StartSelection()
+        private async Task StartSelection()
         {
             Debug.Log("Selection");
-            tabletClient.SendMenuChangedMessage(MenuMode.Selection);
+            await tabletClient.SendMenuChangedMessage(MenuMode.Selection);
             SwitchToInteractionMenu("Selection Mode");
         }
 
-        public void StartMapping() => tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
+        public async Task StartMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
 
-        public void StopMapping()
-        {
-            tabletClient.SendTextMessage("Stopped mapping");
-            HandleObjectSelected();
-        }
+        public async Task StopMapping() => await HandleObjectSelected();
 
-        public void StartAnalysis()
+        private async Task StartAnalysis()
         {
-            tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
+            await tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
             SwitchToInteractionMenu("Analysis Mode");
         }
 
-        public void Cancel()
+        public async Task Cancel()
         {
-            tabletClient.SendMenuChangedMessage(MenuMode.None);
+            await tabletClient.SendMenuChangedMessage(MenuMode.None);
             SwitchToMainMenu();
         }
 

@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
 using System;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using Client;
 using UnityEngine;
 
@@ -10,139 +12,145 @@ namespace Networking
     {
         [SerializeField]
         private Menu menu = null!;
+        
+        [SerializeField]
+        private string ip = "127.0.0.1";
 
-        private Player? _player;
+        [SerializeField]
+        private int port = Ports.TabletPort;
+        
+        private TcpClient _tcpClient = null!;
+        private NetworkStream _stream = null!;
+        
         public event Action<MenuMode>? MenuModeChanged;
 
-        private void OnEnable()
+        private void Awake()
         {
-            PlayerConnectedNotifier.OnPlayerConnected += HandlePlayerConnected;
+            _tcpClient = new TcpClient();
+        }
+
+        private async void OnEnable()
+        {
+            await _tcpClient.ConnectAsync(ip, port);
+            _stream = _tcpClient.GetStream();
+        }
+
+        private async void Start()
+        {
+            menu.SwitchToMainMenu();
+            
+            // the only command which can be received is "changing menu mode"
+            var buffer = new byte[2];
+            while (true)
+            {
+                try
+                {
+                    // ReSharper disable once MustUseReturnValue
+                    await _stream.ReadAsync(buffer, 0, 2);
+                }
+                catch
+                {
+                    break;
+                }
+                if (buffer[0] != Categories.MenuMode)
+                {
+                    Debug.LogWarning("Unsupported command was received!");
+                    continue;
+                }
+                MenuModeChanged?.Invoke((MenuMode)buffer[1]);
+            }
         }
 
         private void OnDisable()
         {
-            PlayerConnectedNotifier.OnPlayerConnected -= HandlePlayerConnected;
-            if (_player == null)
-            {
-                return;
-            }
-            _player.ClientMenuModeChanged -= HandleMenuChange;
+            _tcpClient.Close();
         }
 
-        public void SendMenuChangedMessage(MenuMode mode)
+        public async Task SendMenuChangedMessage(MenuMode mode)
         {
-            if (_player == null)
-            {
-                return;
-            }
             Debug.Log($"Sending menu change: {mode}");
-            _player.MenuModeServerRpc(mode);
+            var buffer = new byte[2];
+            buffer[0] = Categories.MenuMode;
+            buffer[1] = (byte)mode;
+            await _stream.WriteAsync(buffer);
         }
 
-        public void SendSwipeMessage(bool inward, float endPointX, float endPointY, float angle)
+        public async Task SendSwipeMessage(bool inward, float endPointX, float endPointY, float angle)
         {
-            if (_player != null)
-            {
-                Debug.Log($"Sending swipe: inward: {inward}, ({endPointX},{endPointY}) -> {angle}°");
-                _player.SwipeServerRpc(inward, endPointX, endPointY, angle);
-                _player.TextServerRpc("Cancel initiated from client");
-            }
-
+            var buffer = new byte[14];
+            buffer[0] = Categories.Swipe;
+            buffer[1] = BitConverter.GetBytes(inward)[0];
+            Buffer.BlockCopy(BitConverter.GetBytes(endPointX), 0, buffer, 2, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(endPointY), 0, buffer, 6, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(angle), 0, buffer, 10, sizeof(float));
+            var writeTask = _stream.WriteAsync(buffer);
+            
             if (!inward)
             {
                 return;
             }
             Debug.Log("Inward swipe, cancelling menu");
-            menu.Cancel();
+
+            var cancelTask = menu.Cancel();
+            await Task.WhenAll(cancelTask, writeTask.AsTask());
         }
 
-        public void SendScaleMessage(float scale)
+        public async Task SendScaleMessage(float scale)
         {
-            if (_player == null)
-            {
-                return;
-            }
             Debug.Log($"Sending scale: {scale}");
-            _player.ScaleServerRpc(scale);
+            var buffer = new byte[5];
+            buffer[0] = Categories.Scale;
+            Buffer.BlockCopy(BitConverter.GetBytes(scale), 0, buffer, 1, sizeof(float));
+            await _stream.WriteAsync(buffer);
         }
 
-        public void SendRotateMessage(float rotation)
+        public async Task SendRotateMessage(float rotation)
         {
-            if (_player == null)
-            {
-                return;
-            }
             Debug.Log($"Sending rotation: {rotation}");
-            _player.RotateServerRpc(rotation);
+            var buffer = new byte[5];
+            buffer[0] = Categories.Rotate;
+            Buffer.BlockCopy(BitConverter.GetBytes(rotation), 0, buffer, 1, sizeof(float));
+            await _stream.WriteAsync(buffer);
         }
 
-        public void SendTiltMessage(bool isLeft)
+        public async Task SendTiltMessage(bool isLeft)
         {
-            if (_player == null)
-            {
-                return;
-            }
             Debug.Log($"Sending tilt {(isLeft ? "left" : "right")}");
-            _player.TiltServerRpc(isLeft);
+            var buffer = new byte[2];
+            buffer[0] = Categories.Tilt;
+            buffer[1] = BitConverter.GetBytes(isLeft)[0];
+            await _stream.WriteAsync(buffer);
         }
 
-        public void SendShakeMessage(int count)
+        public async Task SendShakeMessage(int count)
         {
-            if (_player == null)
-            {
-                return;
-            }
             Debug.Log($"Sending shake: {count}");
-            _player.ShakeServerRpc(count);
+            var buffer = new byte[5];
+            buffer[0] = Categories.Shake;
+            Buffer.BlockCopy(BitConverter.GetBytes(count), 0, buffer, 1, sizeof(int));
+            await _stream.WriteAsync(buffer);
         }
 
-        public void SendTapMessage(TapType type, float x, float y)
+        public async Task SendTapMessage(TapType type, float x, float y)
         {
-            if (_player != null)
-            {
-                Debug.Log($"Sending tap: {type} at ({x},{y})");
-                _player.TapServerRpc(type, x, y);
-            }
-
+            Debug.Log($"Sending tap: {type} at ({x},{y})");
+            var buffer = new byte[10];
+            buffer[0] = Categories.Tap;
+            buffer[1] = (byte)type;
+            Buffer.BlockCopy(BitConverter.GetBytes(x), 0, buffer, 2, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(y), 0, buffer, 6, sizeof(float));
+            var writeTask = _stream.WriteAsync(buffer);
+            
             if (TapType.HoldStart == type)
             {
-                menu.StartMapping();
+                await menu.StartMapping();
             }
             else if (TapType.HoldEnd == type)
             {
-                menu.StopMapping();
+                await menu.StopMapping();
             }
-        }
 
-        public void SendTextMessage(string text)
-        {
-            if (_player == null)
-            {
-                return;
-            }
-            Debug.Log($"Sending a debug text message: {text}");
-            _player.TextServerRpc(text);
+            await writeTask;
         }
-
-        private void HandlePlayerConnected(Player p)
-        {
-            if (p == null)
-            {
-                Debug.LogWarning("Connected player is null!");
-                return;
-            }
-            if (!p.IsLocalPlayer)
-            {
-                Debug.Log("Connected player is not local player. Player will be ignored.");
-                return;
-            }
-            Debug.Log("Local player connected");
-            
-            _player = p;
-            _player.ClientMenuModeChanged += HandleMenuChange;
-            menu.SwitchToMainMenu();
-        }
-        
-        private void HandleMenuChange(MenuMode mode) => MenuModeChanged?.Invoke(mode);
     }
 }
