@@ -41,7 +41,7 @@ namespace Networking.Screens
                 var client = await _server.AcceptTcpClientAsync();
                 var stream = client.GetStream();
                 var buffer = new byte[4];
-                var bytes = await stream.ReadAsync(buffer, 0, 4);
+                _ = await stream.ReadAsync(buffer, 0, 4);
                 var id = BitConverter.ToInt32(buffer);
                 _clients.Add(id, (client, stream));
                 Debug.Log($"Client {id} connected");
