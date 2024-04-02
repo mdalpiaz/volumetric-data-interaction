@@ -1,5 +1,9 @@
 ﻿#nullable enable
 
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using Extensions;
 using Helper;
 using Model;
@@ -7,7 +11,6 @@ using Networking.Screens;
 using Slicing;
 using Selection;
 using Snapshots;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Networking.Tablet
@@ -32,12 +35,15 @@ namespace Networking.Tablet
         private GameObject tablet = null!;
         
         [SerializeField]
-        private NetworkManager netMan = null!;
-
+        private int port = Ports.TabletPort;
+        
         [SerializeField]
         private ScreenServer screenServer = null!;
+        
+        private TcpListener _server = null!;
+        private TcpClient _tabletClient = null!;
+        private NetworkStream _tabletStream = null!;
 
-        private Player? _player;
         private MenuMode _menuMode;
         
         private Selectable? _selected;
@@ -73,6 +79,7 @@ namespace Networking.Tablet
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
+                _server = new TcpListener(IPAddress.Loopback, port);
             }
             else
             {
@@ -80,71 +87,95 @@ namespace Networking.Tablet
             }
         }
 
-        private void OnEnable()
+        private async void OnEnable()
         {
-            PlayerConnectedNotifier.OnPlayerConnected += HandlePlayerConnected;
+            _server.Start();
+            _tabletClient = await _server.AcceptTcpClientAsync();
+            _tabletStream = _tabletClient.GetStream();
         }
 
-        private void Start()
+        private async void Start()
         {
-            netMan.StartHost();
             ray.SetActive(false);
 
             Selected = ModelManager.Instance.CurrentModel.Selectable;
+
+            var commandIdentifier = new byte[1];
+            while (true)
+            {
+                try
+                {
+                    await _tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
+                    switch (commandIdentifier[0])
+                    {
+                        case Categories.MenuMode:
+                        {
+                            var buffer = new byte[1];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleModeChange((MenuMode)buffer[0]);
+                            break;
+                        }
+                        case Categories.Swipe:
+                        {
+                            var buffer = new byte[13];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleSwipe(BitConverter.ToBoolean(buffer, 0),
+                                BitConverter.ToSingle(buffer, 1),
+                                BitConverter.ToSingle(buffer, 5),
+                                BitConverter.ToSingle(buffer, 9));
+                            break;
+                        }
+                        case Categories.Scale:
+                        {
+                            var buffer = new byte[4];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleScaling(BitConverter.ToSingle(buffer, 0));
+                            break;
+                        }
+                        case Categories.Rotate:
+                        {
+                            var buffer = new byte[4];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleRotation(BitConverter.ToSingle(buffer, 0));
+                            break;
+                        }
+                        case Categories.Tilt:
+                        {
+                            var buffer = new byte[1];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleTilt(BitConverter.ToBoolean(buffer, 0));
+                            break;
+                        }
+                        case Categories.Shake:
+                        {
+                            var buffer = new byte[4];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleShakes(BitConverter.ToInt32(buffer, 0));
+                            break;
+                        }
+                        case Categories.Tap:
+                        {
+                            var buffer = new byte[9];
+                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
+                            HandleTap((TapType)buffer[0],
+                                BitConverter.ToSingle(buffer, 1),
+                                BitConverter.ToSingle(buffer, 5));
+                            break;
+                        }
+                    }
+                }
+                catch
+                {
+                    break;
+                }
+            }
         }
 
         private void OnDisable()
         {
-            PlayerConnectedNotifier.OnPlayerConnected -= HandlePlayerConnected;
-            if (_player != null)
-            {
-                DeregisterPlayerCallbacks(_player);
-            }
+            _tabletClient.Close();
+            _server.Stop();
         }
-
-        private void HandlePlayerConnected(Player p)
-        {
-            // don't register itself
-            if (p.IsLocalPlayer)
-            {
-                return;
-            }
-
-            if (_player != null)
-            {
-                Debug.LogWarning("Another player tried to register itself! There should only be one further player!");
-                return;
-            }
-            Debug.Log("New player connected");
-            RegisterPlayerCallbacks(p);
-            _player = p;
-        }
-
-        private void RegisterPlayerCallbacks(Player p)
-        {
-            p.ModeChanged += HandleModeChange;
-            p.ShakeCompleted += HandleShakes;
-            p.Tilted += HandleTilt;
-            p.Tapped += HandleTap;
-            p.Swiped += HandleSwipe;
-            p.Scaled += HandleScaling;
-            p.Rotated += HandleRotation;
-            p.TextReceived += HandleText;
-        }
-
-        private void DeregisterPlayerCallbacks(Player p)
-        {
-            p.ModeChanged -= HandleModeChange;
-            p.ShakeCompleted -= HandleShakes;
-            p.Tilted -= HandleTilt;
-            p.Tapped -= HandleTap;
-            p.Swiped -= HandleSwipe;
-            p.Scaled -= HandleScaling;
-            p.Rotated -= HandleRotation;
-            p.TextReceived -= HandleText;
-        }
-        
-        #region Player Callbacks
         
         private void HandleModeChange(MenuMode mode)
         {
@@ -195,7 +226,7 @@ namespace Networking.Tablet
             _menuMode = mode;
         }
         
-        private void HandleShakes(int shakeCount)
+        private async void HandleShakes(int shakeCount)
         {
             if (shakeCount <= 1) // one shake can happen unintentionally
             {
@@ -217,7 +248,7 @@ namespace Networking.Tablet
             }
 
             HandleModeChange(MenuMode.None);
-            if (_player != null) _player.MenuModeClientRpc(MenuMode.None);
+            await SendMenuModeToClient(MenuMode.None);
         }
 
         private void HandleTilt(bool isLeft)
@@ -234,7 +265,7 @@ namespace Networking.Tablet
             }
         }
 
-        private void HandleTap(TapType type, float x, float y)
+        private async void HandleTap(TapType type, float x, float y)
         {
             switch(type)
             {
@@ -251,7 +282,7 @@ namespace Networking.Tablet
                         ray.SetActive(false);
                         Highlighted = null;
 
-                        if (_player != null) _player.MenuModeClientRpc(MenuMode.Selected);
+                        await SendMenuModeToClient(MenuMode.Selected);
                         HandleModeChange(MenuMode.Selected);
                     }
                     else if (_menuMode == MenuMode.Analysis)
@@ -334,11 +365,7 @@ namespace Networking.Tablet
                 Selected.transform.Rotate(Vector3.forward, rotationRadDelta * Mathf.Rad2Deg);
             }
         }
-
-        private static void HandleText(string text) => Debug.Log($"Text received: {text}");
         
-        #endregion
-
         private void Unselect()
         {
             if (Highlighted != null)
@@ -354,6 +381,14 @@ namespace Networking.Tablet
             _selected = null;
             Highlighted = null;
             ui.SetMode(MenuMode.None);
+        }
+
+        private async Task SendMenuModeToClient(MenuMode mode)
+        {
+            var buffer = new byte[2];
+            buffer[0] = Categories.MenuMode;
+            buffer[1] = (byte)mode;
+            await _tabletStream.WriteAsync(buffer);
         }
     }
 }
