@@ -12,7 +12,7 @@ namespace Snapshots.Editor
             
             DrawDefaultInspector();
 
-            if (GUILayout.Button("Toggle Alignment"))
+            if (GUILayout.Button("Toggle Snapshots Attached"))
             {
                 var sm = (SnapshotManager)serializedObject.targetObject;
                 sm.ToggleSnapshotsAttached();
