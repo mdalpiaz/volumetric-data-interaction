@@ -39,8 +39,7 @@ namespace Networking.Tablet
             {
                 try
                 {
-                    // ReSharper disable once MustUseReturnValue
-                    await _stream.ReadAsync(buffer, 0, 2);
+                    _ = await _stream.ReadAsync(buffer, 0, 2);
                 }
                 catch
                 {
