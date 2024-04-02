@@ -319,14 +319,13 @@ namespace Networking
             const float threshold = 20.0f;
             const float downAngle = 90.0f;
 
-            if (trackerTransform.eulerAngles.x <= downAngle + threshold && trackerTransform.eulerAngles.x >= downAngle - threshold)
+            if (trackerTransform.eulerAngles.x is >= downAngle - threshold and <= downAngle + threshold)
             {
                 Selected.transform.Rotate(0.0f, rotationRadDelta * Mathf.Rad2Deg, 0.0f);
                 return;
             }
 
-            if (trackerTransform.rotation.x <= 30f && 0f <= trackerTransform.rotation.x ||
-                trackerTransform.rotation.x <= 160f && 140f <= trackerTransform.rotation.x)
+            if (trackerTransform.rotation.x is >= 0f and <= 30f or >= 140f and <= 160f)
             {
                 Selected.transform.Rotate(Vector3.up, -rotationRadDelta * Mathf.Rad2Deg);
             }
