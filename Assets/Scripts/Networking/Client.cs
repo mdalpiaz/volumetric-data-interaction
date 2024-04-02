@@ -1,6 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using Client;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Networking
@@ -8,10 +9,10 @@ namespace Networking
     public class Client : MonoBehaviour
     {
         [SerializeField]
-        private Menu menu;
+        private Menu menu = null!;
 
-        [CanBeNull] private Player _player;
-        public event Action<MenuMode> MenuModeChanged;
+        private Player? _player;
+        public event Action<MenuMode>? MenuModeChanged;
 
         private void OnEnable()
         {
@@ -30,11 +31,12 @@ namespace Networking
 
         public void SendMenuChangedMessage(MenuMode mode)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending menu change: {mode}");
-                _player.MenuModeServerRpc(mode);
+                return;
             }
+            Debug.Log($"Sending menu change: {mode}");
+            _player.MenuModeServerRpc(mode);
         }
 
         public void SendSwipeMessage(bool inward, float endPointX, float endPointY, float angle)
@@ -46,47 +48,52 @@ namespace Networking
                 _player.TextServerRpc("Cancel initiated from client");
             }
 
-            if (inward)
+            if (!inward)
             {
-                Debug.Log("Inward swipe, cancelling menu");
-                menu.Cancel();
+                return;
             }
+            Debug.Log("Inward swipe, cancelling menu");
+            menu.Cancel();
         }
 
         public void SendScaleMessage(float scale)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending scale: {scale}");
-                _player.ScaleServerRpc(scale);
+                return;
             }
+            Debug.Log($"Sending scale: {scale}");
+            _player.ScaleServerRpc(scale);
         }
 
         public void SendRotateMessage(float rotation)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending rotation: {rotation}");
-                _player.RotateServerRpc(rotation);
+                return;
             }
+            Debug.Log($"Sending rotation: {rotation}");
+            _player.RotateServerRpc(rotation);
         }
 
         public void SendTiltMessage(bool isLeft)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending tilt {(isLeft ? "left" : "right")}");
-                _player.TiltServerRpc(isLeft);
+                return;
             }
+            Debug.Log($"Sending tilt {(isLeft ? "left" : "right")}");
+            _player.TiltServerRpc(isLeft);
         }
 
         public void SendShakeMessage(int count)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending shake: {count}");
-                _player.ShakeServerRpc(count);
+                return;
             }
+            Debug.Log($"Sending shake: {count}");
+            _player.ShakeServerRpc(count);
         }
 
         public void SendTapMessage(TapType type, float x, float y)
@@ -97,24 +104,24 @@ namespace Networking
                 _player.TapServerRpc(type, x, y);
             }
 
-            switch (type)
+            if (TapType.HoldStart == type)
             {
-                case TapType.HoldStart:
-                    menu.StartMapping();
-                    break;
-                case TapType.HoldEnd:
-                    menu.StopMapping();
-                    break;
+                menu.StartMapping();
+            }
+            else if (TapType.HoldEnd == type)
+            {
+                menu.StopMapping();
             }
         }
 
         public void SendTextMessage(string text)
         {
-            if (_player != null)
+            if (_player == null)
             {
-                Debug.Log($"Sending a debug text message: {text}");
-                _player.TextServerRpc(text);
+                return;
             }
+            Debug.Log($"Sending a debug text message: {text}");
+            _player.TextServerRpc(text);
         }
 
         private void HandlePlayerConnected(Player p)
