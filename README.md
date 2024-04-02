@@ -96,51 +96,51 @@ All cuts and snapshots can be `reset` by shaking the tablet. If a snapshot is se
   <image src="Gifs/Reset.gif"/>
 </div>
 
-## <a name="section-2"></a>Structure
+## Structure
 
 The prototype consists of a single Unity application with different scenes for the `client` and the `host`. The `Client` scene needs to be deployed to a tablet, while the `Host` scene is deployed on a PC. Both devices need to be in the same network to communicate. In case of communication problems, check your firewall settings.
 
-### <a name="section-2.1"></a>Used Technologies
+### Used Technologies
 
 - Unity 2021.3.36f1
 - SteamVR (tested with 2.3.5, needed for HMD and PC connection)
 
-### <a name="section-2.2"></a>Used Hardware
+### Used Hardware
 
 Any Android based device will suffice (tested with Android 12 and 13), but for development a Samsung Galaxy Tab was used (S7 and S6 lite).
 
-## <a name="section-3"></a>Installation
+## Installation
 
 SteamVR needs to be installed and running. In Unity inside the `Host` scene, a model has to be setup (see section [`Change model`](#section-4.2)).  
 The tablet needs to run the client APK.
 
-### <a name="section-3.1"></a>Building Client APK
+### Building Client APK
 
 Open Unity and navigate to `File > Build Settings`. Make sure the `Scenes/Client` scene appears in the top and is activated with index 0 (disable all other scenes to be safe). Select `Android` as the platform in the bottom left. If the platform needs to be changed, also click the `Switch Platform` button on the bottom right.  
 Click `Build` and wait for it to finish (select a build folder if needed). If popups appear during compilation press `Ignore all`.  
 The created APK then needs to be saved on the tablet (e.g. in the `Download` folder), on which it can be installed and run by opening it. Check if your Android device allows sideloading apps.
 
-## <a name="section-4"></a>Configurations
+## Configurations
 
 There are multiple things which can be configured for the prototype.
 
-### <a name="section-4.1"></a>Host IP
+### Host IP
 
 To run the client, you need to know the hosts IP-address.  
 To show the IPv4 addresses on an Windows PC, open up any command line (Win + R and type `cmd`) and run `ipconfig`. Choose the address which belongs to the network where both the host and the client are connected to.  
 Enter the address in the client to connect.
 
-### <a name="section-4.2"></a>Change Model
+### Change Model
 
 The default sewing machine model will serve as a template for new models.  
-Inside the model script, the folder with the cutting plane images has to be specified (see section [`Change Cutting Plane Image Path`](#section-4.3)).  
+Inside the model script, the folder with the cutting plane images has to be specified (see section [`Change Cutting Plane Image Path`](#change-cutting-plane-image-path)).  
 Drag the new model-prefab into the `ModelManager` inside the `Host` scene and make sure it is the only active child of `ModelManager`. In the `ModelManager`, drag and drop the model into the `Model Manager` script onto the empty `Model` field.
 
-### <a name="section-4.3"></a>Change Cutting Plane Image Path
+### Change Cutting Plane Image Path
 
 All calculated cutting plane images must be saved as PNGs and be ordered alphabetically for Unity to read them in the right order.  
-Set the path of the folder to the model prefab as described in section [`Change Model`](#section-4.2).
+Set the path of the folder to the model prefab as described in section [`Change Model`](#change-model).
 
-### <a name="section-4.4"></a>Change Tablet Sensitivity
+### Change Tablet Sensitivity
 
 The thresholds for the configuration of the tablet sensitivities can be changed in the `SpatialInput` and `TouchInput` scripts. To do this either an input field can be implemented on the client UI to change the threshold during run time. The other option is the trial and error way. After the thresholds are changed, the application needs to be rebuilt and redeployed to the tablet. This process can be bothersome as multiple configurations need to be tried.
