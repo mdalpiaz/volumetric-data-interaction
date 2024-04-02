@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-namespace Networking.openIAExtension.States
+namespace Networking.openIA.States
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class WaitingForServerACK : InterpreterState

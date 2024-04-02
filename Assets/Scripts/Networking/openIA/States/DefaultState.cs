@@ -2,11 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Helper;
 using Model;
-using Networking.openIAExtension.Commands;
+using Networking.openIA.Commands;
 using Snapshots;
 using UnityEngine;
 
-namespace Networking.openIAExtension.States
+namespace Networking.openIA.States
 {
     public class DefaultState : InterpreterState
     {

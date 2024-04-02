@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Networking.openIAExtension.Commands
+namespace Networking.openIA.Commands
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class ACK : ICommand

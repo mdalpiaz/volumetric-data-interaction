@@ -1,6 +1,6 @@
 using System;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     public class NoProtocolMatchException : Exception
     {

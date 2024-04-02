@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Networking.openIAExtension.States
+namespace Networking.openIA.States
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public abstract class InterpreterState

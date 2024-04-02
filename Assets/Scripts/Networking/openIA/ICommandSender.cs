@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Networking.openIAExtension.Commands;
+using Networking.openIA.Commands;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     public interface ICommandSender
     {

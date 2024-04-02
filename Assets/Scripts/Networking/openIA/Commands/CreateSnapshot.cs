@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Networking.openIAExtension.Commands
+namespace Networking.openIA.Commands
 {
     public class CreateSnapshot : ICommand
     {

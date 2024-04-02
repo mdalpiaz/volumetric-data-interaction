@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     public interface ICommandInterpreter
     {

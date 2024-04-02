@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using Networking.openIAExtension.Commands;
-using Networking.openIAExtension.States;
+using Networking.openIA.Commands;
+using Networking.openIA.States;
 using UnityEngine;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     public class InterpreterV1 : ICommandInterpreter, ICommandSender
     {

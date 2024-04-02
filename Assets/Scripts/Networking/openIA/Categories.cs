@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class Categories

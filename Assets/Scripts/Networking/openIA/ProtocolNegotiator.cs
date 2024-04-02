@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Networking.openIAExtension
+namespace Networking.openIA
 {
     public class ProtocolNegotiator : ICommandInterpreter
     {
