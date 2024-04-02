@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using Extensions;
 using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace Networking.Tablet
             {
                 try
                 {
-                    _ = await _stream.ReadAsync(buffer, 0, 2);
+                    await _stream.ReadAllAsync(buffer, 0, 2);
                 }
                 catch
                 {
