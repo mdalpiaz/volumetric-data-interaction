@@ -1,9 +1,12 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Extensions;
 using UnityEngine;
 
 namespace Networking.Screens
@@ -18,7 +21,7 @@ namespace Networking.Screens
         [SerializeField]
         private List<Screen> screens = new();
 
-        private TcpListener _server;
+        private TcpListener _server = null!;
 
         private readonly Dictionary<int, (TcpClient, NetworkStream)> _clients = new();
 
@@ -40,7 +43,7 @@ namespace Networking.Screens
                     var client = await _server.AcceptTcpClientAsync();
                     var stream = client.GetStream();
                     var buffer = new byte[4];
-                    _ = await stream.ReadAsync(buffer, 0, 4);
+                    await stream.ReadAllAsync(buffer, 0, 4);
                     var id = BitConverter.ToInt32(buffer);
                     _clients.Add(id, (client, stream));
                     Debug.Log($"Client {id} connected");
