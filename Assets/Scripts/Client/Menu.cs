@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+
+using System.Threading.Tasks;
 using Networking.Tablet;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,25 +14,25 @@ namespace Client
     public class Menu : MonoBehaviour
     {
         [SerializeField]
-        private TabletClient tabletClient;
+        private TabletClient tabletClient = null!;
 
         [SerializeField]
-        private TouchInput touchInput;
+        private TouchInput touchInput = null!;
 
         [SerializeField]
-        private SpatialInput spatialInput;
+        private SpatialInput spatialInput = null!;
         
         [SerializeField]
-        private GameObject mainMenu;
+        private GameObject mainMenu = null!;
         
         [SerializeField]
-        private GameObject interactionMenu;
+        private GameObject interactionMenu = null!;
         
         [SerializeField]
-        private GameObject networkConfigMenu;
+        private GameObject networkConfigMenu = null!;
         
         [SerializeField]
-        private Text headerText;
+        private Text headerText = null!;
 
         private void Awake()
         {
