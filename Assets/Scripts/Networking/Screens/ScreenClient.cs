@@ -1,6 +1,9 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,38 +21,40 @@ namespace Networking.Screens
         private int id = 1;
 
         [SerializeField]
-        private RawImage image;
+        private RawImage image = null!;
 
-        private RectTransform _rect;
+        private TcpClient _client = null!;
+        
+        private RectTransform _rect = null!;
 
         private Vector2 _rectSize;
-        
-        private bool _running;
 
         private void Awake()
         {
+            _client = new TcpClient();
             _rect = image.GetComponent<RectTransform>();
             _rectSize = _rect.sizeDelta;
         }
 
         private async void OnEnable()
         {
-            _running = true;
-            using var client = new TcpClient();
-            await client.ConnectAsync(ip, port);
-            await using var stream = client.GetStream();
+            await _client.ConnectAsync(ip, port);
+            await using var stream = _client.GetStream();
 
             await stream.WriteAsync(BitConverter.GetBytes(id));
             Debug.Log($"ID sent {id}");
 
             var dimBuffer = new byte[8];
             
-            while (_running)
+            while (true)
             {
-                var bytes = 0;
-                while (bytes == 0)
+                try
                 {
-                    bytes = await stream.ReadAsync(dimBuffer, 0, 8);
+                    await stream.ReadAllAsync(dimBuffer, 0, 8);
+                }
+                catch
+                {
+                    break;
                 }
 
                 var width = BitConverter.ToInt32(dimBuffer, 0);
@@ -57,13 +62,13 @@ namespace Networking.Screens
                 Debug.Log($"Received dimensions: {width}, {height}");
 
                 var buffer = new byte[width * height * 4];
-                var offset = 0;
-                while (buffer.Length != offset)
+                try
                 {
-                    var missingBytes = buffer.Length - offset;
-                    var bytesToRead = Math.Min(Constants.BufferSize, missingBytes);
-                    bytes = await stream.ReadAsync(buffer, offset, bytesToRead);
-                    offset += bytes;
+                    await stream.ReadAllAsync(buffer, 0, buffer.Length);
+                }
+                catch
+                {
+                    break;
                 }
                 Debug.Log("Image read");
 
@@ -78,7 +83,7 @@ namespace Networking.Screens
 
         private void OnDisable()
         {
-            _running = false;
+            _client.Close();
         }
 
         private Vector2 ExpandToRectSize(int width, int height)
