@@ -1,6 +1,5 @@
-#nullable enable
+﻿#nullable enable
 
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -89,8 +88,10 @@ namespace Networking.Tablet
 
         private async void OnEnable()
         {
+            Debug.Log($"TabletServer started on port {port}");
             _server.Start();
             _tabletClient = await _server.AcceptTcpClientAsync();
+            Debug.Log("Client connected");
             _tabletStream = _tabletClient.GetStream();
 
             var commandIdentifier = new byte[1];
@@ -99,62 +100,72 @@ namespace Networking.Tablet
                 try
                 {
                     await _tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
+                    Debug.Log($"Received command {commandIdentifier[0]}");
                     switch (commandIdentifier[0])
                     {
                         case Categories.MenuMode:
-                        {
-                            var buffer = new byte[1];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleModeChange((MenuMode)buffer[0]);
-                            break;
-                        }
+                            {
+                                var buffer = new byte[MenuModeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = MenuModeCommand.FromByteArray(buffer);
+                                HandleModeChange(cmd.Mode);
+                                break;
+                            }
                         case Categories.Swipe:
-                        {
-                            var buffer = new byte[13];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleSwipe(BitConverter.ToBoolean(buffer, 0),
-                                BitConverter.ToSingle(buffer, 1),
-                                BitConverter.ToSingle(buffer, 5),
-                                BitConverter.ToSingle(buffer, 9));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[SwipeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = SwipeCommand.FromByteArray(buffer);
+                                HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
+                                break;
+                            }
                         case Categories.Scale:
-                        {
-                            var buffer = new byte[4];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleScaling(BitConverter.ToSingle(buffer, 0));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[ScaleCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = ScaleCommand.FromByteArray(buffer);
+                                HandleScaling(cmd.Scale);
+                                break;
+                            }
                         case Categories.Rotate:
-                        {
-                            var buffer = new byte[4];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleRotation(BitConverter.ToSingle(buffer, 0));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[RotateCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = RotateCommand.FromByteArray(buffer);
+                                HandleRotation(cmd.Rotation);
+                                break;
+                            }
                         case Categories.Tilt:
-                        {
-                            var buffer = new byte[1];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleTilt(BitConverter.ToBoolean(buffer, 0));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[TiltCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = TiltCommand.FromByteArray(buffer);
+                                HandleTilt(cmd.IsLeft);
+                                break;
+                            }
                         case Categories.Shake:
-                        {
-                            var buffer = new byte[4];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleShakes(BitConverter.ToInt32(buffer, 0));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[ShakeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = ShakeCommand.FromByteArray(buffer);
+                                HandleShakes(cmd.Count);
+                                break;
+                            }
                         case Categories.Tap:
-                        {
-                            var buffer = new byte[9];
-                            await _tabletStream.ReadAllAsync(buffer, 0, buffer.Length);
-                            HandleTap((TapType)buffer[0],
-                                BitConverter.ToSingle(buffer, 1),
-                                BitConverter.ToSingle(buffer, 5));
-                            break;
-                        }
+                            {
+                                var buffer = new byte[TapCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                var cmd = TapCommand.FromByteArray(buffer);
+                                HandleTap(cmd.Type, cmd.X, cmd.Y);
+                                break;
+                            }
                     }
                 }
                 catch
