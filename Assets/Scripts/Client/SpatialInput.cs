@@ -1,6 +1,7 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Client
 {
@@ -10,26 +11,30 @@ namespace Client
     /// </summary>
     public class SpatialInput : MonoBehaviour
     {
-        [FormerlySerializedAs("client")]
-        [SerializeField]
-        private Networking.TabletClient tabletClient;
+        public event Action<int>? Shook;
+        public event Action<bool>? Tilted;
         
         private const float MinInputInterval = 0.2f; // 0.2sec - to avoid detecting multiple shakes per shake
         private int _shakeCounter;
 
-        private InputTracker _shakeTracker;
-        private InputTracker _tiltTracker;
+        private InputTracker _shakeTracker = null!;
+        private InputTracker _tiltTracker = null!;
 
-        private Gyroscope _deviceGyroscope;
+        private Gyroscope _deviceGyroscope = null!;
 
         private void Start()
         {
-            _shakeTracker = new InputTracker();
-            _shakeTracker.Threshold = 5f;
+            _shakeTracker = new InputTracker
+            {
+                Threshold = 5f
+            };
 
-            _tiltTracker = new InputTracker();
-            _tiltTracker.Threshold = 1.3f;
-            _tiltTracker.TimeSinceLast = Time.unscaledTime;
+            _tiltTracker = new InputTracker
+            {
+                Threshold = 1.3f,
+                TimeSinceLast = Time.unscaledTime
+            };
+            
             _deviceGyroscope = Input.gyro;
             _deviceGyroscope.enabled = true;
         }
@@ -65,7 +70,7 @@ namespace Client
         private void HandleShakeInput()
         {
             _shakeTracker.TimeSinceLast = Time.unscaledTime;
-            tabletClient.SendShakeMessage(_shakeCounter);
+            Shook?.Invoke(_shakeCounter);
         }
 
         /// <summary>
@@ -86,7 +91,7 @@ namespace Client
 
                 _tiltTracker.TimeSinceLast = Time.unscaledTime;
 
-                tabletClient.SendTiltMessage(horizontalTilt > 0);
+                Tilted?.Invoke(horizontalTilt > 0);
             }
         }
     }

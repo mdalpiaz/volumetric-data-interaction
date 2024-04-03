@@ -1,6 +1,8 @@
-﻿using DigitalRubyShared;
+﻿#nullable enable
+
+using System;
+using DigitalRubyShared;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Client
 {
@@ -10,67 +12,71 @@ namespace Client
     /// </summary>
     public class TouchInput : MonoBehaviour
     {
-        [FormerlySerializedAs("client")]
-        [SerializeField]
-        private Networking.TabletClient tabletClient;
+        public event Action<bool, float, float, float>? Swiped;
+        public event Action<float>? Scaled;
+        public event Action<float>? Rotated;
+        public event Action<TapType, float, float>? Tapped;
 
-        private TapGestureRecognizer tapGesture;
-        private TapGestureRecognizer doubleTapGesture;
-        private SwipeGestureRecognizer swipeGesture;
-        private ScaleGestureRecognizer scaleGesture;
-        private RotateGestureRecognizer rotateGesture;
-        private LongPressGestureRecognizer longPressGesture;
+        private TapGestureRecognizer _tapGesture = null!;
+        private TapGestureRecognizer _doubleTapGesture = null!;
+        private SwipeGestureRecognizer _swipeGesture = null!;
+        private ScaleGestureRecognizer _scaleGesture = null!;
+        private RotateGestureRecognizer _rotateGesture = null!;
+        private LongPressGestureRecognizer _longPressGesture = null!;
 
-        private float outterAreaSize = 0.2f;
-        private Vector2 outterSwipeAreaBottomLeft;
-        private Vector2 outterSwipeAreaTopRight;
+        // private const float OutterAreaSize = 0.2f;
+        // private Vector2 outterSwipeAreaBottomLeft;
+        // private Vector2 outterSwipeAreaTopRight;
 
-        private void Start()
+        private void Awake()
         {
-            var areaWidth = Screen.width * outterAreaSize;
-            var areaHeight = Screen.height * outterAreaSize;
-            outterSwipeAreaBottomLeft = new Vector2(areaWidth, areaHeight);
-            outterSwipeAreaTopRight = new Vector2(Screen.width - areaWidth, Screen.height - areaHeight);
+            // var areaWidth = Screen.width * OutterAreaSize;
+            // var areaHeight = Screen.height * OutterAreaSize;
+            // outterSwipeAreaBottomLeft = new Vector2(areaWidth, areaHeight);
+            // outterSwipeAreaTopRight = new Vector2(Screen.width - areaWidth, Screen.height - areaHeight);
 
-            doubleTapGesture = new TapGestureRecognizer();
-            doubleTapGesture.NumberOfTapsRequired = 2;
-            doubleTapGesture.StateUpdated += DoubleTapGestureCallback;
+            _doubleTapGesture = new TapGestureRecognizer();
+            _doubleTapGesture.NumberOfTapsRequired = 2;
+            _doubleTapGesture.StateUpdated += DoubleTapGestureCallback;
             
-            tapGesture = new TapGestureRecognizer();
-            tapGesture.RequireGestureRecognizerToFail = doubleTapGesture;
-            tapGesture.StateUpdated += TapGestureCallback;
+            _tapGesture = new TapGestureRecognizer();
+            _tapGesture.RequireGestureRecognizerToFail = _doubleTapGesture;
+            _tapGesture.StateUpdated += TapGestureCallback;
 
-            swipeGesture = new SwipeGestureRecognizer
+            _swipeGesture = new SwipeGestureRecognizer
             {
                 Direction = SwipeGestureRecognizerDirection.Any,
                 DirectionThreshold = 1.0f // allow a swipe, regardless of slope
             };
-            swipeGesture.StateUpdated += SwipeGestureCallback;
+            _swipeGesture.StateUpdated += SwipeGestureCallback;
             
-            rotateGesture = new RotateGestureRecognizer();
-            rotateGesture.StateUpdated += RotateGestureCallback;
+            _rotateGesture = new RotateGestureRecognizer();
+            _rotateGesture.StateUpdated += RotateGestureCallback;
             
-            scaleGesture = new ScaleGestureRecognizer();
-            scaleGesture.StateUpdated += ScaleGestureCallback;
-            scaleGesture.AllowSimultaneousExecution(rotateGesture);
+            _scaleGesture = new ScaleGestureRecognizer();
+            _scaleGesture.StateUpdated += ScaleGestureCallback;
+            _scaleGesture.AllowSimultaneousExecution(_rotateGesture);
             
-            longPressGesture = new LongPressGestureRecognizer();
-            longPressGesture.MaximumNumberOfTouchesToTrack = 1;
-            longPressGesture.StateUpdated += LongPressGestureCallback;
-            
-            FingersScript.Instance.AddGesture(doubleTapGesture);
-            FingersScript.Instance.AddGesture(tapGesture);
-            FingersScript.Instance.AddGesture(swipeGesture);
-            FingersScript.Instance.AddGesture(scaleGesture);
-            FingersScript.Instance.AddGesture(rotateGesture);
-            FingersScript.Instance.AddGesture(longPressGesture);
+            _longPressGesture = new LongPressGestureRecognizer();
+            _longPressGesture.MaximumNumberOfTouchesToTrack = 1;
+            _longPressGesture.StateUpdated += LongPressGestureCallback;
+        }
+
+        private void Start()
+        {
+            FingersScript.Instance.AddGesture(_doubleTapGesture);
+            FingersScript.Instance.AddGesture(_tapGesture);
+            FingersScript.Instance.AddGesture(_swipeGesture);
+            FingersScript.Instance.AddGesture(_scaleGesture);
+            FingersScript.Instance.AddGesture(_rotateGesture);
+            FingersScript.Instance.AddGesture(_longPressGesture);
         }
 
         private void TapGestureCallback(GestureRecognizer gesture)
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                tabletClient.SendTapMessage(TapType.Single, gesture.FocusX, gesture.FocusY);
+                Tapped?.Invoke(TapType.Single, gesture.FocusX, gesture.FocusY);
             }
         }
 
@@ -78,7 +84,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                tabletClient.SendTapMessage(TapType.Double, gesture.FocusX, gesture.FocusY);
+                Tapped?.Invoke(TapType.Double, gesture.FocusX, gesture.FocusY);
             }
         }
 
@@ -86,18 +92,18 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                //var isStartEdgeArea = IsWithinEdgeArea(swipeGesture.StartFocusX, swipeGesture.StartFocusY);
+                //var isStartEdgeArea = IsWithinEdgeArea(_swipeGesture.StartFocusX, _swipeGesture.StartFocusY);
                 //var isEndEdgeArea = IsWithinEdgeArea(gesture.FocusX, gesture.FocusY);
 
                 //if (isStartEdgeArea || isEndEdgeArea)
                 //{
-                    var isInwardSwipe = IsInwardSwipe(swipeGesture.StartFocusX, swipeGesture.StartFocusY, gesture.FocusX, gesture.FocusY);
+                    var isInwardSwipe = IsInwardSwipe(_swipeGesture.StartFocusX, _swipeGesture.StartFocusY, gesture.FocusX, gesture.FocusY);
 
                     // instead of calculating the angle from the center of the screen, start from the first touch point
                     //var angle = Math.Atan2(Screen.height / 2.0 - gesture.FocusY, gesture.FocusX -  Screen.width / 2.0) * Mathf.Rad2Deg;
                     var angle = Mathf.Atan2(gesture.StartFocusY - gesture.FocusY, gesture.FocusX - gesture.StartFocusX) * Mathf.Rad2Deg;
                     Debug.Log($"Swipe angle: {angle}, is inward: {isInwardSwipe}");
-                    tabletClient.SendSwipeMessage(isInwardSwipe, gesture.FocusX, gesture.FocusY, angle);
+                    Swiped?.Invoke(isInwardSwipe, gesture.FocusX, gesture.FocusY, angle);
                 //}
             }
         }
@@ -106,7 +112,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Executing)
             {
-                tabletClient.SendScaleMessage(scaleGesture.ScaleMultiplier);
+                Scaled?.Invoke(_scaleGesture.ScaleMultiplier);
             }
         }
 
@@ -114,7 +120,7 @@ namespace Client
         {
             if (gesture.State == GestureRecognizerState.Executing)
             {
-                tabletClient.SendRotateMessage(rotateGesture.RotationRadiansDelta * -1);
+                Rotated?.Invoke(_rotateGesture.RotationRadiansDelta * -1);
             }
         }
 
@@ -129,29 +135,29 @@ namespace Client
             switch (gesture.State)
             {
                 case GestureRecognizerState.Began:
-                    tabletClient.SendTapMessage(TapType.HoldStart, xUV, yUV);
+                    Tapped?.Invoke(TapType.HoldStart, xUV, yUV);
                     break;
                 case GestureRecognizerState.Ended:
-                    tabletClient.SendTapMessage(TapType.HoldEnd, xUV, yUV);
+                    Tapped?.Invoke(TapType.HoldEnd, xUV, yUV);
                     break;
             }
         }
 
-        /// <summary>
-        /// There is a small area on the edge of the touchscreen
-        /// Swipes can only be executed in this area
-        /// </summary>
-        private bool IsWithinEdgeArea(float x, float y)
-        {
-            if (x > outterSwipeAreaBottomLeft.x && x < outterSwipeAreaTopRight.x &&
-                y > outterSwipeAreaBottomLeft.y && y < outterSwipeAreaTopRight.y)
-            {
-                return false;
-            }
-
-            return x > 0 && x < Screen.width &&
-                   y > 0 && y < Screen.height;
-        }
+        // /// <summary>
+        // /// There is a small area on the edge of the touchscreen
+        // /// Swipes can only be executed in this area
+        // /// </summary>
+        // private bool IsWithinEdgeArea(float x, float y)
+        // {
+        //     if (x > outterSwipeAreaBottomLeft.x && x < outterSwipeAreaTopRight.x &&
+        //         y > outterSwipeAreaBottomLeft.y && y < outterSwipeAreaTopRight.y)
+        //     {
+        //         return false;
+        //     }
+        //
+        //     return x > 0 && x < Screen.width &&
+        //            y > 0 && y < Screen.height;
+        // }
 
         /// <summary>
         /// Check if start or end of swipe is further away from screen center

@@ -283,8 +283,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5213595056518243056}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: StartAnalysis
+        m_TargetAssemblyTypeName: Client.Menu, Assembly-CSharp
+        m_MethodName: OnAnalysisClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -497,8 +497,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5213595056518243056}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: StartSelection
+        m_TargetAssemblyTypeName: Client.Menu, Assembly-CSharp
+        m_MethodName: OnSelectionClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -554,10 +554,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a66f29caf3371ad4d9d55756c6fafd4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  comm: {fileID: 0}
-  mainMenu: {fileID: 0}
-  interactionMenu: {fileID: 0}
+  tabletClient: {fileID: 0}
+  touchInput: {fileID: 0}
+  spatialInput: {fileID: 0}
+  mainMenu: {fileID: 5213595056772205064}
+  interactionMenu: {fileID: 5213595057382178444}
   networkConfigMenu: {fileID: 0}
+  headerText: {fileID: 5213595055928256377}
 --- !u!1 &5213595056772205064
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,6 +619,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -717,6 +721,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0

@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.IO;
 using System.Net.WebSockets;
@@ -16,8 +18,8 @@ namespace Networking
         private readonly string _url;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        public event Action<string> OnText;
-        public event Action<byte[]> OnBinary;
+        public event Action<string>? OnText;
+        public event Action<byte[]>? OnBinary;
         
         public WebSocketClient(string url)
         {
@@ -101,7 +103,7 @@ namespace Networking
             // CancellationTokenSource should only Dispose when everything is finished. (As seen above in Run())
             // Cancel() does the same cleanup, but also cancels the token without race condition
             _cancellationTokenSource.Cancel();
-            _cws?.Dispose();
+            _cws.Dispose();
         }
     }
 }
