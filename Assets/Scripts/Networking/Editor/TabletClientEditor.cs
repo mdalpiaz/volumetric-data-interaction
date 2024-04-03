@@ -7,7 +7,7 @@ namespace Networking.Editor
     [CustomEditor(typeof(TabletClient))]
     public class TabletClientEditor : UnityEditor.Editor
     {
-        public override async void OnInspectorGUI()
+        public override void OnInspectorGUI()
         {
             var client = (TabletClient)target;
 
@@ -15,32 +15,32 @@ namespace Networking.Editor
 
             if (GUILayout.Button("Send Menu: Analysis"))
             {
-                await client.SendMenuChangedMessage(MenuMode.Analysis);
+                _ = client.SendMenuChangedMessage(MenuMode.Analysis);
             }
 
             if (GUILayout.Button("Send Menu: Selection"))
             {
-                await client.SendMenuChangedMessage(MenuMode.Selection);
+                _ = client.SendMenuChangedMessage(MenuMode.Selection);
             }
 
             if (GUILayout.Button("Send Menu: Mapping"))
             {
-                await client.SendMenuChangedMessage(MenuMode.Mapping);
+                _ = client.SendMenuChangedMessage(MenuMode.Mapping);
             }
 
             if (GUILayout.Button("Send Swipe"))
             {
-                await client.SendSwipeMessage(true, 250, 250, 0);
+                _ = client.SendSwipeMessage(true, 250, 250, 0);
             }
 
             if (GUILayout.Button("Send Shake"))
             {
-                await client.SendShakeMessage(3);
+                _ = client.SendShakeMessage(3);
             }
 
             if (GUILayout.Button("Send Double Tap"))
             {
-                await client.SendTapMessage(TapType.Double, 250, 250);
+                _ = client.SendTapMessage(TapType.Double, 250, 250);
             }
         }
     }
