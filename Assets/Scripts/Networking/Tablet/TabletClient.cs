@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using Extensions;
 using System;
@@ -32,8 +32,6 @@ namespace Networking.Tablet
             _stream = _tcpClient.GetStream();
         }
 
-        private async void Start()
-        {
             // the only command which can be received is "changing menu mode"
             var buffer = new byte[2];
             while (true)

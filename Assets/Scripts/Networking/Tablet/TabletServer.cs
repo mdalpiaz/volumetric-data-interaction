@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 using System.Net;
@@ -92,13 +92,6 @@ namespace Networking.Tablet
             _server.Start();
             _tabletClient = await _server.AcceptTcpClientAsync();
             _tabletStream = _tabletClient.GetStream();
-        }
-
-        private async void Start()
-        {
-            ray.SetActive(false);
-
-            Selected = ModelManager.Instance.CurrentModel.Selectable;
 
             var commandIdentifier = new byte[1];
             while (true)
@@ -169,6 +162,13 @@ namespace Networking.Tablet
                     break;
                 }
             }
+        }
+
+        private void Start()
+        {
+            ray.SetActive(false);
+
+            Selected = ModelManager.Instance.CurrentModel.Selectable;
         }
 
         private void OnDisable()
