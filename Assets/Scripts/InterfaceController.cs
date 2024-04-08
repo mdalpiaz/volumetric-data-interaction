@@ -89,9 +89,6 @@ public class InterfaceController : MonoBehaviour
                     SetMaterial(uiSelected);
                 }
                 break;
-            case MenuMode.Mapping:
-                SetMaterial(uiSelected);
-                break;
             default:
                 SetMaterial(uiMain);
                 break;

@@ -23,11 +23,6 @@ namespace Networking.Editor
                 _ = client.SendMenuChangedMessage(MenuMode.Selection);
             }
 
-            if (GUILayout.Button("Send Menu: Mapping"))
-            {
-                _ = client.SendMenuChangedMessage(MenuMode.Mapping);
-            }
-
             if (GUILayout.Button("Send Swipe"))
             {
                 _ = client.SendSwipeMessage(true, 250, 250, 0);

@@ -3,6 +3,5 @@
     None,
     Selection,
     Selected,
-    Mapping,
     Analysis
 }

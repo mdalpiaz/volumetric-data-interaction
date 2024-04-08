@@ -227,7 +227,6 @@ namespace Networking.Tablet
                 case MenuMode.Analysis:
                     slicer.SetTemporaryCuttingPlaneActive(true);
                     break;
-                case MenuMode.Mapping:
                 default:
                     Debug.Log($"{nameof(HandleModeChange)}() received unhandled mode: {mode}");
                     break;
