@@ -61,15 +61,9 @@ namespace Client
             spatialInput.Tilted -= OnTilt;
         }
 
-        public async void OnSelectionClick()
-        {
-            await StartSelection();
-        }
+        public async void OnSelectionClick() => await StartSelection();
         
-        public async void OnAnalysisClick()
-        {
-            await StartAnalysis();
-        }
+        public async void OnAnalysisClick() => await StartAnalysis();
         
         private async void HandleMenuModeChanged(MenuMode mode)
         {
