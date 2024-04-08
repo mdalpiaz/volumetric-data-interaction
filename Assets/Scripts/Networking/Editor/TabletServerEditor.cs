@@ -50,44 +50,59 @@ namespace Networking.Editor
                 _modeMethod.Invoke(host, new object[] { MenuMode.Selection });
             }
 
-            GUILayout.Label("Interaction");
+            GUILayout.Label("Tap");
             if (GUILayout.Button("Double Tap"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _tapMethod.Invoke(host, new object[] { TapType.Double, 250, 250 });
             }
 
-            if (GUILayout.Button("Swipe Left"))
+            if (GUILayout.Button("Hold Start"))
+            {
+                var host = (TabletServer)serializedObject.targetObject;
+                _tapMethod.Invoke(host, new object[] { TapType.HoldStart, 250, 250 });
+            }
+            
+            if (GUILayout.Button("Hold End"))
+            {
+                var host = (TabletServer)serializedObject.targetObject;
+                _tapMethod.Invoke(host, new object[] { TapType.HoldEnd, 250, 250 });
+            }
+
+            GUILayout.Label("Swipe");
+            if (GUILayout.Button("Left"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _swipeMethod.Invoke(host, new object[] { false, 0, 150, 180 });
             }
 
-            if (GUILayout.Button("Swipe Right"))
+            if (GUILayout.Button("Right"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _swipeMethod.Invoke(host, new object[] { false, 500, 150, 0});
             }
             
-            if (GUILayout.Button("Swipe Up"))
+            if (GUILayout.Button("Up"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _swipeMethod.Invoke(host, new object[] { false, 250, 300, 90});
             }
 
-            if (GUILayout.Button("Tilt left"))
+            GUILayout.Label("Tilt");
+            if (GUILayout.Button("Left"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _tiltMethod.Invoke(host, new object[] { true });
             }
 
-            if (GUILayout.Button("Tilt right"))
+            if (GUILayout.Button("Right"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _tiltMethod.Invoke(host, new object[] { false });
             }
 
-            if (GUILayout.Button("Shake"))
+            GUILayout.Label("Shake");
+            if (GUILayout.Button("2"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
                 _shakeMethod.Invoke(host, new object[] { 2 });
