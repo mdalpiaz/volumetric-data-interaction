@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using Constants;
 using JetBrains.Annotations;
 using TMPro;
@@ -14,31 +16,31 @@ public class InterfaceController : MonoBehaviour
     public const int AdditionCount = 5;
     
     [SerializeField]
-    private TextMeshProUGUI hud;
+    private TextMeshProUGUI hud = null!;
 
     [SerializeField]
-    private Transform main;
+    private Transform main = null!;
     
     [SerializeField]
-    private Text centerText;
+    private Text centerText = null!;
 
     [SerializeField]
-    private Material uiMain;
+    private Material uiMain = null!;
     
     [SerializeField]
-    private Material uiExploration;
+    private Material uiExploration = null!;
     
     [SerializeField]
-    private Material uiSelection;
+    private Material uiSelection = null!;
     
     [SerializeField]
-    private Material uiSelected;
+    private Material uiSelected = null!;
 
     [SerializeField]
-    private Material blackMaterial;
+    private Material blackMaterial = null!;
 
-    private MeshRenderer _mainMeshRenderer;
-    private Material _previousMaterial;
+    private MeshRenderer _mainMeshRenderer = null!;
+    private Material? _previousMaterial;
     
     public Transform Main => main;
 
@@ -104,6 +106,10 @@ public class InterfaceController : MonoBehaviour
 
     public void RestorePreviousOverlay()
     {
+        if (_previousMaterial == null)
+        {
+            return;
+        }
         SetMaterial(_previousMaterial);
         _previousMaterial = null;
     }
@@ -112,5 +118,5 @@ public class InterfaceController : MonoBehaviour
 
     private void SetHUD(string text = "") => hud.text = text;
 
-    private void SetMaterial([NotNull] Material mat) => _mainMeshRenderer.material = mat;
+    private void SetMaterial(Material mat) => _mainMeshRenderer.material = mat;
 }
