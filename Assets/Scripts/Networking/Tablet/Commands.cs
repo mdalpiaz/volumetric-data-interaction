@@ -3,6 +3,7 @@
 using System;
 using System.ComponentModel;
 
+// needed for setting values in record
 namespace System.Runtime.CompilerServices
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
