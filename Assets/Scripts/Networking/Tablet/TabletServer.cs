@@ -294,8 +294,8 @@ namespace Networking.Tablet
                         ray.SetActive(false);
                         Highlighted = null;
 
-                        await SendMenuModeToClient(MenuMode.Selected);
                         HandleModeChange(MenuMode.Selected);
+                        await SendMenuModeToClient(MenuMode.Selected);
                     }
                     else if (_menuMode == MenuMode.Analysis)
                     {
