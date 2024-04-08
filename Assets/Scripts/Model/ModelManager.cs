@@ -50,6 +50,16 @@ namespace Model
             }
         }
 
+        public void StartMapping(Transform tracker)
+        {
+            CurrentModel.transform.SetParent(tracker);
+        }
+
+        public void StopMapping()
+        {
+            CurrentModel.transform.SetParent(transform);
+        }
+
         public void ResetState()
         {
             // TODO

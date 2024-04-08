@@ -233,6 +233,8 @@ namespace Networking.Tablet
                     break;
             }
 
+            // stop mapping if the menu is changed
+            ModelManager.Instance.StopMapping();
             ui.SetMode(mode, isSnapshotSelected);
             _menuMode = mode;
         }
@@ -303,9 +305,15 @@ namespace Networking.Tablet
                     break;
                 case TapType.HoldStart:
                     Debug.Log($"Tap Hold Start received at: ({x},{y})");
+                    if (_menuMode == MenuMode.Selected &&
+                        Selected == ModelManager.Instance.CurrentModel.Selectable)
+                    {
+                        ModelManager.Instance.StartMapping(tracker.transform);
+                    }
                     break;
                 case TapType.HoldEnd:
                     Debug.Log($"Tap Hold End received at: ({x},{y})");
+                    ModelManager.Instance.StopMapping();
                     break;
                 default:
                     Debug.Log($"{nameof(HandleTap)}() received unhandled tap type: {type}");
@@ -334,7 +342,7 @@ namespace Networking.Tablet
         }
 
         /// <summary>
-        /// Depending on mode, the scale input is used for resizing object or recognised as a grab gesture
+        /// Depending on mode, the scale input is used for resizing object or recognised as a grab gesture.
         /// </summary>
         private void HandleScaling(float scaleMultiplier)
         {
