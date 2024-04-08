@@ -14,7 +14,7 @@ namespace Networking.openIA
         private string ip = "127.0.0.1";
 
         [SerializeField]
-        private ushort port = 80;
+        private int port = Ports.OpenIAPort;
 
         [SerializeField]
         private string path = "/";
