@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using Networking.openIA.Commands;
@@ -19,11 +21,11 @@ namespace Networking.openIA
         [SerializeField]
         private string path = "/";
 
-        private WebSocketClient _ws;
+        private WebSocketClient _ws = null!;
 
-        private ICommandInterpreter _interpreter;
+        private ICommandInterpreter _interpreter = null!;
 
-        private ICommandSender _sender;
+        private ICommandSender _sender = null!;
 
         private async void Start()
         {
