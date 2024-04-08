@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Threading.Tasks;
 using Helper;
@@ -16,7 +18,7 @@ namespace Networking.openIA.States
 
         public override Task<InterpreterState> Client(byte[] data)
         {
-            var id = BitConverter.ToUInt64(data, 1);
+            _ = BitConverter.ToUInt64(data, 1);
             // INFO id is entirely unused on the client
             return Task.FromResult<InterpreterState>(this);
         }
