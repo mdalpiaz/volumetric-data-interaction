@@ -52,11 +52,13 @@ namespace Model
 
         public void StartMapping(Transform tracker)
         {
+            Debug.Log("Started Mapping");
             CurrentModel.transform.SetParent(tracker);
         }
 
         public void StopMapping()
         {
+            Debug.Log("Stopped Mapping");
             CurrentModel.transform.SetParent(transform);
         }
 
