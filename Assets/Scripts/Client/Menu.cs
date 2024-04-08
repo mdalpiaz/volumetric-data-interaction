@@ -101,10 +101,6 @@ namespace Client
             SwitchToInteractionMenu("Analysis Mode");
         }
         
-        private async Task StartMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Mapping);
-
-        private async Task StopMapping() => await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
-
         private async Task Cancel()
         {
             await tabletClient.SendMenuChangedMessage(MenuMode.None);
@@ -130,17 +126,7 @@ namespace Client
 
         private async void OnRotate(float angle) => await tabletClient.SendRotateMessage(angle);
 
-        private async void OnTap(TapType type, float x, float y)
-        {
-            if (TapType.HoldStart == type)
-            {
-                await StartMapping();
-            }
-            else if (TapType.HoldEnd == type)
-            {
-                await StopMapping();
-            }
-        }
+        private async void OnTap(TapType type, float x, float y) => await tabletClient.SendTapMessage(type, x, y);
 
         private async void OnShake(int shakeCount) => await tabletClient.SendShakeMessage(shakeCount);
 
