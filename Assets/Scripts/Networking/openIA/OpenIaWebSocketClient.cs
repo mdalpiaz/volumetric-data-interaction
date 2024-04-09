@@ -10,7 +10,7 @@ namespace Networking.openIA
     public class OpenIaWebSocketClient : MonoBehaviour
     {
         [SerializeField]
-        private bool https = false;
+        private bool https;
         
         [SerializeField]
         private string ip = "127.0.0.1";
