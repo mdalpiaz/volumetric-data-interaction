@@ -11,12 +11,6 @@ namespace Model
 
         public Model CurrentModel { get; private set; } = null!;
 
-        private Transform? _tracker;
-
-        private Vector3 _positionOffset;
-
-        private Quaternion _rotationOffset;
-
         private void Awake()
         {
             if (Instance == null)
@@ -29,19 +23,6 @@ namespace Model
             {
                 Destroy(this);
             }
-        }
-
-        private void Update()
-        {
-            // tracker is null if not mapping
-            if (_tracker == null)
-            {
-                return;
-            }
-
-            var cachedTransform = CurrentModel.transform;
-            cachedTransform.position = _positionOffset + _tracker.position;
-            cachedTransform.rotation = _tracker.rotation * _rotationOffset;
         }
 
         public bool ModelExists(string nameToCheck)
@@ -68,22 +49,7 @@ namespace Model
                 }
             }
         }
-
-        public void StartMapping(Transform tracker)
-        {
-            Debug.Log("Started Mapping");
-            _tracker = tracker;
-            var cachedTransform = CurrentModel.transform;
-            _positionOffset = cachedTransform.position - _tracker.position;
-            _rotationOffset = _tracker.rotation * Quaternion.Inverse(cachedTransform.rotation);
-        }
-
-        public void StopMapping()
-        {
-            Debug.Log("Stopped Mapping");
-            _tracker = null;
-        }
-
+        
         public void ResetState()
         {
             // TODO

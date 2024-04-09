@@ -32,6 +32,9 @@ namespace Networking.Tablet
 
         [SerializeField]
         private GameObject tablet = null!;
+
+        [SerializeField]
+        private MappingAnchor mappingAnchor = null!;
         
         [SerializeField]
         private int port = Ports.TabletPort;
@@ -210,19 +213,19 @@ namespace Networking.Tablet
                         ray.SetActive(false);
                         Unselect();
                     }
-                    ModelManager.Instance.StopMapping();
+                    mappingAnchor.StopMapping();
                     SnapshotManager.Instance.DeactivateAllSnapshots();
                     break;
                 case MenuMode.Selection:
                     ray.SetActive(true);
-                    ModelManager.Instance.StopMapping();
+                    mappingAnchor.StopMapping();
                     break;
                 case MenuMode.Selected:
                     isSnapshotSelected = Selected != null && Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
                     slicer.SetTemporaryCuttingPlaneActive(true);
-                    ModelManager.Instance.StopMapping();
+                    mappingAnchor.StopMapping();
                     break;
                 default:
                     Debug.Log($"{nameof(HandleModeChange)}() received unhandled mode: {mode}");
@@ -304,12 +307,12 @@ namespace Networking.Tablet
                         Selected != null &&
                         ModelManager.Instance.CurrentModel.gameObject == Selected.gameObject)
                     {
-                        ModelManager.Instance.StartMapping(tracker.transform);
+                        mappingAnchor.StartMapping(Selected.transform);
                     }
                     break;
                 case TapType.HoldEnd:
                     Debug.Log($"Tap Hold End received at: ({x},{y})");
-                    ModelManager.Instance.StopMapping();
+                    mappingAnchor.StopMapping();
                     break;
                 default:
                     Debug.Log($"{nameof(HandleTap)}() received unhandled tap type: {type}");
