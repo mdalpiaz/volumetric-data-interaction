@@ -44,9 +44,6 @@ namespace Snapshots
         [SerializeField]
         private GameObject sectionQuad = null!;
 
-        [SerializeField]
-        private OpenIaWebSocketClient openIaWebSocketClient = null!;
-        
         private Timer _snapshotTimer = null!;
 
         public InterfaceController InterfaceController => interfaceController;
@@ -101,7 +98,7 @@ namespace Snapshots
                 snapshot.transform.position = newPosition;
                 _preCreatedSnapshot = snapshot;
                 
-                await openIaWebSocketClient.Send(new CreateSnapshot(slicerPosition, slicerRotation));
+                await OpenIaWebSocketClient.Instance.Send(new CreateSnapshot(slicerPosition, slicerRotation));
             }
             else
             {
