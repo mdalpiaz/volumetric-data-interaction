@@ -11,15 +11,30 @@ namespace Model
         private readonly Model _model;
         private readonly BoxCollider _modelBoxCollider;
         private readonly Vector3 _slicerPosition;
+        private readonly Matrix4x4 _slicerMatrix;
 
         private readonly IEnumerable<Vector3> _planeMeshVertices;
 
         public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, Mesh mesh)
         {
+            Debug.Log(slicerLocalToWorld);
+            
             _model = model;
             _modelBoxCollider = modelBoxCollider;
             _slicerPosition = slicerPosition;
+            _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
+
+            foreach (var vert in mesh.vertices)
+            {
+                Debug.DrawRay(vert, Vector3.forward, Color.green, 60, false);
+            }
+            
             _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
+
+            foreach (var vert in _planeMeshVertices)
+            {
+                Debug.DrawRay(vert, Vector3.forward, Color.red, 60, false);
+            }
         }
 
         public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
