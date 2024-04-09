@@ -200,6 +200,7 @@ namespace Networking.Tablet
             switch (mode)
             {
                 case MenuMode.None:
+                    ModelManager.Instance.StopMapping();
                     if (_menuMode == MenuMode.Analysis)
                     {
                         slicer.SetTemporaryCuttingPlaneActive(false);
@@ -214,6 +215,7 @@ namespace Networking.Tablet
                     }
                     break;
                 case MenuMode.Selection:
+                    ModelManager.Instance.StopMapping();
                     ray.SetActive(true);
                     break;
                 case MenuMode.Selected:
@@ -225,6 +227,7 @@ namespace Networking.Tablet
                     isSnapshotSelected = Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
+                    ModelManager.Instance.StopMapping();
                     slicer.SetTemporaryCuttingPlaneActive(true);
                     break;
                 default:
@@ -233,7 +236,6 @@ namespace Networking.Tablet
             }
 
             // stop mapping if the menu is changed
-            ModelManager.Instance.StopMapping();
             ui.SetMode(mode, isSnapshotSelected);
             _menuMode = mode;
         }
