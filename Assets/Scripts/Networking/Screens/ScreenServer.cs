@@ -13,6 +13,8 @@ namespace Networking.Screens
 {
     public class ScreenServer : MonoBehaviour
     {
+        public static ScreenServer Instance { get; private set; } = null!;
+        
         private const float ConeAngleDegree = 30.0f;
         
         [SerializeField]
@@ -27,8 +29,16 @@ namespace Networking.Screens
 
         private void Awake()
         {
-            DontDestroyOnLoad(this);
-            _server = new TcpListener(IPAddress.Loopback, port);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(this);
+                _server = new TcpListener(IPAddress.Loopback, port);
+            }
+            else
+            {
+                Destroy(this);
+            }
         }
 
         private async void Start()
