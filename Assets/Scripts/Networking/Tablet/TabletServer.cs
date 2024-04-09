@@ -301,7 +301,8 @@ namespace Networking.Tablet
                 case TapType.HoldStart:
                     Debug.Log($"Tap Hold Start received at: ({x},{y})");
                     if (_menuMode == MenuMode.Selected &&
-                        ModelManager.Instance.CurrentModel.gameObject == Selected!.gameObject)
+                        Selected != null &&
+                        ModelManager.Instance.CurrentModel.gameObject == Selected.gameObject)
                     {
                         ModelManager.Instance.StartMapping(tracker.transform);
                     }
