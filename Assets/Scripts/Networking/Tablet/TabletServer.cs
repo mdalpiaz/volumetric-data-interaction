@@ -190,45 +190,39 @@ namespace Networking.Tablet
         
         private void HandleModeChange(MenuMode mode)
         {
-            Debug.Log($"Changing Menu Mode to \"{mode}\"");
+            Debug.Log($"Menu Mode change requested: \"{mode}\"");
             if (_menuMode == mode)
             {
                 return;
             }
+            Debug.Log($"Changing Menu Mode to \"{mode}\"");
 
             var isSnapshotSelected = false;
             switch (mode)
             {
                 case MenuMode.None:
-                    ModelManager.Instance.StopMapping();
                     if (_menuMode == MenuMode.Analysis)
                     {
                         slicer.SetTemporaryCuttingPlaneActive(false);
-                        SnapshotManager.Instance.DeactivateAllSnapshots();
                     }
                     else
                     {
                         ray.SetActive(false);
-
                         Unselect();
-                        SnapshotManager.Instance.DeactivateAllSnapshots();
                     }
+                    ModelManager.Instance.StopMapping();
+                    SnapshotManager.Instance.DeactivateAllSnapshots();
                     break;
                 case MenuMode.Selection:
-                    ModelManager.Instance.StopMapping();
                     ray.SetActive(true);
+                    ModelManager.Instance.StopMapping();
                     break;
                 case MenuMode.Selected:
-                    if (Selected == null)
-                    {
-                        isSnapshotSelected = false;
-                        break;
-                    }
-                    isSnapshotSelected = Selected.gameObject.IsSnapshot();
+                    isSnapshotSelected = Selected != null && Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
-                    ModelManager.Instance.StopMapping();
                     slicer.SetTemporaryCuttingPlaneActive(true);
+                    ModelManager.Instance.StopMapping();
                     break;
                 default:
                     Debug.Log($"{nameof(HandleModeChange)}() received unhandled mode: {mode}");
