@@ -20,12 +20,9 @@ namespace Model
     {
         [SerializeField]
         private string stackPath = StringConstants.XStackPath;
-
+        
         [SerializeField]
-        private GameObject sectionQuad = null!;
-
-        [SerializeField]
-        private MeshFilter sectionQuadMeshFilter = null!;
+        private MeshFilter sectionQuad = null!;
 
         private MeshFilter _meshFilter = null!;
         private Renderer _renderer = null!;
@@ -46,6 +43,8 @@ namespace Model
         public int YCount { get; private set; }
 
         public int ZCount { get; private set; }
+        
+        public Vector3 CountVector => new(XCount, YCount, ZCount);
 
         private void Awake()
         {
@@ -64,35 +63,11 @@ namespace Model
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
         }
 
-        private static Texture2D[] InitModel(string path)
-        {
-            if (!Directory.Exists(path))
-            {
-                return Array.Empty<Texture2D>();
-            }
-            var files = Directory.GetFiles(path);
-            if (files.Length == 0)
-            {
-                Debug.LogWarning($"WARNING! No files loaded from: \"{path}\", check if the path exists");
-                return Array.Empty<Texture2D>();
-            }
-            
-            var model3D = new Texture2D[files.Length];
-
-            for (var i = 0; i < files.Length; i++)
-            {
-                var imagePath = Path.Combine(path, files[i]);
-                model3D[i] = FileTools.LoadImage(imagePath);
-            }
-
-            return model3D;
-        }
-
-        public Vector3 CountVector => new(XCount, YCount, ZCount);
-
         public SlicePlane? GenerateSlicePlane(Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var modelIntersection = new ModelIntersection(this, BoxCollider, slicerPosition, sectionQuad.transform.localToWorldMatrix, sectionQuadMeshFilter);
+            var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
+            
+            var modelIntersection = new ModelIntersection(this, BoxCollider, slicerPosition, sectionQuad.transform.localToWorldMatrix, sectionQuad);
             var intersectionPoints = modelIntersection.GetNormalisedIntersectionPosition();
             var validIntersectionPoints = intersectionPoints.Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold));
             var slicePlane = SlicePlane.Create(this, validIntersectionPoints.ToList());
@@ -188,6 +163,30 @@ namespace Model
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
+        }
+        
+        private static Texture2D[] InitModel(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                return Array.Empty<Texture2D>();
+            }
+            var files = Directory.GetFiles(path);
+            if (files.Length == 0)
+            {
+                Debug.LogWarning($"WARNING! No files loaded from: \"{path}\", check if the path exists");
+                return Array.Empty<Texture2D>();
+            }
+            
+            var model3D = new Texture2D[files.Length];
+
+            for (var i = 0; i < files.Length; i++)
+            {
+                var imagePath = Path.Combine(path, files[i]);
+                model3D[i] = FileTools.LoadImage(imagePath);
+            }
+
+            return model3D;
         }
     }
 }
