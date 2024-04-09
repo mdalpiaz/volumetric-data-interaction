@@ -9,6 +9,8 @@ namespace Networking.openIA
 {
     public class OpenIaWebSocketClient : MonoBehaviour
     {
+        public static OpenIaWebSocketClient Instance { get; private set; } = null!;
+        
         [SerializeField]
         private bool https;
         
@@ -26,6 +28,19 @@ namespace Networking.openIA
         private ICommandInterpreter _interpreter = null!;
 
         private ICommandSender _sender = null!;
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(this);
+            }
+            else
+            {
+                Destroy(this);
+            }
+        }
 
         private async void Start()
         {
