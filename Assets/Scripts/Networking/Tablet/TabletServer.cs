@@ -40,8 +40,8 @@ namespace Networking.Tablet
         private ScreenServer screenServer = null!;
         
         private TcpListener _server = null!;
-        private TcpClient _tabletClient = null!;
-        private NetworkStream _tabletStream = null!;
+        private TcpClient? _tabletClient;
+        private NetworkStream? _tabletStream;
 
         private MenuMode _menuMode;
         
@@ -184,7 +184,7 @@ namespace Networking.Tablet
 
         private void OnDisable()
         {
-            _tabletClient.Close();
+            _tabletClient?.Close();
             _server.Stop();
         }
         
@@ -403,6 +403,11 @@ namespace Networking.Tablet
 
         private async Task SendMenuModeToClient(MenuMode mode)
         {
+            if (_tabletStream == null)
+            {
+                return;
+            }
+            
             var buffer = new byte[2];
             buffer[0] = Categories.MenuMode;
             buffer[1] = (byte)mode;
