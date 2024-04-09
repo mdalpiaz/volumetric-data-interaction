@@ -39,9 +39,6 @@ namespace Networking.Tablet
         [SerializeField]
         private int port = Ports.TabletPort;
         
-        [SerializeField]
-        private ScreenServer screenServer = null!;
-        
         private TcpListener _server = null!;
         private TcpClient? _tabletClient;
         private NetworkStream? _tabletStream;
@@ -181,7 +178,6 @@ namespace Networking.Tablet
         private void Start()
         {
             ray.SetActive(false);
-
             Selected = ModelManager.Instance.CurrentModel.Selectable;
         }
 
@@ -332,7 +328,7 @@ namespace Networking.Tablet
                 && Direction.Up == DirectionMethods.GetDirectionDegree(angle)
                 && Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
-                await screenServer.Send(tablet.transform, snapshot.SnapshotTexture);
+                await ScreenServer.Instance.Send(tablet.transform, snapshot.SnapshotTexture);
             }
             else if (_menuMode == MenuMode.Analysis)
             {
