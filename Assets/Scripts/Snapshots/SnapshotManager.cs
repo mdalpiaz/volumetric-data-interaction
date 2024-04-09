@@ -128,14 +128,7 @@ namespace Snapshots
                 return snapshotReference;
             }
 
-            var snapshot = CreateSnapshot_internal(id, slicerPosition, slicerRotation);
-
-            if (snapshot != null)
-            {
-                Snapshots.Add(snapshot);
-            }
-
-            return snapshot;
+            return CreateSnapshot_internal(id, slicerPosition, slicerRotation);
         }
         
         public void ToggleSnapshotsAttached()
@@ -233,6 +226,8 @@ namespace Snapshots
             snapshot.Viewer = trackedCamera;
             snapshot.OriginPlane = originPlane;
             snapshot.Selectable.IsSelected = false;
+            
+            Snapshots.Add(snapshot);
             
             return snapshot;
         }
