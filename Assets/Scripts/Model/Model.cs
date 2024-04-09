@@ -67,7 +67,7 @@ namespace Model
         {
             var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
             
-            var modelIntersection = new ModelIntersection(this, BoxCollider, slicerPosition, sectionQuad.transform.localToWorldMatrix, sectionQuad);
+            var modelIntersection = new ModelIntersection(this, BoxCollider, slicerPosition, slicerRotation, sectionQuad.transform.localToWorldMatrix, sectionQuad);
             var intersectionPoints = modelIntersection.GetNormalisedIntersectionPosition();
             var validIntersectionPoints = intersectionPoints.Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold));
             var slicePlane = SlicePlane.Create(this, validIntersectionPoints.ToList());

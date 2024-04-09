@@ -14,7 +14,7 @@ namespace Model
 
         private readonly IEnumerable<Vector3> _planeMeshVertices;
 
-        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Matrix4x4 slicerLocalToWorld, Mesh mesh)
+        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, Mesh mesh)
         {
             _model = model;
             _modelBoxCollider = modelBoxCollider;
@@ -22,8 +22,8 @@ namespace Model
             _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
         }
 
-        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
-            : this(model, modelBoxCollider, slicerPosition, slicerLocalToWorld, planeMeshFilter.sharedMesh) { }
+        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
+            : this(model, modelBoxCollider, slicerPosition, slicerRotation, slicerLocalToWorld, planeMeshFilter.sharedMesh) { }
 
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
         {

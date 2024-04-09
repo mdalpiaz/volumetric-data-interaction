@@ -152,6 +152,7 @@ namespace Slicing
             var modelIntersection = new ModelIntersection(newModel,
                 newModel.BoxCollider,
                 cuttingPlaneTransform.position,
+                cuttingPlaneTransform.rotation,
                 cuttingPlaneTransform.localToWorldMatrix,
                 _cuttingPlaneMeshFilter);
             var mesh = modelIntersection.CreateIntersectingMesh();
