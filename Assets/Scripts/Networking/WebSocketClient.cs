@@ -27,20 +27,11 @@ namespace Networking
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public async Task ConnectAsync()
-        {
-            await _cws.ConnectAsync(new Uri(_url), _cancellationTokenSource.Token);
-        }
+        public async Task ConnectAsync() => await _cws.ConnectAsync(new Uri(_url), _cancellationTokenSource.Token);
 
-        public async Task SendAsync(string text)
-        {
-            await _cws.SendAsync(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text, true, _cancellationTokenSource.Token);
-        }
+        public async Task SendAsync(string text) => await _cws.SendAsync(Encoding.UTF8.GetBytes(text), WebSocketMessageType.Text, true, _cancellationTokenSource.Token);
 
-        public async Task SendAsync(byte[] data)
-        {
-            await _cws.SendAsync(data, WebSocketMessageType.Binary, true, _cancellationTokenSource.Token);
-        }
+        public async Task SendAsync(byte[] data) => await _cws.SendAsync(data, WebSocketMessageType.Binary, true, _cancellationTokenSource.Token);
 
         public async Task Run()
         {
@@ -92,10 +83,7 @@ namespace Networking
             _cancellationTokenSource.Dispose();
         }
         
-        public async Task Close()
-        {
-            await _cws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Requested", _cancellationTokenSource.Token);
-        }
+        public async Task Close() => await _cws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Requested", _cancellationTokenSource.Token);
 
         public void Dispose()
         {
