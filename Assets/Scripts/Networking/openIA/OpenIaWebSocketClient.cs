@@ -56,7 +56,15 @@ namespace Networking.openIA
             _interpreter = negotiator;
             
             Debug.Log("Starting WebSocket client");
-            await _ws.ConnectAsync();
+            try
+            {
+                await _ws.ConnectAsync();
+            }
+            catch
+            {
+                Debug.LogError("Couldn't connect to WebSocket Server! Check ip and path!");
+                return;
+            }
             Debug.Log("Connected WebSocket client");
             var runTask = _ws.Run();
 
