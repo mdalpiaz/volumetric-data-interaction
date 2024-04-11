@@ -153,13 +153,14 @@ The thresholds for the configuration of the tablet sensitivities can be changed 
 
 The prototype should enable simple debugging.
 
-Find the `ViewModeSetter` in the hierarchy and set the `View Mode` to Display.  
-Find the `Tracker` in the hierarchy and disable the `Tracked Pose Driver`. You can now freely move the tracker.
+Find the `ViewModeSetter` gameobject in the hierarchy and set the `View Mode` to Display.  
+Find the `Tracker` gameobject in the hierarchy and disable the `Tracked Pose Driver`. You can now freely move the tracker inside the editor. There is no support for keyboard and mouse movement.
+Find the `OnlineState` gameobject in the hierarchy to specify, if the prototype should act as a client to a OpenIA server. You can set the server address in the `WebSocketManager` gameobject separatly.
 
 You can now start interacting with the prototype without a VR/AR Headset.  
 Every gameobject needed was supplied with custom editor buttons to trigger actions.
 
-- Host: This is the networking component, which handles connections between the tablet and the prototype. The buttons in the editor can be used to simulate its actions.
+- TabletServer: This is the networking component, which handles connections between the tablet and the prototype. The buttons in the editor can be used to simulate its actions.
 - SnapshotManager: This gameobject handles snapshots and can be used to toggle attachment of snapshots to the tablet.
 
 Selection can be done with the objects themselves. Every object which contains the `Selectable` component (Snapshots, Model) have a custom button to select them.
