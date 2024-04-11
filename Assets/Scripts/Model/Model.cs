@@ -170,12 +170,13 @@ namespace Model
         {
             if (!Directory.Exists(path))
             {
+                Debug.LogError($"Directory \"{path}\" not found!");
                 return Array.Empty<Texture2D>();
             }
             var files = Directory.GetFiles(path);
             if (files.Length == 0)
             {
-                Debug.LogWarning($"WARNING! No files loaded from: \"{path}\", check if the path exists");
+                Debug.LogError($"No files loaded from \"{path}\"!");
                 return Array.Empty<Texture2D>();
             }
             
