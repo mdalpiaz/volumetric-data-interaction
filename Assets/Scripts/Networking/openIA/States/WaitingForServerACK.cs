@@ -7,27 +7,29 @@ using System.Threading.Tasks;
 namespace Networking.openIA.States
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class WaitingForServerACK : InterpreterState
+    public class WaitingForServerACK : IInterpreterState
     {
+        private readonly IInterpreterState _nextState;
         private readonly Action? _onACK;
         private readonly Action? _onNAK;
         
-        public WaitingForServerACK(ICommandSender sender, Action? onACK = null, Action? onNAK = null) : base(sender)
+        public WaitingForServerACK(IInterpreterState nextState, Action? onACK = null, Action? onNAK = null)
         {
+            _nextState = nextState;
             _onACK = onACK;
             _onNAK = onNAK;
         }
 
-        public override Task<InterpreterState> ACK()
+        public Task<IInterpreterState> ACK()
         {
             _onACK?.Invoke();
-            return Task.FromResult<InterpreterState>(new DefaultState(Sender));
+            return Task.FromResult(_nextState);
         }
 
-        public override Task<InterpreterState> NAK()
+        public Task<IInterpreterState> NAK()
         {
             _onNAK?.Invoke();
-            return Task.FromResult<InterpreterState>(new DefaultState(Sender));
+            return Task.FromResult(_nextState);
         }
     }
 }

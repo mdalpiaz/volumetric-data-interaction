@@ -7,46 +7,39 @@ using UnityEngine;
 namespace Networking.openIA.States
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public abstract class InterpreterState
+    public interface IInterpreterState
     {
-        protected readonly ICommandSender Sender;
-
-        protected InterpreterState(ICommandSender sender)
-        {
-            Sender = sender;
-        }
-        
-        public virtual Task<InterpreterState> ACK()
+        public virtual Task<IInterpreterState> ACK()
         {
             Debug.LogWarning($"Message {nameof(ACK)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> NAK()
+        public virtual Task<IInterpreterState> NAK()
         {
             Debug.LogWarning($"Message {nameof(NAK)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> ProtocolAdvertisement(byte[] data)
+        public virtual Task<IInterpreterState> ProtocolAdvertisement(byte[] data)
         {
             Debug.LogWarning($"Message {nameof(ProtocolAdvertisement)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> Client(byte[] data)
+        public virtual Task<IInterpreterState> Client(byte[] data)
         {
             Debug.LogWarning($"Message {nameof(Client)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> Datasets(byte[] data)
+        public virtual Task<IInterpreterState> Datasets(byte[] data)
         {
             Debug.LogWarning($"Message {nameof(Datasets)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> Objects(byte[] data)
+        public virtual Task<IInterpreterState> Objects(byte[] data)
         {
             Debug.LogWarning($"Message {nameof(Objects)} not implemented");
             return Task.FromResult(this);
         }
-        public virtual Task<InterpreterState> Snapshots(byte[] data)
+        public virtual Task<IInterpreterState> Snapshots(byte[] data)
         {
             Debug.LogWarning($"Message {nameof(Snapshots)} not implemented");
             return Task.FromResult(this);

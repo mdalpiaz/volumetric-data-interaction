@@ -9,12 +9,12 @@ namespace Networking.openIA
     public class InterpreterV1 : ICommandInterpreter, ICommandSender
     {
         private readonly WebSocketClient _ws;
-        private InterpreterState _state;
+        private IInterpreterState _state;
 
         public InterpreterV1(WebSocketClient ws)
         {
             _ws = ws;
-            _state = new DefaultState(this);
+            _state = new DefaultStateV1(this);
         }
         
         public async Task Interpret(byte[] data)

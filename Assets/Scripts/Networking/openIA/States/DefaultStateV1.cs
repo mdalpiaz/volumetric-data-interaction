@@ -10,20 +10,23 @@ using UnityEngine;
 
 namespace Networking.openIA.States
 {
-    public class DefaultState : InterpreterState
+    public class DefaultStateV1 : IInterpreterState
     {
-        public DefaultState(ICommandSender sender) : base(sender)
+        private readonly ICommandSender _sender;
+
+        public DefaultStateV1(ICommandSender sender)
         {
+            _sender = sender;
         }
 
-        public override Task<InterpreterState> Client(byte[] data)
+        public Task<IInterpreterState> Client(byte[] data)
         {
             _ = BitConverter.ToUInt64(data, 1);
             // INFO id is entirely unused on the client
-            return Task.FromResult<InterpreterState>(this);
+            return Task.FromResult<IInterpreterState>(this);
         }
 
-        public override async Task<InterpreterState> Datasets(byte[] data)
+        public async Task<IInterpreterState> Datasets(byte[] data)
         {
             switch (data[1])
             {
@@ -39,11 +42,11 @@ namespace Networking.openIA.States
                     var name = BitConverter.ToString(data, 6, nameLength);
                     if (ModelManager.Instance.ModelExists(name))
                     {
-                        await Sender.Send(new ACK());
-                        return new WaitingForServerACK(Sender, () => ModelManager.Instance.ChangeModel(name));
+                        await _sender.Send(new ACK());
+                        return new WaitingForServerACK(this, () => ModelManager.Instance.ChangeModel(name));
                     }
 
-                    await Sender.Send(new NAK());
+                    await _sender.Send(new NAK());
                     return this;
                 }
                 default:
@@ -54,7 +57,7 @@ namespace Networking.openIA.States
             }
         }
 
-        public override Task<InterpreterState> Objects(byte[] data)
+        public Task<IInterpreterState> Objects(byte[] data)
         {
             switch (data[1])
             {
@@ -108,10 +111,10 @@ namespace Networking.openIA.States
                 }
             }
 
-            return Task.FromResult<InterpreterState>(this);
+            return Task.FromResult<IInterpreterState>(this);
         }
 
-        public override Task<InterpreterState> Snapshots(byte[] data)
+        public Task<IInterpreterState> Snapshots(byte[] data)
         {
             switch (data[1])
             {
@@ -173,7 +176,7 @@ namespace Networking.openIA.States
                 }
             }
             
-            return Task.FromResult<InterpreterState>(this);
+            return Task.FromResult<IInterpreterState>(this);
         }
 
         private static void MatrixToObject(ulong id, Matrix4x4 matrix)
