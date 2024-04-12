@@ -98,7 +98,7 @@ namespace Snapshots
                 snapshot.transform.position = newPosition;
                 _preCreatedSnapshot = snapshot;
                 
-                await OpenIaWebSocketClient.Instance.Send(new CreateSnapshot(slicerPosition, slicerRotation));
+                await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(slicerPosition, slicerRotation));
             }
             else
             {

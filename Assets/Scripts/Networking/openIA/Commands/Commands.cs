@@ -2,7 +2,7 @@
 
 using System.Buffers.Binary;
 using System;
-using System.Numerics;
+using UnityEngine;
 
 namespace Networking.openIA.Commands
 {
@@ -42,13 +42,13 @@ namespace Networking.openIA.Commands
             var request = new byte[Size];
             request[0] = Categories.Snapshots.Value;
             request[1] = Categories.Snapshots.Create;
-            Buffer.BlockCopy(BitConverter.GetBytes(Position.X), 0, request, 2, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Position.Y), 0, request, 6, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Position.Z), 0, request, 10, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.X), 0, request, 14, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.Y), 0, request, 18, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.Z), 0, request, 22, sizeof(float));
-            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.W), 0, request, 26, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.x), 0, request, 2, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.y), 0, request, 6, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.z), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.x), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.y), 0, request, 18, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.z), 0, request, 22, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.w), 0, request, 26, sizeof(float));
             return request;
         }
 
