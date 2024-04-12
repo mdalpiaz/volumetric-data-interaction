@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Networking.openIA.Commands;
 using UnityEngine;
@@ -49,9 +50,10 @@ namespace Networking.openIA
                 return;
             }
             _ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}", HandleBinaryData, HandleText);
-            
-            var negotiator = new ProtocolNegotiator(_ws);
-            _interpreter = negotiator;
+
+            var interpreter = new InterpreterV1(_ws);
+            _interpreter = interpreter;
+            _sender = interpreter;
             
             Debug.Log("Starting WebSocket client");
             try
@@ -65,19 +67,7 @@ namespace Networking.openIA
             }
             Debug.Log("Connected WebSocket client");
             var runTask = _ws.Run();
-
-            try
-            {
-                (_interpreter, _sender) = await negotiator.Negotiate();
-            }
-            catch (NoProtocolMatchException)
-            {
-                // no supported version matches
-                await _ws.Close();
-                _ws.Dispose();
-                return;
-            }
-            
+            await interpreter.Start();
             await runTask;
             Debug.Log("WebSocket client stopped");
         }
@@ -94,12 +84,13 @@ namespace Networking.openIA
 
         public async Task Send(ICommand cmd) => await _sender.Send(cmd);
         
-        private void HandleText(string text)
+        private Task HandleText(string text)
         {
             Debug.Log($"WS text received: \"{text}\"");
+            return Task.CompletedTask;
         }
         
-        private async void HandleBinaryData(byte[] data)
+        private async Task HandleBinaryData(byte[] data)
         {
             Debug.Log($"WS bytes received: {BitConverter.ToString(data)}");
             await _interpreter.Interpret(data);
