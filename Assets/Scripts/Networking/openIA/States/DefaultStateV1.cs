@@ -21,7 +21,8 @@ namespace Networking.openIA.States
 
         public Task<IInterpreterState> Client(byte[] data)
         {
-            _ = BitConverter.ToUInt64(data, 1);
+            var client = ClientLoginResponse.FromByteArray(data);
+            Debug.Log($"Received client id: {client.Id}");
             // INFO id is entirely unused on the client
             return Task.FromResult<IInterpreterState>(this);
         }

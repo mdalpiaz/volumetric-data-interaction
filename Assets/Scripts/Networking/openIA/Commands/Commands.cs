@@ -28,11 +28,29 @@ namespace Networking.openIA.Commands
         {
             var request = new byte[Size];
             request[0] = Categories.ProtocolAdvertisement.Value;
-            Buffer.BlockCopy(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(Version)), 0, request, 1, sizeof(ulong));
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(1), Version);
             return request;
         }
 
         public static int Size => 1 + sizeof(ulong);
+    }
+
+    public record ClientLoginResponse(ulong Id) : ICommand
+    {
+        public byte[] ToByteArray()
+        {
+            var request = new byte[Size];
+            request[0] = Categories.Client.Value;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(1), Id);
+            return request;
+        }
+
+        public static int Size => 1 + sizeof(ulong);
+
+        public static ClientLoginResponse FromByteArray(byte[] buffer)
+        {
+            return new ClientLoginResponse(BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(1)));
+        }
     }
 
     public record CreateSnapshotClient(Vector3 Position, Quaternion Rotation) : ICommand
