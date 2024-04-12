@@ -1,41 +1,33 @@
 #nullable enable
 
-using System;
 using System.Threading.Tasks;
-using System.Buffers.Binary;
+using UnityEngine;
+using Networking.openIA.Commands;
 
 namespace Networking.openIA.States
 {
     public class ProtocolNegotiator : IInterpreterState
     {
-        private ulong _protocolVersion;
-
-        private readonly WebSocketClient _ws;
-
         private readonly ICommandSender _sender;
 
-        public ProtocolNegotiator(WebSocketClient ws, ICommandSender sender)
+        public ProtocolNegotiator(ICommandSender sender)
         {
-            _ws = ws;
             _sender = sender;
         }
         
         public async Task Negotiate()
         {
-            var request = new byte[1 + sizeof(ulong)];
-            request[0] = Categories.ProtocolAdvertisement.Value;
-            var versionBytes = BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(1L));
-            _protocolVersion = 1;
-            Buffer.BlockCopy(versionBytes, 0, request, 1, sizeof(ulong));
-            await _ws.SendAsync(request);
+            await _sender.Send(new ProtocolAdvertisement(1L));
         }
 
         public Task<IInterpreterState> ACK()
         {
+            Debug.Log($"ACK received in {nameof(ProtocolNegotiator)}");
             return Task.FromResult<IInterpreterState>(new DefaultStateV1(_sender));
         }
         public Task<IInterpreterState> NAK()
         {
+            Debug.Log($"NAK received in {nameof(ProtocolNegotiator)}");
             return Task.FromResult<IInterpreterState>(this);
         }
     }

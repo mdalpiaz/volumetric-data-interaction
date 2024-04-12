@@ -17,7 +17,7 @@ namespace Networking.openIA
         public InterpreterV1(WebSocketClient ws)
         {
             _ws = ws;
-            _negotiator = new ProtocolNegotiator(_ws, this);
+            _negotiator = new ProtocolNegotiator(this);
             _state = _negotiator;
         }
 
