@@ -28,7 +28,7 @@ namespace Networking.openIA.States
         public Task<IInterpreterState> NAK()
         {
             Debug.Log($"NAK received in {nameof(ProtocolNegotiator)}");
-            return Task.FromResult<IInterpreterState>(this);
+            throw new NoProtocolMatchException();
         }
     }
 }
