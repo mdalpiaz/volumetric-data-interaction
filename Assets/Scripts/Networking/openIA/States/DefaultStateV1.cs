@@ -22,7 +22,7 @@ namespace Networking.openIA.States
         public Task<IInterpreterState> Client(byte[] data)
         {
             var client = ClientLoginResponse.FromByteArray(data);
-            Debug.Log($"Received client id: {client.Id}");
+            Debug.Log($"Received client id: {client.ID}");
             // INFO id is entirely unused on the client
             return Task.FromResult<IInterpreterState>(this);
         }
@@ -39,12 +39,11 @@ namespace Networking.openIA.States
                 }
                 case Categories.Datasets.LoadDataset:
                 {
-                    var nameLength = BitConverter.ToInt32(data, 2);
-                    var name = BitConverter.ToString(data, 6, nameLength);
-                    if (ModelManager.Instance.ModelExists(name))
+                    var loadCommand = LoadDataset.FromByteArray(data);
+                    if (ModelManager.Instance.ModelExists(loadCommand.Name))
                     {
                         await _sender.Send(new ACK());
-                        return new WaitingForServerACK(this, () => ModelManager.Instance.ChangeModel(name));
+                        return new WaitingForServerACK(this, () => ModelManager.Instance.ChangeModel(loadCommand.Name));
                     }
 
                     await _sender.Send(new NAK());
@@ -75,39 +74,26 @@ namespace Networking.openIA.States
                 }
                 case Categories.Objects.Translate:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var x = BitConverter.ToSingle(data, 10);
-                    var y = BitConverter.ToSingle(data, 14);
-                    var z = BitConverter.ToSingle(data, 18);
-
-                    TranslateObject(id, new Vector3(x, y, z));
+                    var translateCommand = SetObjectTranslation.FromByteArray(data);
+                    TranslateObject(translateCommand.ID, translateCommand.Translation);
                     break;
                 }
                 case Categories.Objects.Scale:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var x = BitConverter.ToSingle(data, 10);
-                    var y = BitConverter.ToSingle(data, 14);
-                    var z = BitConverter.ToSingle(data, 18);
-                    ScaleObject(id, new Vector3(x, y, z));
+                    var scaleCommand = SetObjectScale.FromByteArray(data);
+                    ScaleObject(scaleCommand.ID, scaleCommand.Scale);
                     break;
                 }
                 case Categories.Objects.RotateQuaternion:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var x = BitConverter.ToSingle(data, 10);
-                    var y = BitConverter.ToSingle(data, 14);
-                    var z = BitConverter.ToSingle(data, 18);
-                    var w = BitConverter.ToSingle(data, 22);
-                    RotateObject(id, new Quaternion(x, y, z, w));
+                    var rotateCommand = SetObjectRotationQuaternion.FromByteArray(data);
+                    RotateObject(rotateCommand.ID, rotateCommand.Rotation);
                     break;
                 }
                 case Categories.Objects.RotateEuler:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var axis = data[8];
-                    var amount = BitConverter.ToSingle(data, 9);
-                    RotateObject(id, axis, amount);
+                    var rotateCommand = SetObjectRotationEuler.FromByteArray(data);
+                    RotateObject(rotateCommand.ID, rotateCommand.Axis, rotateCommand.Value);
                     break;
                 }
             }
@@ -221,7 +207,7 @@ namespace Networking.openIA.States
             ModelManager.Instance.CurrentModel.transform.localScale += scale;
         }
         
-        private static void RotateObject(ulong id, int axis, float value)
+        private static void RotateObject(ulong id, Axis axis, float value)
         {
             if (id != 0)
             {
@@ -231,7 +217,7 @@ namespace Networking.openIA.States
                 return;
             }
 
-            var vec = axis switch
+            var vec = (byte)axis switch
             {
                 0 => new Vector3(1, 0, 0),
                 1 => new Vector3(0, 1, 0),
