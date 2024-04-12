@@ -28,8 +28,7 @@ namespace Networking.openIA.Commands
         {
             var request = new byte[Size];
             request[0] = Categories.ProtocolAdvertisement.Value;
-            var versionBytes = BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(Version));
-            Buffer.BlockCopy(versionBytes, 0, request, 1, sizeof(ulong));
+            Buffer.BlockCopy(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(Version)), 0, request, 1, sizeof(ulong));
             return request;
         }
 
