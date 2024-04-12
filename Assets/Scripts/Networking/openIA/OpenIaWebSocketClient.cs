@@ -48,9 +48,7 @@ namespace Networking.openIA
             {
                 return;
             }
-            _ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}");
-            _ws.OnText += HandleText;
-            _ws.OnBinary += HandleBinaryData;
+            _ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}", HandleBinaryData, HandleText);
             
             var negotiator = new ProtocolNegotiator(_ws);
             _interpreter = negotiator;

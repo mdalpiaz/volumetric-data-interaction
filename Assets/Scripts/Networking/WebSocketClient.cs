@@ -16,14 +16,16 @@ namespace Networking
         
         private readonly ClientWebSocket _cws = new();
         private readonly string _url;
-        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly Func<byte[], Task> _binaryCallback;
+        private readonly Func<string, Task> _textCallback;
 
-        public event Action<string>? OnText;
-        public event Action<byte[]>? OnBinary;
+        private readonly CancellationTokenSource _cancellationTokenSource;
         
-        public WebSocketClient(string url)
+        public WebSocketClient(string url, Func<byte[], Task> binaryCallback, Func<string, Task> textCallback)
         {
             _url = url;
+            _binaryCallback = binaryCallback;
+            _textCallback = textCallback;
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
@@ -64,12 +66,12 @@ namespace Networking
                         {
                             var msg = await reader.ReadToEndAsync();
                             Debug.Log($"WebSocket message received: {msg}");
-                            OnText?.Invoke(msg);
+                            await _textCallback.Invoke(msg);
                         }
                         break;
                     case WebSocketMessageType.Binary:
                         Debug.Log("WebSocket binary message received");
-                        OnBinary?.Invoke(ms.GetBuffer());
+                        await _binaryCallback.Invoke(ms.GetBuffer());
                         break;
                     case WebSocketMessageType.Close:
                         Debug.Log("WebSocket Close requested");
