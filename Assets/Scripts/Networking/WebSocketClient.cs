@@ -12,7 +12,7 @@ namespace Networking
 {
     public class WebSocketClient : IDisposable
     {
-        private const int BufferSize = 8192;
+        private const int BufferSize = 1024;
         
         private readonly ClientWebSocket _cws = new();
         private readonly string _url;
