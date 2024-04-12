@@ -2925,6 +2925,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: fibers Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 1253644937185150830, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771008, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: plane
@@ -2984,6 +2989,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: stackPath
+      value: C:\DevProjects\volume data\5segments_stack
       objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
@@ -3597,6 +3607,11 @@ PrefabInstance:
       objectReference: {fileID: 500436827}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
+      propertyPath: stackPath
+      value: C:\DevProjects\volume data\Stack_converted
+      objectReference: {fileID: 0}
+    - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
       propertyPath: sectionQuad
       value: 
       objectReference: {fileID: 2899917703023114336}
@@ -3614,6 +3629,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: sewing-machine-v2.4 Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 5906740283371962224, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
