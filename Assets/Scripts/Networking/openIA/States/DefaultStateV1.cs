@@ -63,13 +63,8 @@ namespace Networking.openIA.States
             {
                 case Categories.Objects.SetMatrix:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var matrix = new Matrix4x4();
-                    for (var i = 0; i < 16; i++)
-                    {
-                        matrix[i] = BitConverter.ToSingle(data, 10 + (i * 4));
-                    }
-                    MatrixToObject(id, matrix);
+                    var matrixCommand = SetObjectMatrix.FromByteArray(data);
+                    MatrixToObject(matrixCommand.ID, matrixCommand.Matrix);
                     break;
                 }
                 case Categories.Objects.Translate:
@@ -107,23 +102,14 @@ namespace Networking.openIA.States
             {
                 case Categories.Snapshots.Create:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var x = BitConverter.ToSingle(data, 10);
-                    var y = BitConverter.ToSingle(data, 14);
-                    var z = BitConverter.ToSingle(data, 18);
-                    var position = new Vector3(x, y, z);
-                    x = BitConverter.ToSingle(data, 22);
-                    y = BitConverter.ToSingle(data, 26);
-                    z = BitConverter.ToSingle(data, 30);
-                    var w = BitConverter.ToSingle(data, 34);
-                    var rotation = new Quaternion(x, y, z, w);
-                    SnapshotManager.Instance.CreateSnapshot(id, position, rotation);
+                    var createCommand = CreateSnapshotServer.FromByteArray(data);
+                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, createCommand.Position, createCommand.Rotation);
                     break;
                 }
                 case Categories.Snapshots.Remove:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    SnapshotManager.Instance.DeleteSnapshot(id);
+                    var removeCommand = RemoveSnapshot.FromByteArray(data);
+                    SnapshotManager.Instance.DeleteSnapshot(removeCommand.ID);
                     break;
                 }
                 case Categories.Snapshots.Clear:
@@ -133,30 +119,27 @@ namespace Networking.openIA.States
                 }
                 case Categories.Snapshots.SlicePosition:
                 {
-                    var id = BitConverter.ToUInt64(data, 2);
-                    var axis = data[6];
-                    var value = BitConverter.ToSingle(data, 7);
-
-                    var snapshot = SnapshotManager.Instance.GetSnapshot(id);
+                    var slicerEditCommand = SetSlicePosition.FromByteArray(data);
+                    var snapshot = SnapshotManager.Instance.GetSnapshot(slicerEditCommand.ID);
                     if (snapshot == null)
                     {
-                        Debug.LogWarning($"Snapshot with ID {id} not found.");
+                        Debug.LogWarning($"Snapshot with ID {slicerEditCommand.ID} not found.");
                         break;
                     }
                     
-                    switch ((Axis)axis)
+                    switch (slicerEditCommand.Axis)
                     {
                         case Axis.X:
-                            snapshot.MoveSliceX(value);
+                            snapshot.MoveSliceX(slicerEditCommand.Value);
                             break;
                         case Axis.Y:
-                            snapshot.MoveSliceY(value);
+                            snapshot.MoveSliceY(slicerEditCommand.Value);
                             break;
                         case Axis.Z:
-                            snapshot.MoveSliceZ(value);
+                            snapshot.MoveSliceZ(slicerEditCommand.Value);
                             break;
                         default:
-                            Debug.LogError($"Axis {axis} not specified in protocol!");
+                            Debug.LogError($"Axis {slicerEditCommand.Axis} not specified in protocol!");
                             break;
                     }
                     break;
