@@ -11,13 +11,17 @@ namespace Networking.openIA
     public class InterpreterV1 : ICommandInterpreter, ICommandSender
     {
         private readonly WebSocketClient _ws;
+        private readonly ProtocolNegotiator _negotiator;
         private IInterpreterState _state;
 
         public InterpreterV1(WebSocketClient ws)
         {
             _ws = ws;
-            _state = new DefaultStateV1(this);
+            _negotiator = new ProtocolNegotiator(_ws, this);
+            _state = _negotiator;
         }
+
+        public async Task Start() => await _negotiator.Negotiate();
         
         public async Task Interpret(byte[] data)
         {
