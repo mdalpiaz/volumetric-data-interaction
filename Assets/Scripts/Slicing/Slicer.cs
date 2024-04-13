@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System.Diagnostics.CodeAnalysis;
 using Constants;
 using EzySlice;
 using Helper;
@@ -73,38 +72,53 @@ namespace Slicing
             {
                 return;
             }
-            // is this needed?
-            // _isTouched should be automatically reset when sliced, because the collision listener is exiting
-            //_isTouched = false;
             
             Debug.Log("Slicing");
 
             var cachedTransform = transform;
-            var objectsToBeSliced = Physics.OverlapBox(cachedTransform.position, new Vector3(1, 0.1f, 0.1f), cachedTransform.rotation);
-            
-            if (!CalculateIntersectionImage(out var sliceMaterial))
+            var model = ModelManager.Instance.CurrentModel;
+            var modelGo = model.gameObject;
+
+            var sectionQuadTransform = sectionQuad.transform;
+            var slicePlane = model.GenerateSlicePlane(sectionQuadTransform.position, sectionQuadTransform.rotation);
+            if (slicePlane == null)
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
                 return;
             }
 
-            foreach (var objectToBeSliced in objectsToBeSliced)
+            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
+            transparentMaterial.name = "SliceMaterial";
+            transparentMaterial.mainTexture = slicePlane.CalculateIntersectionPlane();
+            var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
+
+            var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
+            if (slicedObject == null)
             {
-                var slicedObject = objectToBeSliced.gameObject.Slice(cachedTransform.position, cachedTransform.forward);
-
-                if (slicedObject == null) // e.g. collision with hand sphere
-                {
-                    Debug.Log("Nothing sliced");
-                    continue;
-                }
-
-                Debug.Log($"Sliced gameobject \"{objectToBeSliced.name}\"");
-                var lowerHull = slicedObject.CreateUpperHull(objectToBeSliced.gameObject, materialBlack);
-                ModelManager.Instance.CurrentModel.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
-                Destroy(lowerHull);
-                SetTemporaryCuttingPlaneActive(true);
-                SetIntersectionMesh(ModelManager.Instance.CurrentModel, sliceMaterial);
+                Debug.LogError("Nothing sliced");
+                return;
             }
+
+            Debug.Log($"Sliced gameobject \"{model.name}\"");
+            var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
+            model.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
+            Destroy(lowerHull);
+            SetTemporaryCuttingPlaneActive(true);
+
+            //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
+            var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
+            var modelIntersection = new ModelIntersection(model,
+                model.BoxCollider,
+                cuttingPlaneTransform.position,
+                cuttingPlaneTransform.rotation,
+                cuttingPlaneTransform.localToWorldMatrix,
+                _cuttingPlaneMeshFilter);
+            var mesh = modelIntersection.CreateIntersectingMesh();
+
+            var quad = Instantiate(cutQuadPrefab, model.transform, true);
+            quad.name = "cut";
+            quad.Mesh = mesh;
+            quad.Material = sliceMaterial;
         }
         
         public void SetTemporaryCuttingPlaneActive(bool active)
@@ -126,41 +140,6 @@ namespace Slicing
             {
                 ModelManager.Instance.CurrentModel.SetModelMaterial(materialWhite);
             }
-        }
-
-        private bool CalculateIntersectionImage([NotNullWhen(true)] out Material? sliceMaterial, InterpolationType interpolation = InterpolationType.Nearest)
-        {
-            var model = ModelManager.Instance.CurrentModel;
-            var sectionQuadTransform = sectionQuad.transform;
-            var slicePlane = model.GenerateSlicePlane(sectionQuadTransform.position, sectionQuadTransform.rotation);
-            if (slicePlane == null)
-            {
-                sliceMaterial = null;
-                return false;
-            }
-            
-            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
-            transparentMaterial.name = "SliceMaterial";
-            transparentMaterial.mainTexture = slicePlane.CalculateIntersectionPlane(interpolationType: interpolation);
-            sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
-            return true;
-        }
-
-        private void SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
-        {
-            var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
-            var modelIntersection = new ModelIntersection(newModel,
-                newModel.BoxCollider,
-                cuttingPlaneTransform.position,
-                cuttingPlaneTransform.rotation,
-                cuttingPlaneTransform.localToWorldMatrix,
-                _cuttingPlaneMeshFilter);
-            var mesh = modelIntersection.CreateIntersectingMesh();
-
-            var quad = Instantiate(cutQuadPrefab, newModel.transform, true);
-            quad.name = "cut";
-            quad.Mesh = mesh;
-            quad.Material = intersectionTexture;
         }
     }
 }
