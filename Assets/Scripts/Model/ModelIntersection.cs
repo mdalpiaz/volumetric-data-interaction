@@ -80,13 +80,7 @@ namespace Model
                 while (!isTouching && touchPoint != _slicerPosition)
                 {
                     touchPoint = Vector3.MoveTowards(touchPoint, _slicerPosition, 0.005f);
-
-                    var hitColliders = Physics.OverlapBox(touchPoint, new Vector3());
-                    isTouching = hitColliders.FirstOrDefault(c => c.name == _modelBoxCollider.name);
-                    //if (isTouching)
-                    //{
-                    //    CreateDebugPrimitive(touchPoint, black);
-                    //}
+                    isTouching = _modelBoxCollider.bounds.Contains(touchPoint);
                 }
 
                 yield return touchPoint;
