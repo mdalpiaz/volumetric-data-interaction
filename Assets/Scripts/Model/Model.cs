@@ -67,7 +67,7 @@ namespace Model
         {
             var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
             
-            var modelIntersection = new ModelIntersection(this, BoxCollider, slicerPosition, slicerRotation, sectionQuad.transform.localToWorldMatrix, sectionQuad);
+            var modelIntersection = new ModelIntersection(this, slicerPosition, slicerRotation, sectionQuad.transform.localToWorldMatrix, sectionQuad);
             // TODO only works, if the sectionQuad's center is inside the model
             var intersectionPoints = modelIntersection.GetNormalisedIntersectionPosition();
             var validIntersectionPoints = intersectionPoints.Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold));

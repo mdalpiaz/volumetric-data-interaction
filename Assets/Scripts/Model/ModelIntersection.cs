@@ -9,20 +9,20 @@ namespace Model
     public class ModelIntersection
     {
         private readonly Model _model;
-        private readonly BoxCollider _modelBoxCollider;
         private readonly Vector3 _slicerPosition;
         private readonly Matrix4x4 _slicerMatrix;
 
         private readonly IEnumerable<Vector3> _planeMeshVertices;
 
-        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, Mesh mesh)
+        public ModelIntersection(Model model, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
         {
             Debug.Log(slicerLocalToWorld);
             
             _model = model;
-            _modelBoxCollider = modelBoxCollider;
             _slicerPosition = slicerPosition;
             _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
+
+            var mesh = planeMeshFilter.sharedMesh;
 
             foreach (var vert in mesh.vertices)
             {
@@ -37,19 +37,16 @@ namespace Model
             }
         }
 
-        public ModelIntersection(Model model, BoxCollider modelBoxCollider, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
-            : this(model, modelBoxCollider, slicerPosition, slicerRotation, slicerLocalToWorld, planeMeshFilter.sharedMesh) { }
-
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
         {
             var intersectionPoints = GetIntersectionPoints();
-            var halfColliderSize = _modelBoxCollider.size / 2;
+            var halfColliderSize = _model.BoxCollider.size / 2;
 
             var normalisedPositions = intersectionPoints
                 .Select(p => _model.transform.worldToLocalMatrix.MultiplyPoint(p))
                 .Select(newPosition => GetNormalisedPosition(newPosition, halfColliderSize));
 
-            return CalculatePositionWithinModel(normalisedPositions, _model, _modelBoxCollider.size);
+            return CalculatePositionWithinModel(normalisedPositions, _model, _model.BoxCollider.size);
         }
         
         /// <summary>
@@ -58,7 +55,7 @@ namespace Model
         public Mesh CreateIntersectingMesh()
         {
             var originalIntersectionPoints = GetIntersectionPoints();
-            var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _modelBoxCollider);
+            var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _model.BoxCollider);
 
             return new Mesh
             {
@@ -80,7 +77,7 @@ namespace Model
                 while (!isTouching && touchPoint != _slicerPosition)
                 {
                     touchPoint = Vector3.MoveTowards(touchPoint, _slicerPosition, 0.005f);
-                    isTouching = _modelBoxCollider.bounds.Contains(touchPoint);
+                    isTouching = _model.BoxCollider.bounds.Contains(touchPoint);
                 }
 
                 yield return touchPoint;
