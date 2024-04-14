@@ -65,6 +65,11 @@ namespace Model
 
         private IEnumerable<Vector3> GetIntersectionPoints()
         {
+            // TODO idea!
+            // start at the 4 corners on the front
+            // and raycast towards the back.
+            // note the points that are hit
+
             foreach (var planePoint in _planeMeshVertices)
             {
                 var isTouching = false;
