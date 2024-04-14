@@ -66,12 +66,17 @@ namespace Model
         public SlicePlane? GenerateSlicePlane(Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
-            
-            var modelIntersection = new ModelIntersection(this, slicerPosition, slicerRotation, sectionQuad.transform.localToWorldMatrix, sectionQuad);
+
             // TODO only works, if the sectionQuad's center is inside the model
-            var intersectionPoints = modelIntersection.GetNormalisedIntersectionPosition();
-            var validIntersectionPoints = intersectionPoints.Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold));
-            var slicePlane = SlicePlane.Create(this, validIntersectionPoints.ToList());
+            var validIntersectionPoints = new ModelIntersection(this,
+                slicerPosition,
+                slicerRotation,
+                sectionQuad.transform.localToWorldMatrix,
+                sectionQuad)
+                .GetNormalisedIntersectionPosition()
+                .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
+                .ToArray();
+            var slicePlane = SlicePlane.Create(this, validIntersectionPoints);
             if (slicePlane == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created");
