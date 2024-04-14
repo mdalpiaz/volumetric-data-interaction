@@ -18,8 +18,6 @@ namespace Model
 
         public ModelIntersection(Model model, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
         {
-            Debug.Log(slicerLocalToWorld);
-            
             _model = model;
             _slicerPosition = slicerPosition;
             _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
