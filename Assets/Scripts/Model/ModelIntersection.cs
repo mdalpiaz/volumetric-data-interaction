@@ -8,6 +8,8 @@ namespace Model
 {
     public class ModelIntersection
     {
+        private const float MoveDelta = 0.001f;
+
         private readonly Model _model;
         private readonly Vector3 _slicerPosition;
         private readonly Matrix4x4 _slicerMatrix;
@@ -76,7 +78,7 @@ namespace Model
                 // slowly move to center and check if we touch the model
                 while (!isTouching && touchPoint != _slicerPosition)
                 {
-                    touchPoint = Vector3.MoveTowards(touchPoint, _slicerPosition, 0.005f);
+                    touchPoint = Vector3.MoveTowards(touchPoint, _slicerPosition, MoveDelta);
                     isTouching = _model.BoxCollider.bounds.Contains(touchPoint);
                 }
 
