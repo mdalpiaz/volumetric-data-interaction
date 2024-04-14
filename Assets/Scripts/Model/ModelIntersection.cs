@@ -24,7 +24,7 @@ namespace Model
 
             var mesh = planeMeshFilter.sharedMesh;
             _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
-            }
+        }
 
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
         {
@@ -44,7 +44,15 @@ namespace Model
         public Mesh CreateIntersectingMesh()
         {
             var originalIntersectionPoints = GetIntersectionPoints();
+            foreach (var p in originalIntersectionPoints)
+            {
+                Debug.DrawRay(p, Vector3.forward, Color.green, 120);
+            }
             var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _model.BoxCollider);
+            foreach (var p in intersectionPoints)
+            {
+                Debug.DrawRay(p, Vector3.forward, Color.red, 120);
+            }
 
             return new Mesh
             {
