@@ -25,19 +25,8 @@ namespace Model
             _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
 
             var mesh = planeMeshFilter.sharedMesh;
-
-            foreach (var vert in mesh.vertices)
-            {
-                Debug.DrawRay(vert, Vector3.forward, Color.green, 60, false);
-            }
-            
             _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
-
-            foreach (var vert in _planeMeshVertices)
-            {
-                Debug.DrawRay(vert, Vector3.forward, Color.red, 60, false);
             }
-        }
 
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
         {
