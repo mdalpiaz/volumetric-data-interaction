@@ -84,7 +84,7 @@ namespace Model
                 sectionQuad.transform.localToWorldMatrix,
                 sectionQuad*/)
                 .GetNormalisedIntersectionPosition()
-                .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
+                // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             var slicePlane = SlicePlane.Create(this, validIntersectionPoints);
             if (slicePlane == null)
