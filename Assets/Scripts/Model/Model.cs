@@ -9,10 +9,6 @@ using UnityEngine;
 
 namespace Model
 {
-    /// <summary>
-    /// Add scs.rsp to be able to use Bitmaps in Unity
-    /// https://forum.unity.com/threads/using-bitmaps-in-unity.899168/
-    /// </summary>
     [RequireComponent(typeof(Selectable))]
     public class Model : MonoBehaviour
     {
