@@ -59,7 +59,11 @@ namespace Model
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
-            Size = transform.TransformVector(BoxCollider.size);
+            var s = transform.TransformVector(BoxCollider.size);
+            s.x = Mathf.Abs(s.x);
+            s.y = Mathf.Abs(s.y);
+            s.z = Mathf.Abs(s.z);
+            Size = s;
             
             OriginalBitmap = InitModel(stackPath);
 
