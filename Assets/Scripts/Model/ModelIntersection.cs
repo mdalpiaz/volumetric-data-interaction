@@ -9,8 +9,6 @@ namespace Model
 {
     public class ModelIntersection
     {
-        private const float MoveDelta = 0.001f;
-
         private readonly Model _model;
         private readonly Vector3 _slicerPosition;
         private readonly Quaternion _slicerRotation;
