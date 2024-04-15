@@ -46,6 +46,10 @@ namespace Model
         
         public Vector3 CountVector => new(XCount, YCount, ZCount);
 
+        public Vector3 Size { get; private set; }
+
+        public Vector3 Extents => Size / 2.0f;
+
         private void Awake()
         {
             _meshFilter = GetComponent<MeshFilter>();
@@ -53,6 +57,9 @@ namespace Model
             BoxCollider = GetComponent<BoxCollider>();
             _renderer = GetComponent<Renderer>();
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
+
+            // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
+            Size = transform.TransformVector(BoxCollider.size);
             
             OriginalBitmap = InitModel(stackPath);
 
