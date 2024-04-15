@@ -170,14 +170,6 @@ namespace Model
                 yield return ray.GetPoint(distance);
             }
         }
-              
-        private static IEnumerable<Vector3> CalculatePositionWithinModel(IEnumerable<Vector3> normalisedContacts, Model model, Vector3 size)
-        {
-            foreach (var contact in normalisedContacts)
-            {
-                yield return PositionInModel(contact, model, size);
-            }
-        }
 
         private static Vector3 PositionInModel(Vector3 contact, Model model, Vector3 size)
         {
@@ -189,66 +181,6 @@ namespace Model
                 Mathf.Round(xRelativePosition),
                 Mathf.Round(yRelativePosition),
                 Mathf.Round(zRelativePosition));
-        }
-
-        private static IEnumerable<Vector3> GetBoundaryIntersections(IReadOnlyList<Vector3> intersectionPoints, BoxCollider collider)
-        {
-            var p1 = SetBoundsPoint(intersectionPoints[0], collider);
-            var p2 = SetBoundsPoint(intersectionPoints[1], collider);
-            var p3 = SetBoundsPoint(intersectionPoints[2], collider);
-            var p4 = SetBoundsPoint(intersectionPoints[3], collider);
-
-            // vertically
-            var v1 = GetMostOuterPointOnBound(collider, p1, p3);
-            var v2 = GetMostOuterPointOnBound(collider, p2, p4);
-            var v3 = GetMostOuterPointOnBound(collider, p3, p1);
-            var v4 = GetMostOuterPointOnBound(collider, p4, p2);
-
-            //horizontally
-            var h1 = GetMostOuterPointOnBound(collider, v1, v2);
-            var h2 = GetMostOuterPointOnBound(collider, v2, v1);
-            var h3 = GetMostOuterPointOnBound(collider, v3, v4);
-            var h4 = GetMostOuterPointOnBound(collider, v4, v3);
-            
-            return new Vector3[] { h1, h2, h3, h4 };
-        }
-
-        /// <summary>
-        /// Position outside point outside of collider, use two points to create line
-        /// move outside point towards original point until collision with collider to find outside border
-        /// Beforehand, it was tried to work with ray casting, which was not reliable
-        /// See commit f0222339 for obsolete code
-        /// </summary>
-        private static Vector3 GetMostOuterPointOnBound(BoxCollider collider, Vector3 point, Vector3 referencePoint)
-        {
-            const float threshold = 0.01f;
-            const int maxIterations = 10000;
-            
-            var direction = point - referencePoint;
-            var outsidePoint = point + direction * 20;
-            var i = 0;
-            var distance = 100f;
-            while (distance > threshold && i < maxIterations)
-            {
-                outsidePoint = Vector3.MoveTowards(outsidePoint, point, threshold);
-                distance = Vector3.Distance(outsidePoint, collider.ClosestPoint(outsidePoint));
-                i++;
-            }
-
-            var result = i == maxIterations ? point : outsidePoint;
-            return SetBoundsPoint(result, collider);
-        }
-
-        private static Vector3 GetNormalisedPosition(Vector3 relativePosition, Vector3 minPosition) =>
-            relativePosition + minPosition;
-        
-        private static Vector3 SetBoundsPoint(Vector3 point, BoxCollider collider)
-        {
-            const float threshold = 0.1f;
-            
-            var boundsPoint = collider.ClosestPointOnBounds(point);
-            var distance = Vector3.Distance(point, boundsPoint);
-            return distance > threshold ? point : boundsPoint;
         }
     }
 }
