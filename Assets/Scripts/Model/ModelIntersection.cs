@@ -2,6 +2,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Extensions;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Model
@@ -12,6 +14,7 @@ namespace Model
 
         private readonly Model _model;
         private readonly Vector3 _slicerPosition;
+        private readonly Quaternion _slicerRotation;
         private readonly Matrix4x4 _slicerMatrix;
 
         private readonly IEnumerable<Vector3> _planeMeshVertices;
@@ -20,8 +23,9 @@ namespace Model
         {
             _model = model;
             _slicerPosition = slicerPosition;
+            _slicerRotation = slicerRotation;
             _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
-
+            
             var mesh = planeMeshFilter.sharedMesh;
             _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
         }
@@ -44,15 +48,15 @@ namespace Model
         public Mesh CreateIntersectingMesh()
         {
             var originalIntersectionPoints = GetIntersectionPoints();
-            foreach (var p in originalIntersectionPoints)
-            {
-                Debug.DrawRay(p, Vector3.forward, Color.green, 120);
-            }
+            // foreach (var p in originalIntersectionPoints)
+            // {
+            //     Debug.DrawRay(p, Vector3.forward, Color.green, 120);
+            // }
             var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _model.BoxCollider);
-            foreach (var p in intersectionPoints)
-            {
-                Debug.DrawRay(p, Vector3.forward, Color.red, 120);
-            }
+            // foreach (var p in intersectionPoints)
+            // {
+            //     Debug.DrawRay(p, Vector3.forward, Color.red, 120);
+            // }
 
             return new Mesh
             {
@@ -70,19 +74,34 @@ namespace Model
             // and raycast towards the back.
             // note the points that are hit
 
-            foreach (var planePoint in _planeMeshVertices)
+            var mt = _model.transform;
+            var box = _model.BoxCollider;
+            var maxLength = _model.Size.z;
+            var extents = _model.Extents;
+
+            
+            // the transform.position is NOT the centerpoint of the model!
+            var topLeft = mt.TransformPoint(box.center) + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
+            
+            var ray = new Ray(topLeft, mt.forward);
+            
+            // this is the normal of the slicer
+            var normalVec = _slicerRotation * Vector3.back;
+            
+            // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
+            var plane = new Plane(normalVec, _slicerPosition);
+            plane.Raycast(ray, out var distance);
+            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
+            if (math.abs(distance) > math.abs(maxLength))
             {
-                var isTouching = false;
-                var touchPoint = planePoint;
-
-                // slowly move to center and check if we touch the model
-                while (!isTouching && touchPoint != _slicerPosition)
-                {
-                    touchPoint = Vector3.MoveTowards(touchPoint, _slicerPosition, MoveDelta);
-                    isTouching = _model.BoxCollider.bounds.Contains(touchPoint);
-                }
-
-                yield return touchPoint;
+                // no hit
+                Debug.Log("No Hit");
+            }
+            else
+            {
+                // hit
+                Debug.Log("Hit!");
+                yield return ray.GetPoint(distance);
             }
         }
               
