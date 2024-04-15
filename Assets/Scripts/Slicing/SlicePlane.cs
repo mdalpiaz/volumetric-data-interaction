@@ -9,48 +9,30 @@ using UnityEngine;
 
 namespace Slicing
 {
-    public class SlicePlane
+    public static class SlicePlane
     {
-        private readonly Model.Model _model;
-        
-        public SlicePlaneCoordinates SlicePlaneCoordinates { get; }
-        
-        private SlicePlane(Model.Model model, SlicePlaneCoordinates plane)
+        public static Texture2D CalculateIntersectionPlane(Model.Model model, SlicePlaneCoordinates slicePlaneCoordinates, Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            _model = model;
-            SlicePlaneCoordinates = plane;
-        }
-        
-        public static SlicePlane? Create(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
-        {
-            var plane = GetSliceCoordinates(model, intersectionPoints);
-            return plane == null ? null : Create(model, plane);
-        }
+            var resultImage = new Texture2D(slicePlaneCoordinates.Width, slicePlaneCoordinates.Height);
 
-        public static SlicePlane Create(Model.Model model, SlicePlaneCoordinates plane) => new(model, plane);
-        
-        public Texture2D CalculateIntersectionPlane(Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
-        {
-            var resultImage = new Texture2D(SlicePlaneCoordinates.Width, SlicePlaneCoordinates.Height);
-
-            var startPoint = alternativeStartPoint ?? SlicePlaneCoordinates.StartPoint;
+            var startPoint = alternativeStartPoint ?? slicePlaneCoordinates.StartPoint;
             var currVector1 = startPoint;
             var currVector2 = startPoint;
 
-            for (var w = 0; w < SlicePlaneCoordinates.Width; w++)
+            for (var w = 0; w < slicePlaneCoordinates.Width; w++)
             {
-                currVector1.x = (int)Math.Round(startPoint.x + w * SlicePlaneCoordinates.XSteps.x, 0);
-                currVector1.y = (int)Math.Round(startPoint.y + w * SlicePlaneCoordinates.XSteps.y, 0);
-                currVector1.z = (int)Math.Round(startPoint.z + w * SlicePlaneCoordinates.XSteps.z, 0);
+                currVector1.x = (int)Math.Round(startPoint.x + w * slicePlaneCoordinates.XSteps.x, 0);
+                currVector1.y = (int)Math.Round(startPoint.y + w * slicePlaneCoordinates.XSteps.y, 0);
+                currVector1.z = (int)Math.Round(startPoint.z + w * slicePlaneCoordinates.XSteps.z, 0);
 
-                for (var h = 0; h < SlicePlaneCoordinates.Height; h++)
+                for (var h = 0; h < slicePlaneCoordinates.Height; h++)
                 {
-                    currVector2.x = (int)Math.Round(currVector1.x + h * SlicePlaneCoordinates.YSteps.x, 0);
-                    currVector2.y = (int)Math.Round(currVector1.y + h * SlicePlaneCoordinates.YSteps.y, 0);
-                    currVector2.z = (int)Math.Round(currVector1.z + h * SlicePlaneCoordinates.YSteps.z, 0);
+                    currVector2.x = (int)Math.Round(currVector1.x + h * slicePlaneCoordinates.YSteps.x, 0);
+                    currVector2.y = (int)Math.Round(currVector1.y + h * slicePlaneCoordinates.YSteps.y, 0);
+                    currVector2.z = (int)Math.Round(currVector1.z + h * slicePlaneCoordinates.YSteps.z, 0);
 
-                    var croppedIndex = ValueCropper.CropIntVector(currVector2, _model.CountVector);
-                    var currBitmap = _model.OriginalBitmap[croppedIndex.x];
+                    var croppedIndex = ValueCropper.CropIntVector(currVector2, model.CountVector);
+                    var currBitmap = model.OriginalBitmap[croppedIndex.x];
 
                     // convert coordinates from top-left to bottom-left
                     var result = Interpolation.Interpolate(interpolationType, currBitmap, croppedIndex.z, currBitmap.height - croppedIndex.y);
@@ -60,14 +42,14 @@ namespace Slicing
                         result = result.MakeBlackTransparent();
                     }
                     // flip the image
-                    resultImage.SetPixel(w, SlicePlaneCoordinates.Height - 1 - h, result);
+                    resultImage.SetPixel(w, slicePlaneCoordinates.Height - 1 - h, result);
                 }
             }
             resultImage.Apply();
             return resultImage;
         }
         
-        private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        public static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
             if (intersectionPoints.Count < 3)
             {
@@ -202,12 +184,15 @@ namespace Slicing
 
             return (widthSteps, heightSteps);
         }
-        
-        private static Vector3 GetClosestPoint(IEnumerable<Vector3> edgePoints, Vector3 targetPoint) => edgePoints
-            .ToDictionary(p => p, p => Vector3.Distance(p, targetPoint))
-            .OrderBy(p => p.Value)
-            .First()
-            .Key;
+
+        private static Vector3 GetClosestPoint(IEnumerable<Vector3> edgePoints, Vector3 targetPoint)
+        {
+            return edgePoints
+                .ToDictionary(p => p, p => Vector3.Distance(p, targetPoint))
+                .OrderBy(p => p.Value)
+                .First()
+                .Key;
+        }
         
         private static Vector3 GetCustomZeroVector(int zeroOnIndex) => new(
             zeroOnIndex == 0 ? 0 : 1,

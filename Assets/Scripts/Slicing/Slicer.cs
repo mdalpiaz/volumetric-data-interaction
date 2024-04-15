@@ -87,9 +87,9 @@ namespace Slicing
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
-            
-            var slicePlane = SlicePlane.Create(model, intersectionPoints);
-            if (slicePlane == null)
+
+            var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
+            if (slicePlaneCoords == null)
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
                 return;
@@ -97,7 +97,7 @@ namespace Slicing
 
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();
             transparentMaterial.name = "SliceMaterial";
-            transparentMaterial.mainTexture = slicePlane.CalculateIntersectionPlane();
+            transparentMaterial.mainTexture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
             //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
 
             var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);

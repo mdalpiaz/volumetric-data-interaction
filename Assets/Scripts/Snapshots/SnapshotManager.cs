@@ -210,20 +210,20 @@ namespace Snapshots
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
-            
-            var slicePlane = SlicePlane.Create(model, intersectionPoints);
-            if (slicePlane == null)
+
+            var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
+            if (slicePlaneCoords == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
             
-            var texture = slicePlane.CalculateIntersectionPlane();
+            var texture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
-            snapshot.SetIntersectionChild(texture, slicePlane.SlicePlaneCoordinates.StartPoint, model);
-            snapshot.PlaneCoordinates = slicePlane.SlicePlaneCoordinates;
+            snapshot.SetIntersectionChild(texture, slicePlaneCoords.StartPoint, model);
+            snapshot.PlaneCoordinates = slicePlaneCoords;
         
             var mainTransform = interfaceController.Main.transform;
             var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);
