@@ -10,6 +10,7 @@ using Model;
 using Networking;
 using Networking.openIA;
 using Networking.openIA.Commands;
+using Slicing;
 using UnityEngine;
 
 namespace Snapshots
@@ -204,7 +205,13 @@ namespace Snapshots
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
-            var slicePlane = model.GenerateSlicePlane(slicerPosition, slicerRotation);
+            var intersectionPoints = new ModelIntersection(model, slicerPosition, slicerRotation)
+                .GetNormalisedIntersectionPosition()
+                // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
+                .ToArray();
+            AudioManager.Instance.PlayCameraSound();
+            
+            var slicePlane = SlicePlane.Create(model, intersectionPoints);
             if (slicePlane == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");

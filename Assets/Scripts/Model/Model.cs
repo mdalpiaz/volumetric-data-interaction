@@ -74,27 +74,6 @@ namespace Model
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
         }
 
-        public SlicePlane? GenerateSlicePlane(Vector3 slicerPosition, Quaternion slicerRotation)
-        {
-            var validIntersectionPoints = new ModelIntersection(this,
-                slicerPosition,
-                slicerRotation/*,
-                sectionQuad.transform.localToWorldMatrix,
-                sectionQuad*/)
-                .GetNormalisedIntersectionPosition()
-                // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
-                .ToArray();
-            var slicePlane = SlicePlane.Create(this, validIntersectionPoints);
-            if (slicePlane == null)
-            {
-                Debug.LogWarning("SlicePlane couldn't be created");
-                return null;
-            }
-            
-            AudioManager.Instance.PlayCameraSound();
-            return slicePlane;
-        }
-
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
 
         public bool IsZEdgeVector(Vector3 point) => point.z == 0 || (point.z + 1) >= ZCount;

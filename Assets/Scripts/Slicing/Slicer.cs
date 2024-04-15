@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Linq;
 using Constants;
 using EzySlice;
 using Helper;
@@ -80,7 +81,14 @@ namespace Slicing
             var modelGo = model.gameObject;
 
             var sectionQuadTransform = sectionQuad.transform;
-            var slicePlane = model.GenerateSlicePlane(sectionQuadTransform.position, sectionQuadTransform.rotation);
+            
+            var intersectionPoints = new ModelIntersection(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
+                .GetNormalisedIntersectionPosition()
+                // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
+                .ToArray();
+            AudioManager.Instance.PlayCameraSound();
+            
+            var slicePlane = SlicePlane.Create(model, intersectionPoints);
             if (slicePlane == null)
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
