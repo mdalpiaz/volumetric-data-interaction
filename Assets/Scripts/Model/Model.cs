@@ -30,8 +30,6 @@ namespace Model
 
         private Mesh _originalMesh = null!;
         
-        private const float CropThreshold = 0.1f;
-
         public Selectable Selectable { get; private set; } = null!;
 
         public BoxCollider BoxCollider { get; private set; } = null!;
