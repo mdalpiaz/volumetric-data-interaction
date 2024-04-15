@@ -9,21 +9,25 @@ namespace Model
 {
     public static class ModelIntersection
     {
-        public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
-        {
-            return GetIntersectionPoints(model, slicerPosition, slicerRotation)
-                .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
-                .Select(newPosition => newPosition + model.Extents)
-                .Select(contact => PositionInModel(contact, model, model.Size));
-        }
+        // public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        // {
+        //     return GetIntersectionPoints(model, slicerPosition, slicerRotation)
+        //         .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
+        //         .Select(newPosition => newPosition + model.Extents)
+        //         .Select(contact => PositionInModel(contact, model, model.Size));
+        // }
         
         /// <summary>
         /// https://catlikecoding.com/unity/tutorials/procedural-meshes/creating-a-mesh/
         /// </summary>
-        public static Mesh CreateIntersectingMesh(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        // public static Mesh CreateIntersectingMesh(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        // {
+        //     var points = GetIntersectionPoints(model, slicerPosition, slicerRotation).ToArray();
+        //     return CreateIntersectingMesh(points);
+        // }
+
+        public static Mesh CreateIntersectingMesh(Vector3[] points)
         {
-            var points = GetIntersectionPoints(model, slicerPosition, slicerRotation)
-                .ToArray();
             foreach (var p in points)
             {
                 Debug.DrawRay(p, Vector3.forward, Color.red, 120);
@@ -55,7 +59,7 @@ namespace Model
             };
         }
 
-        private static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        public static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             // test ALL edges for cuts and return them
 

@@ -38,14 +38,7 @@ namespace Slicing
         [SerializeField]
         private Shader materialShader = null!;
         
-        private MeshFilter _cuttingPlaneMeshFilter = null!;
-        
         private bool _isTouched;
-
-        private void Awake()
-        {
-            _cuttingPlaneMeshFilter = cuttingPlane.GetComponent<MeshFilter>();
-        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -83,7 +76,7 @@ namespace Slicing
             var sectionQuadTransform = sectionQuad.transform;
             
             var intersectionPoints = ModelIntersection
-                .GetNormalisedIntersectionPosition(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
+                .GetIntersectionPoints(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
@@ -114,8 +107,7 @@ namespace Slicing
             SetTemporaryCuttingPlaneActive(true);
 
             //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
-            var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
-            var mesh = ModelIntersection.CreateIntersectingMesh(model, cuttingPlaneTransform.position, cuttingPlaneTransform.rotation);
+            var mesh = ModelIntersection.CreateIntersectingMesh(intersectionPoints);
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";

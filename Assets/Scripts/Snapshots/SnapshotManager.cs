@@ -206,7 +206,7 @@ namespace Snapshots
         {
             var model = ModelManager.Instance.CurrentModel;
             var intersectionPoints = ModelIntersection
-                .GetNormalisedIntersectionPosition(model, slicerPosition, slicerRotation)
+                .GetIntersectionPoints(model, slicerPosition, slicerRotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
