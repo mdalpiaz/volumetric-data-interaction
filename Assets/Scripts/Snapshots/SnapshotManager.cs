@@ -205,8 +205,8 @@ namespace Snapshots
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
-            var intersectionPoints = new ModelIntersection(model, slicerPosition, slicerRotation)
-                .GetNormalisedIntersectionPosition()
+            var intersectionPoints = ModelIntersection
+                .GetNormalisedIntersectionPosition(model, slicerPosition, slicerRotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();

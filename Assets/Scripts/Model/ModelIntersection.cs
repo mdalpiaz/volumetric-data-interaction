@@ -7,39 +7,23 @@ using UnityEngine;
 
 namespace Model
 {
-    public class ModelIntersection
+    public static class ModelIntersection
     {
-        private readonly Model _model;
-        private readonly Vector3 _slicerPosition;
-        private readonly Quaternion _slicerRotation;
-        // private readonly Matrix4x4 _slicerMatrix;
-        // private readonly IEnumerable<Vector3> _planeMeshVertices;
-
-        public ModelIntersection(Model model, Vector3 slicerPosition, Quaternion slicerRotation/*, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter*/)
+        public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            _model = model;
-            _slicerPosition = slicerPosition;
-            _slicerRotation = slicerRotation;
-            // _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
-            //
-            // var mesh = planeMeshFilter.sharedMesh;
-            // _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
-        }
-
-        public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
-        {
-            return GetIntersectionPoints()
-                .Select(p => _model.transform.worldToLocalMatrix.MultiplyPoint(p))
-                .Select(newPosition => newPosition + _model.Extents)
-                .Select(contact => PositionInModel(contact, _model, _model.Size));
+            return GetIntersectionPoints(model, slicerPosition, slicerRotation)
+                .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
+                .Select(newPosition => newPosition + model.Extents)
+                .Select(contact => PositionInModel(contact, model, model.Size));
         }
         
         /// <summary>
         /// https://catlikecoding.com/unity/tutorials/procedural-meshes/creating-a-mesh/
         /// </summary>
-        public Mesh CreateIntersectingMesh()
+        public static Mesh CreateIntersectingMesh(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var points = GetIntersectionPoints().ToArray();
+            var points = GetIntersectionPoints(model, slicerPosition, slicerRotation)
+                .ToArray();
             foreach (var p in points)
             {
                 Debug.DrawRay(p, Vector3.forward, Color.red, 120);
@@ -50,7 +34,7 @@ namespace Model
             // and the up vector can only move up and rotate down by 90 degrees.
             // it can NOT be rotated otherwise! (no roll, only pitch and yaw)
 
-
+            // TODO
             Debug.Log($"Intersection points: {points.Length}");
             if (points.Length == 3)
             {
@@ -71,21 +55,21 @@ namespace Model
             };
         }
 
-        private IEnumerable<Vector3> GetIntersectionPoints()
+        private static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             // test ALL edges for cuts and return them
 
-            var mt = _model.transform;
+            var mt = model.transform;
             // transform.position is NOT the centerpoint of the model!
-            var center = mt.TransformPoint(_model.BoxCollider.center);
-            var size = _model.Size;
-            var extents = _model.Extents;
+            var center = mt.TransformPoint(model.BoxCollider.center);
+            var size = model.Size;
+            var extents = model.Extents;
             
             // this is the normal of the slicer
-            var normalVec = _slicerRotation * Vector3.back;
+            var normalVec = slicerRotation * Vector3.back;
             
             // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
-            var plane = new Plane(normalVec, _slicerPosition);
+            var plane = new Plane(normalVec, slicerPosition);
             
             // test Z axis (front - back)
             var topFrontLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.forward * extents.z;

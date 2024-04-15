@@ -82,8 +82,8 @@ namespace Slicing
 
             var sectionQuadTransform = sectionQuad.transform;
             
-            var intersectionPoints = new ModelIntersection(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
-                .GetNormalisedIntersectionPosition()
+            var intersectionPoints = ModelIntersection
+                .GetNormalisedIntersectionPosition(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
@@ -115,12 +115,7 @@ namespace Slicing
 
             //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
             var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
-            var mesh = new ModelIntersection(model,
-                cuttingPlaneTransform.position,
-                cuttingPlaneTransform.rotation/*,
-                cuttingPlaneTransform.localToWorldMatrix,
-                _cuttingPlaneMeshFilter*/)
-                .CreateIntersectingMesh();
+            var mesh = ModelIntersection.CreateIntersectingMesh(model, cuttingPlaneTransform.position, cuttingPlaneTransform.rotation);
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
