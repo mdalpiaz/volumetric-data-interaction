@@ -76,8 +76,6 @@ namespace Model
 
         public SlicePlane? GenerateSlicePlane(Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
-
             var validIntersectionPoints = new ModelIntersection(this,
                 slicerPosition,
                 slicerRotation/*,
