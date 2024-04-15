@@ -12,19 +12,18 @@ namespace Model
         private readonly Model _model;
         private readonly Vector3 _slicerPosition;
         private readonly Quaternion _slicerRotation;
-        private readonly Matrix4x4 _slicerMatrix;
+        // private readonly Matrix4x4 _slicerMatrix;
+        // private readonly IEnumerable<Vector3> _planeMeshVertices;
 
-        private readonly IEnumerable<Vector3> _planeMeshVertices;
-
-        public ModelIntersection(Model model, Vector3 slicerPosition, Quaternion slicerRotation, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter)
+        public ModelIntersection(Model model, Vector3 slicerPosition, Quaternion slicerRotation/*, Matrix4x4 slicerLocalToWorld, MeshFilter planeMeshFilter*/)
         {
             _model = model;
             _slicerPosition = slicerPosition;
             _slicerRotation = slicerRotation;
-            _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
-            
-            var mesh = planeMeshFilter.sharedMesh;
-            _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
+            // _slicerMatrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
+            //
+            // var mesh = planeMeshFilter.sharedMesh;
+            // _planeMeshVertices = mesh.vertices.Select(v => slicerLocalToWorld.MultiplyPoint(v));
         }
 
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()

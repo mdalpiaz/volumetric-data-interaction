@@ -109,9 +109,9 @@ namespace Slicing
             var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
             var mesh = new ModelIntersection(model,
                 cuttingPlaneTransform.position,
-                cuttingPlaneTransform.rotation,
+                cuttingPlaneTransform.rotation/*,
                 cuttingPlaneTransform.localToWorldMatrix,
-                _cuttingPlaneMeshFilter)
+                _cuttingPlaneMeshFilter*/)
                 .CreateIntersectingMesh();
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);

@@ -81,9 +81,9 @@ namespace Model
             // TODO only works, if the sectionQuad's center is inside the model
             var validIntersectionPoints = new ModelIntersection(this,
                 slicerPosition,
-                slicerRotation,
+                slicerRotation/*,
                 sectionQuad.transform.localToWorldMatrix,
-                sectionQuad)
+                sectionQuad*/)
                 .GetNormalisedIntersectionPosition()
                 .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
