@@ -29,14 +29,10 @@ namespace Model
 
         public IEnumerable<Vector3> GetNormalisedIntersectionPosition()
         {
-            var intersectionPoints = GetIntersectionPoints();
-            var halfColliderSize = _model.BoxCollider.size / 2;
-
-            var normalisedPositions = intersectionPoints
+            return GetIntersectionPoints()
                 .Select(p => _model.transform.worldToLocalMatrix.MultiplyPoint(p))
-                .Select(newPosition => GetNormalisedPosition(newPosition, halfColliderSize));
-
-            return CalculatePositionWithinModel(normalisedPositions, _model, _model.BoxCollider.size);
+                .Select(newPosition => newPosition + _model.Extents)
+                .Select(contact => PositionInModel(contact, _model, _model.Size));
         }
         
         /// <summary>
