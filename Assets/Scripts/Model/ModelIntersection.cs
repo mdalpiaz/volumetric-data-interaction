@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Extensions;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Model
@@ -48,10 +47,10 @@ namespace Model
         public Mesh CreateIntersectingMesh()
         {
             var originalIntersectionPoints = GetIntersectionPoints();
-            // foreach (var p in originalIntersectionPoints)
-            // {
-            //     Debug.DrawRay(p, Vector3.forward, Color.green, 120);
-            // }
+            foreach (var p in originalIntersectionPoints)
+            {
+                Debug.DrawRay(p, Vector3.forward, Color.green, 120);
+            }
             var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _model.BoxCollider);
             // foreach (var p in intersectionPoints)
             // {
@@ -73,26 +72,80 @@ namespace Model
             // start at the 4 corners on the front
             // and raycast towards the back.
             // note the points that are hit
+            
+            // TODO idea extension!
+            // test ALL edges and put points into a list
+            // filter out duplicates (every edge can be cut max once!)
 
             var mt = _model.transform;
-            var box = _model.BoxCollider;
+            // transform.position is NOT the centerpoint of the model!
+            var center = mt.TransformPoint(_model.BoxCollider.center);
             var maxLength = _model.Size.z;
             var extents = _model.Extents;
-
-            
-            // the transform.position is NOT the centerpoint of the model!
-            var topLeft = mt.TransformPoint(box.center) + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
-            
-            var ray = new Ray(topLeft, mt.forward);
             
             // this is the normal of the slicer
             var normalVec = _slicerRotation * Vector3.back;
             
             // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
             var plane = new Plane(normalVec, _slicerPosition);
+            
+            var topLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
+            var ray = new Ray(topLeft, mt.forward);
             plane.Raycast(ray, out var distance);
+            distance *= -1;
             Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
-            if (math.abs(distance) > math.abs(maxLength))
+            if (distance > maxLength)
+            {
+                // no hit
+                Debug.Log("No Hit");
+            }
+            else
+            {
+                // hit
+                Debug.Log("Hit!");
+                yield return ray.GetPoint(distance);
+            }
+            
+            var topRight = center + mt.right * extents.x + mt.up * extents.y + mt.backward() * extents.z;
+            ray = new Ray(topRight, mt.forward);
+            plane.Raycast(ray, out distance);
+            distance *= -1;
+            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
+            if (distance > maxLength)
+            {
+                // no hit
+                Debug.Log("No Hit");
+            }
+            else
+            {
+                // hit
+                Debug.Log("Hit!");
+                yield return ray.GetPoint(distance);
+            }
+            
+            var bottomLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
+            ray = new Ray(bottomLeft, mt.forward);
+            plane.Raycast(ray, out distance);
+            distance *= -1;
+            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
+            if (distance > maxLength)
+            {
+                // no hit
+                Debug.Log("No Hit");
+            }
+            else
+            {
+                // hit
+                Debug.Log("Hit!");
+                yield return ray.GetPoint(distance);
+            }
+            
+            var bottomRight = center + mt.right * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
+            ray = new Ray(bottomRight, mt.forward);
+            plane.Raycast(ray, out distance);
+            distance *= -1;
+            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
+            if (distance > maxLength)
             {
                 // no hit
                 Debug.Log("No Hit");
@@ -109,15 +162,20 @@ namespace Model
         {
             foreach (var contact in normalisedContacts)
             {
-                var xRelativePosition = (contact.z / size.z) * model.XCount;
-                var yRelativePosition = (contact.y / size.y) * model.YCount;
-                var zRelativePosition = (contact.x / size.x) * model.ZCount;
-
-                yield return new Vector3(
-                    Mathf.Round(xRelativePosition),
-                    Mathf.Round(yRelativePosition),
-                    Mathf.Round(zRelativePosition));
+                yield return PositionInModel(contact, model, size);
             }
+        }
+
+        private static Vector3 PositionInModel(Vector3 contact, Model model, Vector3 size)
+        {
+            var xRelativePosition = (contact.z / size.z) * model.XCount;
+            var yRelativePosition = (contact.y / size.y) * model.YCount;
+            var zRelativePosition = (contact.x / size.x) * model.ZCount;
+
+            return new Vector3(
+                Mathf.Round(xRelativePosition),
+                Mathf.Round(yRelativePosition),
+                Mathf.Round(zRelativePosition));
         }
 
         private static IEnumerable<Vector3> GetBoundaryIntersections(IReadOnlyList<Vector3> intersectionPoints, BoxCollider collider)
