@@ -3608,7 +3608,7 @@ PrefabInstance:
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: stackPath
-      value: C:\DevProjects\volume data\Stack_converted
+      value: C:\Users\p42652\Desktop\Janine_VIVE_Data\Data\Stack_converted
       objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
