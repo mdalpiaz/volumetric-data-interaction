@@ -2,11 +2,9 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using Constants;
 using Helper;
 using Selection;
-using Slicing;
 using UnityEngine;
 
 namespace Model
