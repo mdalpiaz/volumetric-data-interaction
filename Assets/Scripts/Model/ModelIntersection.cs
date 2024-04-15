@@ -68,19 +68,12 @@ namespace Model
 
         private IEnumerable<Vector3> GetIntersectionPoints()
         {
-            // TODO idea!
-            // start at the 4 corners on the front
-            // and raycast towards the back.
-            // note the points that are hit
-            
-            // TODO idea extension!
-            // test ALL edges and put points into a list
-            // filter out duplicates (every edge can be cut max once!)
+            // test ALL edges for cuts and return them
 
             var mt = _model.transform;
             // transform.position is NOT the centerpoint of the model!
             var center = mt.TransformPoint(_model.BoxCollider.center);
-            var maxLength = _model.Size.z;
+            var size = _model.Size;
             var extents = _model.Extents;
             
             // this is the normal of the slicer
@@ -89,71 +82,97 @@ namespace Model
             // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
             var plane = new Plane(normalVec, _slicerPosition);
             
-            var topLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
-            var ray = new Ray(topLeft, mt.forward);
-            plane.Raycast(ray, out var distance);
-            distance *= -1;
-            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
-            if (distance > maxLength)
+            // test Z axis (front - back)
+            var topFrontLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.forward * extents.z;
+            var ray = new Ray(topFrontLeft, mt.backward());
+            if (plane.Raycast(ray, out var distance) &&
+                distance >= 0 && distance <= size.z)
             {
-                // no hit
-                Debug.Log("No Hit");
-            }
-            else
-            {
-                // hit
-                Debug.Log("Hit!");
                 yield return ray.GetPoint(distance);
             }
             
-            var topRight = center + mt.right * extents.x + mt.up * extents.y + mt.backward() * extents.z;
-            ray = new Ray(topRight, mt.forward);
-            plane.Raycast(ray, out distance);
-            distance *= -1;
-            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
-            if (distance > maxLength)
+            var topFrontRight = center + mt.right * extents.x + mt.up * extents.y + mt.forward * extents.z;
+            ray = new Ray(topFrontRight, mt.backward());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.z)
             {
-                // no hit
-                Debug.Log("No Hit");
-            }
-            else
-            {
-                // hit
-                Debug.Log("Hit!");
                 yield return ray.GetPoint(distance);
             }
             
-            var bottomLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
-            ray = new Ray(bottomLeft, mt.forward);
-            plane.Raycast(ray, out distance);
-            distance *= -1;
-            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
-            if (distance > maxLength)
+            var bottomFrontLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.forward * extents.z;
+            ray = new Ray(bottomFrontLeft, mt.backward());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.z)
             {
-                // no hit
-                Debug.Log("No Hit");
-            }
-            else
-            {
-                // hit
-                Debug.Log("Hit!");
                 yield return ray.GetPoint(distance);
             }
             
-            var bottomRight = center + mt.right * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
-            ray = new Ray(bottomRight, mt.forward);
-            plane.Raycast(ray, out distance);
-            distance *= -1;
-            Debug.Log($"Distance: {distance}, MaxLength: {maxLength}");
-            if (distance > maxLength)
+            var bottomFrontRight = center + mt.right * extents.x + mt.down() * extents.y + mt.forward * extents.z;
+            ray = new Ray(bottomFrontRight, mt.backward());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.z)
             {
-                // no hit
-                Debug.Log("No Hit");
+                yield return ray.GetPoint(distance);
             }
-            else
+            
+            // test Y axis (top - bottom)
+            var topBackLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
+            ray = new Ray(topBackLeft, mt.down());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.y)
             {
-                // hit
-                Debug.Log("Hit!");
+                yield return ray.GetPoint(distance);
+            }
+            
+            ray = new Ray(topFrontLeft, mt.down());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.y)
+            {
+                yield return ray.GetPoint(distance);
+            }
+            
+            ray = new Ray(topFrontRight, mt.down());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.y)
+            {
+                yield return ray.GetPoint(distance);
+            }
+            
+            var topBackRight = center + mt.right * extents.x + mt.up * extents.y + mt.backward() * extents.z;
+            ray = new Ray(topBackRight, mt.down());
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.y)
+            {
+                yield return ray.GetPoint(distance);
+            }
+
+            // test X axis (left - right)
+            ray = new Ray(topFrontLeft, mt.right);
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.x)
+            {
+                yield return ray.GetPoint(distance);
+            }
+            
+            ray = new Ray(bottomFrontLeft, mt.right);
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.x)
+            {
+                yield return ray.GetPoint(distance);
+            }
+            
+            ray = new Ray(topBackLeft, mt.right);
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.x)
+            {
+                yield return ray.GetPoint(distance);
+            }
+            
+            var bottomBackLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
+            ray = new Ray(bottomBackLeft, mt.right);
+            if (plane.Raycast(ray, out distance) &&
+                distance >= 0 && distance <= size.x)
+            {
                 yield return ray.GetPoint(distance);
             }
         }
