@@ -40,20 +40,32 @@ namespace Model
         /// </summary>
         public Mesh CreateIntersectingMesh()
         {
-            var originalIntersectionPoints = GetIntersectionPoints();
-            foreach (var p in originalIntersectionPoints)
+            var points = GetIntersectionPoints().ToArray();
+            foreach (var p in points)
             {
-                Debug.DrawRay(p, Vector3.forward, Color.green, 120);
+                Debug.DrawRay(p, Vector3.forward, Color.red, 120);
             }
-            var intersectionPoints = GetBoundaryIntersections(originalIntersectionPoints.ToList(), _model.BoxCollider);
-            // foreach (var p in intersectionPoints)
-            // {
-            //     Debug.DrawRay(p, Vector3.forward, Color.red, 120);
-            // }
 
+            // cube cross-section has very specific cuts
+            // we need to construct the smallest rectangle with all the points on the corner
+            // and the up vector can only move up and rotate down by 90 degrees.
+            // it can NOT be rotated otherwise! (no roll, only pitch and yaw)
+
+
+            Debug.Log($"Intersection points: {points.Length}");
+            if (points.Length == 3)
+            {
+            }
+            else if (points.Length == 4)
+            {
+            }
+            else if (points.Length == 6)
+            {
+            }
+            
             return new Mesh
             {
-                vertices = intersectionPoints.ToArray(),
+                vertices = points.ToArray(),
                 triangles = new int[] { 0, 2, 1, 1, 2, 3},
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back , Vector3.back },
                 uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }
