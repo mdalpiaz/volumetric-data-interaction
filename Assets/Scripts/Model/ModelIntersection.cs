@@ -9,14 +9,6 @@ namespace Model
 {
     public static class ModelIntersection
     {
-        // public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
-        // {
-        //     return GetIntersectionPoints(model, slicerPosition, slicerRotation)
-        //         .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
-        //         .Select(newPosition => newPosition + model.Extents)
-        //         .Select(contact => PositionInModel(contact, model, model.Size));
-        // }
-        
         /// <summary>
         /// https://catlikecoding.com/unity/tutorials/procedural-meshes/creating-a-mesh/
         /// </summary>
@@ -26,7 +18,7 @@ namespace Model
         //     return CreateIntersectingMesh(points);
         // }
 
-        public static Mesh CreateIntersectingMesh(Vector3[] points)
+        public static Mesh? CreateIntersectingMesh(Vector3[] points)
         {
             foreach (var p in points)
             {
@@ -42,21 +34,33 @@ namespace Model
             Debug.Log($"Intersection points: {points.Length}");
             if (points.Length == 3)
             {
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up }
+                };
             }
             else if (points.Length == 4)
             {
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1, 1, 2, 3 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }
+                };
             }
             else if (points.Length == 6)
             {
+                // ordering triangles the right way now gets much harder
+                return null;
             }
-            
-            return new Mesh
+            else
             {
-                vertices = points.ToArray(),
-                triangles = new int[] { 0, 2, 1, 1, 2, 3},
-                normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back , Vector3.back },
-                uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }
-            };
+                return null;
+            }
         }
 
         public static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
@@ -170,11 +174,29 @@ namespace Model
             }
         }
 
-        private static Vector3 PositionInModel(Vector3 contact, Model model, Vector3 size)
+
+        // public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        // {
+        //     return GetIntersectionPoints(model, slicerPosition, slicerRotation)
+        //         .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
+        //         .Select(newPosition => newPosition + model.Extents)
+        //         .Select(contact => PositionInModel(contact, model, model.Size));
+        // }
+
+        public static IEnumerable<Vector3> PointsToModelCoordinates(IEnumerable<Vector3> points, Model model)
         {
-            var xRelativePosition = (contact.z / size.z) * model.XCount;
-            var yRelativePosition = (contact.y / size.y) * model.YCount;
-            var zRelativePosition = (contact.x / size.x) * model.ZCount;
+            foreach (var p in points)
+            {
+                var temp = model.transform.worldToLocalMatrix.MultiplyPoint(p);
+                yield return PositionInModel(temp, model);
+            }
+        }
+
+        private static Vector3 PositionInModel(Vector3 contact, Model model)
+        {
+            var xRelativePosition = (contact.z / model.Size.z) * model.XCount;
+            var yRelativePosition = (contact.y / model.Size.y) * model.YCount;
+            var zRelativePosition = (contact.x / model.Size.x) * model.ZCount;
 
             return new Vector3(
                 Mathf.Round(xRelativePosition),
