@@ -19,6 +19,7 @@ namespace Slicing
             Vector3? alternativeStartPoint = null,
             InterpolationType interpolationType = InterpolationType.Nearest)
         {
+            // TODO xSteps and ySteps are swapped!
             sliceCoords = GetSliceCoordinates(model, intersectionPoints);
             if (sliceCoords == null)
             {
