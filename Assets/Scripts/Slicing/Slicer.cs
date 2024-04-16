@@ -81,16 +81,16 @@ namespace Slicing
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
 
-            var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
-            if (slicePlaneCoords == null)
-            {
-                Debug.LogWarning("Intersection image can't be calculated!");
-                return;
-            }
+            //var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
+            //if (slicePlaneCoords == null)
+            //{
+            //    Debug.LogWarning("Intersection image can't be calculated!");
+            //    return;
+            //}
 
-            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
-            transparentMaterial.name = "SliceMaterial";
-            transparentMaterial.mainTexture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
+            //var transparentMaterial = MaterialTools.CreateTransparentMaterial();
+            //transparentMaterial.name = "SliceMaterial";
+            //transparentMaterial.mainTexture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
             //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
 
             var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
@@ -108,6 +108,10 @@ namespace Slicing
 
             //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
             var mesh = ModelIntersection.CreateIntersectingMesh(intersectionPoints);
+            if (mesh == null)
+            {
+                Debug.LogWarning($"Cannot create mesh! Number of points: {intersectionPoints.Length}");
+            }
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
