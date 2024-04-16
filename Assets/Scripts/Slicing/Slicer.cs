@@ -72,14 +72,20 @@ namespace Slicing
             var cachedTransform = transform;
             var model = ModelManager.Instance.CurrentModel;
             var modelGo = model.gameObject;
-
             var sectionQuadTransform = sectionQuad.transform;
+            
+            var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
+            if (slicedObject == null)
+            {
+                Debug.LogError("Nothing sliced");
+                return;
+            }
+            AudioManager.Instance.PlayCameraSound();
             
             var intersectionPoints = ModelIntersection
                 .GetIntersectionPoints(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
-            AudioManager.Instance.PlayCameraSound();
 
             //var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
             //if (slicePlaneCoords == null)
@@ -92,13 +98,6 @@ namespace Slicing
             //transparentMaterial.name = "SliceMaterial";
             //transparentMaterial.mainTexture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
             //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
-
-            var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
-            if (slicedObject == null)
-            {
-                Debug.LogError("Nothing sliced");
-                return;
-            }
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
