@@ -68,7 +68,7 @@ namespace Slicing
             return resultImage;
         }
         
-        public static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
             if (intersectionPoints.Count < 3)
             {
