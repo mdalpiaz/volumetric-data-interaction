@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Extensions;
 using Helper;
@@ -11,6 +12,24 @@ namespace Slicing
 {
     public static class SlicePlane
     {
+        public static bool CalculateIntersectionPlane(
+            [NotNullWhen(true)] out SlicePlaneCoordinates? sliceCoords,
+            [NotNullWhen(true)] out Texture2D? texture,
+            Model.Model model, IReadOnlyList<Vector3> intersectionPoints,
+            Vector3? alternativeStartPoint = null,
+            InterpolationType interpolationType = InterpolationType.Nearest)
+        {
+            sliceCoords = GetSliceCoordinates(model, intersectionPoints);
+            if (sliceCoords == null)
+            {
+                texture = null;
+                return false;
+            }
+
+            texture = CalculateIntersectionPlane(model, sliceCoords, alternativeStartPoint, interpolationType);
+            return true;
+        }
+        
         public static Texture2D CalculateIntersectionPlane(Model.Model model, SlicePlaneCoordinates slicePlaneCoordinates, Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
         {
             var resultImage = new Texture2D(slicePlaneCoordinates.Width, slicePlaneCoordinates.Height);

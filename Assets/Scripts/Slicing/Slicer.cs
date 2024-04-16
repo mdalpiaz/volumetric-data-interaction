@@ -87,17 +87,16 @@ namespace Slicing
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
 
-            //var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
-            //if (slicePlaneCoords == null)
-            //{
-            //    Debug.LogWarning("Intersection image can't be calculated!");
-            //    return;
-            //}
+            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, model, intersectionPoints))
+            {
+                Debug.LogWarning("Intersection image can't be calculated!");
+                return;
+            }
 
-            //var transparentMaterial = MaterialTools.CreateTransparentMaterial();
-            //transparentMaterial.name = "SliceMaterial";
-            //transparentMaterial.mainTexture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
-            //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
+            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
+            transparentMaterial.name = "SliceMaterial";
+            transparentMaterial.mainTexture = texture;
+            var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, sliceCoords.StartPoint);
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
@@ -115,7 +114,7 @@ namespace Slicing
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
             quad.Mesh = mesh;
-            //quad.Material = sliceMaterial;
+            quad.Material = sliceMaterial;
         }
         
         public void SetTemporaryCuttingPlaneActive(bool active)

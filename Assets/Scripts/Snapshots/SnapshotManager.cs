@@ -211,19 +211,17 @@ namespace Snapshots
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
 
-            var slicePlaneCoords = SlicePlane.GetSliceCoordinates(model, intersectionPoints);
-            if (slicePlaneCoords == null)
+            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, model, intersectionPoints))
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
             
-            var texture = SlicePlane.CalculateIntersectionPlane(model, slicePlaneCoords);
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
-            snapshot.SetIntersectionChild(texture, slicePlaneCoords.StartPoint, model);
-            snapshot.PlaneCoordinates = slicePlaneCoords;
+            snapshot.SetIntersectionChild(texture, sliceCoords.StartPoint, model);
+            snapshot.PlaneCoordinates = sliceCoords;
         
             var mainTransform = interfaceController.Main.transform;
             var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);
