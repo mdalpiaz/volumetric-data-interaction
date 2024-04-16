@@ -20,12 +20,11 @@ namespace Model
 
         public static Mesh? CreateIntersectingMesh(Vector3[] points)
         {
-            // TODO cube cross-section has very specific cuts
+            // cube cross-section has very specific cuts
             // we need to construct the smallest rectangle with all the points on the corner
             // and the up vector can only move up and rotate down by 90 degrees.
             // it can NOT be rotated otherwise! (no roll, only pitch and yaw)
 
-            // TODO
             Debug.Log($"Intersection points: {points.Length}");
             if (points.Length == 3)
             {
