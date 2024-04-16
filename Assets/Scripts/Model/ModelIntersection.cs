@@ -69,7 +69,7 @@ namespace Model
                 return new Mesh
                 {
                     vertices = points,
-                    triangles = new int[] { 0, 2, 1, 0, 3, 2, 0, 4, 3, 0, 5, 4 },
+                    triangles = new int[] { 0, 2, 1, 0, 5, 2, 5, 3, 2, 5, 4, 3 },
                     normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back },
                     uv = new Vector2[] {}
                 };
