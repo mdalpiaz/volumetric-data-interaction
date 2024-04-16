@@ -20,12 +20,7 @@ namespace Model
 
         public static Mesh? CreateIntersectingMesh(Vector3[] points)
         {
-            foreach (var p in points)
-            {
-                Debug.DrawRay(p, Vector3.forward, Color.red, 120);
-            }
-
-            // cube cross-section has very specific cuts
+            // TODO cube cross-section has very specific cuts
             // we need to construct the smallest rectangle with all the points on the corner
             // and the up vector can only move up and rotate down by 90 degrees.
             // it can NOT be rotated otherwise! (no roll, only pitch and yaw)
@@ -34,6 +29,10 @@ namespace Model
             Debug.Log($"Intersection points: {points.Length}");
             if (points.Length == 3)
             {
+                Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                Debug.DrawRay(points[1], Vector3.forward, Color.magenta, 120);
+                Debug.DrawRay(points[2], Vector3.forward, Color.red, 120);
+                
                 return new Mesh
                 {
                     vertices = points,
@@ -42,25 +41,40 @@ namespace Model
                     uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up }
                 };
             }
-            else if (points.Length == 4)
+            if (points.Length == 4)
             {
+                Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
+                Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
+                Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
+                
                 return new Mesh
                 {
                     vertices = points,
-                    triangles = new int[] { 0, 2, 1, 1, 2, 3 },
+                    triangles = new int[] { 0, 2, 1, 0, 3, 2 },
                     normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
-                    uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }
+                    uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
                 };
             }
-            else if (points.Length == 6)
+            if (points.Length == 6)
             {
                 // ordering triangles the right way now gets much harder
-                return null;
+                Debug.DrawRay(points[0], Vector3.forward, Color.magenta, 120);
+                Debug.DrawRay(points[1], Vector3.forward, Color.blue, 120);
+                Debug.DrawRay(points[2], Vector3.forward, Color.green, 120);
+                Debug.DrawRay(points[3], Vector3.forward, Color.yellow, 120);
+                Debug.DrawRay(points[4], Vector3.forward, new Color(1.0f, 0.65f, 0.0f, 1.0f), 120);
+                Debug.DrawRay(points[5], Vector3.forward, Color.red, 120);
+
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1, 0, 3, 2, 0, 4, 3, 0, 5, 4 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] {}
+                };
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         public static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
