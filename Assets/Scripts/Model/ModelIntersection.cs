@@ -65,6 +65,43 @@ namespace Model
 
         public static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
+            var points = GetIntersectionPoints_internal(model, slicerPosition, slicerRotation).ToArray();
+            
+            // we need to sort the points by angle, so that the mesh later on will be visible
+            // to find the right order of the points
+            // we can find the middle point and then calculate the angle between all points
+            var minX = points.Min(p => p.x);
+            var maxX = points.Max(p => p.x);
+            var minY = points.Min(p => p.y);
+            var maxY = points.Max(p => p.y);
+            var minZ = points.Min(p => p.z);
+            var maxZ = points.Max(p => p.z);
+            
+            var middle = new Vector3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
+
+            var slicerUp = slicerRotation * Vector3.up;
+            var slicerLeft = slicerRotation * Vector3.left;
+
+            var pointsInQuadrants = points
+                .Select(p => (p, Vector3.Normalize(p - middle)))
+                .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
+                .ToArray();
+
+            // the quadrants go: top left, bottom left, bottom right, top right
+            var q1 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q2 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q3 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: < 0}).OrderBy(p => p.Item2);
+            var q4 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: < 0 }).OrderBy(p => p.Item2);
+
+            return q1
+                .Concat(q2)
+                .Concat(q3)
+                .Concat(q4)
+                .Select(p => p.p);
+        }
+
+        private static IEnumerable<Vector3> GetIntersectionPoints_internal(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        {
             // test ALL edges for cuts and return them
 
             var mt = model.transform;
