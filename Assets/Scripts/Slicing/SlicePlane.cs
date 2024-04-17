@@ -77,25 +77,66 @@ namespace Slicing
                 return null;
             }
 
-            // get bottom left edge (get most left point and most bottom point and check where they meet on the plane)
-            var forward = plane.flipped.normal.normalized;
-            var left = new Vector3(-forward.y, 0, -forward.x).normalized;
-            var down = new Vector3(forward.x, 0, forward.z);
-            Debug.DrawRay(Vector3.zero, forward, Color.black, 120);
-            Debug.DrawRay(Vector3.zero, left, Color.red, 120);
+            // get bottom left edge (get left-most point and bottom-most point and check where they meet on the plane)
+            var forward = plane.normal;
+            var rotation = Quaternion.LookRotation(forward);
+
+            var up = rotation * Vector3.up;
+            var down = rotation * Vector3.down;
+
+            // yes, they are swapped!
+            //var left = rotation * Vector3.right;
+            //var right = rotation * Vector3.left;
+
+            // to get the left-most point the following algorithm is run:
+            // construct a horizontal plane at to bottom-most point
+            // for every intersection point, raycast with the down direction until the plane is hit (we get the distance to the bottom)
+            // move all points onto the new plane
+            // now get the left-most point
 
             // 1) get start point at the bottom left
             var minPoint = intersectionPoints.Select(p => p.y).Min();
-            // we don't need height
-            var leftPoints = intersectionPoints.Select(p => new Vector2(p.x, p.z));
-
-            foreach (var p in leftPoints)
+            var lowerPlane = new Plane(Vector3.up, -minPoint);
+            var lowerPoints = intersectionPoints.Select(p =>
             {
-                Debug.DrawRay(p, Vector3.down, Color.red, 120);
-            }
+                var ray = new Ray(p, down);
+                lowerPlane.Raycast(ray, out var distance);
+                return p + down * distance;
+            });
+
+            // we take the first point as base measurement and compare with all other points
+            var first = lowerPoints.First();
+            var leftPoint = lowerPoints.OrderBy(p => Vector3.Distance(first, p)).First();
+
+            // 1.5) and also at the top right to calculate the difference
+            var maxPoint = intersectionPoints.Select(p => p.y).Max();
+            var upperPlane = new Plane(Vector3.up, -maxPoint);
+            var upperPoints = intersectionPoints.Select(p =>
+            {
+                var ray = new Ray(p, up);
+                upperPlane.Raycast(ray, out var distance);
+                return p + up * distance;
+            });
+
+            var last = upperPoints.Last();
+            var rightPoint = upperPoints.OrderBy(p => Vector3.Distance(last, p)).First();
 
             // TODO
-            return null;
+            // 2) we get the width and height of the new texture
+            // what we do is:
+            // for width we only look at X and Z axis and we get the one with the most pixels
+            // for height we DON'T look at the Y height, we compare the point of the lower points with the higher points and count pixels
+            var width = 0;
+            var height = 0;
+
+            Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
+
+            // TODO
+            // 3) we get the step size using the edge points and width and height
+            var xSteps = Vector3.zero;
+            var ySteps = Vector3.zero;
+
+            return new SlicePlaneCoordinates(width, height, leftPoint, xSteps, ySteps);
         }
 
         private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
