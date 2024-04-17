@@ -23,5 +23,10 @@ namespace Slicing
             XSteps = xSteps;
             YSteps = ySteps;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Width)}: {Width}, {nameof(Height)}: {Height}, {nameof(StartPoint)}: {StartPoint}, {nameof(XSteps)}: {XSteps}, {nameof(YSteps)}: {YSteps}";
+        }
     }
 }
