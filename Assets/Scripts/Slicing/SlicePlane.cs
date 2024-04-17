@@ -106,7 +106,9 @@ namespace Slicing
 
             // we take the first point as base measurement and compare with all other points
             var first = lowerPoints.First();
-            var leftPoint = lowerPoints.OrderBy(p => Vector3.Distance(first, p)).First();
+            lowerPoints = lowerPoints.OrderBy(p => Vector3.Distance(first, p)).ToArray();
+            var lowerLeft = lowerPoints.First();
+            var lowerRight = lowerPoints.Last();
 
             // 1.5) and also at the top right to calculate the difference
             var maxPoint = intersectionPoints.Select(p => p.y).Max();
@@ -119,7 +121,9 @@ namespace Slicing
             });
 
             var last = upperPoints.Last();
-            var rightPoint = upperPoints.OrderBy(p => Vector3.Distance(last, p)).First();
+            upperPoints = upperPoints.OrderBy(p => Vector3.Distance(last, p)).ToArray();
+            var upperLeft = upperPoints.Last();
+            var upperRight = upperPoints.First();
 
             // TODO
             // 2) we get the width and height of the new texture
@@ -131,12 +135,33 @@ namespace Slicing
 
             Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
 
+            var steps = Vector3.zero;
+            steps.x = model.Size.x / model.XCount;
+            steps.y = model.Size.y / model.YCount;
+            steps.z = model.Size.z / model.ZCount;
+
+            Debug.Log($"Size: {model.Size}, Steps: {steps}");
+
+            var diff = upperRight - lowerLeft;
+            var xSteps = (int)(diff.x / steps.x);
+            var ySteps = (int)(diff.y / steps.y);
+            var zSteps = (int)(diff.z / steps.z);
+
+            Debug.Log($"Steps X: {xSteps}, Y: {ySteps}, Z: {zSteps}");
+
+            // TODO only works, if top and bottom are touching the top and bottom of model
+            // fully vertical slices don't work yet
+            height = ySteps;
+            width = xSteps > zSteps ? xSteps : zSteps;
+
             // TODO
             // 3) we get the step size using the edge points and width and height
-            var xSteps = Vector3.zero;
-            var ySteps = Vector3.zero;
+            var textureStepX = (lowerRight - lowerLeft) / width;
+            var textureStepY = (upperRight - lowerLeft) / height;
 
-            return new SlicePlaneCoordinates(width, height, leftPoint, xSteps, ySteps);
+            var sliceCoords = new SlicePlaneCoordinates(width, height, lowerLeft, textureStepX, Vector3.zero);
+            Debug.Log($"SliceCoords: {sliceCoords}");
+            return sliceCoords;
         }
 
         private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
