@@ -76,9 +76,9 @@ namespace Model
             return null;
         }
 
-        public static IEnumerable<Vector3> GetIntersectionPoints(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        public static IEnumerable<Vector3> GetIntersectionPoints(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var points = GetIntersectionPoints_internal(model, slicerPosition, slicerRotation).ToArray();
+            var points = GetIntersectionPoints_internal(out plane, model, slicerPosition, slicerRotation).ToArray();
             
             // we need to sort the points by angle, so that the mesh later on will be visible
             // to find the right order of the points
@@ -113,7 +113,7 @@ namespace Model
                 .Select(p => p.p);
         }
 
-        private static IEnumerable<Vector3> GetIntersectionPoints_internal(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             // test ALL edges for cuts and return them
 
@@ -127,15 +127,17 @@ namespace Model
             var normalVec = slicerRotation * Vector3.back;
             
             // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
-            var plane = new Plane(normalVec, slicerPosition);
+            plane = new Plane(normalVec, slicerPosition);
             
+            var list = new List<Vector3>();
+
             // test Z axis (front - back)
             var topFrontLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.forward * extents.z;
             var ray = new Ray(topFrontLeft, mt.backward());
             if (plane.Raycast(ray, out var distance) &&
                 distance >= 0 && distance <= size.z)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             var topFrontRight = center + mt.right * extents.x + mt.up * extents.y + mt.forward * extents.z;
@@ -143,7 +145,7 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             var bottomFrontLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.forward * extents.z;
@@ -151,7 +153,7 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             var bottomFrontRight = center + mt.right * extents.x + mt.down() * extents.y + mt.forward * extents.z;
@@ -159,7 +161,7 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             // test Y axis (top - bottom)
@@ -168,21 +170,21 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             ray = new Ray(topFrontLeft, mt.down());
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             ray = new Ray(topFrontRight, mt.down());
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             var topBackRight = center + mt.right * extents.x + mt.up * extents.y + mt.backward() * extents.z;
@@ -190,7 +192,7 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
 
             // test X axis (left - right)
@@ -198,21 +200,21 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             ray = new Ray(bottomFrontLeft, mt.right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             ray = new Ray(topBackLeft, mt.right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
             
             var bottomBackLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
@@ -220,8 +222,10 @@ namespace Model
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
-                yield return ray.GetPoint(distance);
+                list.Add(ray.GetPoint(distance));
             }
+
+            return list;
         }
 
 

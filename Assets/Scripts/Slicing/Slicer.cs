@@ -83,11 +83,11 @@ namespace Slicing
             AudioManager.Instance.PlayCameraSound();
             
             var intersectionPoints = ModelIntersection
-                .GetIntersectionPoints(model, sectionQuadTransform.position, sectionQuadTransform.rotation)
+                .GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
 
-            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, model, intersectionPoints))
+            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, plane, model, intersectionPoints))
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
                 return;

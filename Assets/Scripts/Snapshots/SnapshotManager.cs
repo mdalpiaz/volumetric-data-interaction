@@ -206,12 +206,12 @@ namespace Snapshots
         {
             var model = ModelManager.Instance.CurrentModel;
             var intersectionPoints = ModelIntersection
-                .GetIntersectionPoints(model, slicerPosition, slicerRotation)
+                .GetIntersectionPoints(out var plane, model, slicerPosition, slicerRotation)
                 // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
                 .ToArray();
             AudioManager.Instance.PlayCameraSound();
 
-            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, model, intersectionPoints))
+            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, plane, model, intersectionPoints))
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;

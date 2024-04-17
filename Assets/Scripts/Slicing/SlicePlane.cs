@@ -15,12 +15,12 @@ namespace Slicing
         public static bool CalculateIntersectionPlane(
             [NotNullWhen(true)] out SlicePlaneCoordinates? sliceCoords,
             [NotNullWhen(true)] out Texture2D? texture,
+            Plane plane,
             Model.Model model, IReadOnlyList<Vector3> intersectionPoints,
             Vector3? alternativeStartPoint = null,
             InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            // TODO xSteps and ySteps are swapped!
-            sliceCoords = GetSliceCoordinatesV2(model, intersectionPoints);
+            sliceCoords = GetSliceCoordinatesV2(plane, model, intersectionPoints);
             if (sliceCoords == null)
             {
                 texture = null;
@@ -69,7 +69,7 @@ namespace Slicing
             return resultImage;
         }
         
-        private static SlicePlaneCoordinates? GetSliceCoordinatesV2(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        private static SlicePlaneCoordinates? GetSliceCoordinatesV2(Plane plane, Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
             if (intersectionPoints.Count < 3)
             {
@@ -78,17 +78,24 @@ namespace Slicing
             }
 
             // get bottom left edge (get most left point and most bottom point and check where they meet on the plane)
-            var plane = new Plane(intersectionPoints[0], intersectionPoints[1], intersectionPoints[2]);
             var forward = plane.flipped.normal.normalized;
-            var left = new Vector3(-forward.y, forward.x, -forward.z).normalized;
+            var left = new Vector3(-forward.y, 0, -forward.x).normalized;
+            var down = new Vector3(forward.x, 0, forward.z);
             Debug.DrawRay(Vector3.zero, forward, Color.black, 120);
-            var minPoint = intersectionPoints.Select(p => p.z).Min();
-            var leftPoint = intersectionPoints.Select(p => new Vector2(p.x, p.y));
-            Debug.Log($"Left vector: {left}");
-            foreach (var p in leftPoint)
+            Debug.DrawRay(Vector3.zero, left, Color.red, 120);
+
+            // 1) get start point at the bottom left
+            var minPoint = intersectionPoints.Select(p => p.y).Min();
+            // we don't need height
+            var leftPoints = intersectionPoints.Select(p => new Vector2(p.x, p.z));
+
+            foreach (var p in leftPoints)
             {
-                Debug.Log($"Point: {p}");
+                Debug.DrawRay(p, Vector3.down, Color.red, 120);
             }
+
+            // TODO
+            return null;
         }
 
         private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
