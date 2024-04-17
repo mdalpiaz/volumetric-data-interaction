@@ -28,9 +28,9 @@ namespace Model
             Debug.Log($"Intersection points: {points.Length}");
             if (points.Length == 3)
             {
-                Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
-                Debug.DrawRay(points[1], Vector3.forward, Color.magenta, 120);
-                Debug.DrawRay(points[2], Vector3.forward, Color.red, 120);
+                //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.magenta, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.red, 120);
                 
                 return new Mesh
                 {
@@ -42,10 +42,10 @@ namespace Model
             }
             if (points.Length == 4)
             {
-                Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
-                Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
-                Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
-                Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
+                //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
+                //Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
                 
                 return new Mesh
                 {
@@ -58,12 +58,12 @@ namespace Model
             if (points.Length == 6)
             {
                 // ordering triangles the right way now gets much harder
-                Debug.DrawRay(points[0], Vector3.forward, Color.magenta, 120);
-                Debug.DrawRay(points[1], Vector3.forward, Color.blue, 120);
-                Debug.DrawRay(points[2], Vector3.forward, Color.green, 120);
-                Debug.DrawRay(points[3], Vector3.forward, Color.yellow, 120);
-                Debug.DrawRay(points[4], Vector3.forward, new Color(1.0f, 0.65f, 0.0f, 1.0f), 120);
-                Debug.DrawRay(points[5], Vector3.forward, Color.red, 120);
+                //Debug.DrawRay(points[0], Vector3.forward, Color.magenta, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.green, 120);
+                //Debug.DrawRay(points[3], Vector3.forward, Color.yellow, 120);
+                //Debug.DrawRay(points[4], Vector3.forward, new Color(1.0f, 0.65f, 0.0f, 1.0f), 120);
+                //Debug.DrawRay(points[5], Vector3.forward, Color.red, 120);
 
                 return new Mesh
                 {
