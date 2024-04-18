@@ -47,22 +47,22 @@ namespace Model
         public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
             transform.TransformDirection(transform.left()) * Extents.x +
             transform.TransformDirection(transform.down()) * Extents.y +
-            transform.TransformDirection(transform.backward()) * Extents.z;
+            transform.TransformDirection(transform.back()) * Extents.z;
 
         public Vector3 BottomFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
             transform.TransformDirection(transform.right) * Extents.x +
             transform.TransformDirection(transform.down()) * Extents.y +
-            transform.TransformDirection(transform.backward()) * Extents.z;
+            transform.TransformDirection(transform.back()) * Extents.z;
 
         public Vector3 TopFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
             transform.TransformDirection(transform.left()) * Extents.x +
             transform.TransformDirection(transform.up) * Extents.y +
-            transform.TransformDirection(transform.backward()) * Extents.z;
+            transform.TransformDirection(transform.back()) * Extents.z;
 
         public Vector3 TopFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
             transform.TransformDirection(transform.right) * Extents.x +
             transform.TransformDirection(transform.up) * Extents.y +
-            transform.TransformDirection(transform.backward()) * Extents.z;
+            transform.TransformDirection(transform.back()) * Extents.z;
 
         public Vector3 BottomBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
             transform.TransformDirection(transform.left()) * Extents.x +

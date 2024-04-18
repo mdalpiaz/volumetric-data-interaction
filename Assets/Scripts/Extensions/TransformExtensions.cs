@@ -9,6 +9,6 @@ namespace Extensions
 
         public static Vector3 down(this Transform t) => t.up * -1;
 
-        public static Vector3 backward(this Transform t) => t.forward * -1;
+        public static Vector3 back(this Transform t) => t.forward * -1;
     }
 }
