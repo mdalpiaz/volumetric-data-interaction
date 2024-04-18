@@ -90,7 +90,15 @@ namespace Networking.Tablet
         {
             Debug.Log($"TabletServer started on port {port}");
             _server.Start();
-            _tabletClient = await _server.AcceptTcpClientAsync();
+            try
+            {
+                _tabletClient = await _server.AcceptTcpClientAsync();
+            }
+            catch
+            {
+                Debug.Log("Tablet never connected.");
+                return;
+            }
             Debug.Log("Client connected");
             _tabletStream = _tabletClient.GetStream();
 
