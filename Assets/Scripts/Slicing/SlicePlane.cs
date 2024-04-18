@@ -37,10 +37,10 @@ namespace Slicing
 
             var startPoint = alternativeStartPoint ?? sliceCoords.StartPoint;
 
-            Debug.Log($"Startpoint: {startPoint}");
             Debug.DrawRay(startPoint, Vector3.down, Color.yellow, 120);
-            Debug.Log($"Startpoint transformed to local: {model.transform.InverseTransformPoint(startPoint)}");
+            Debug.DrawRay(model.BottomFrontLeftCorner, Vector3.down, Color.green, 120);
 
+            //var x = 0;
             for (var x = 0; x < sliceCoords.Width; x++)
             {
                 for (var y = 0; y < sliceCoords.Height; y++)
@@ -49,16 +49,23 @@ namespace Slicing
                     var position = startPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
                     // convert position into index
-                    var diff = position - startPoint;
+                    var diff = position - model.BottomFrontLeftCorner;
                     var xStep = Mathf.RoundToInt(diff.x / (model.Size.x / model.XCount));
                     var yStep = Mathf.RoundToInt(diff.y / (model.Size.y / model.YCount));
                     var zStep = Mathf.RoundToInt(diff.z / (model.Size.z / model.ZCount));
 
-                    //Debug.Log($"X: {xStep}, Y: {yStep}, Z: {zStep}");
+                    //Debug.Log($"Before X: {xStep}, Y: {yStep}, Z: {zStep}");
+
+                    // all steps might wrap around, so we need to correct
+                    xStep = Math.Abs(xStep);
+                    yStep = Math.Abs(yStep);
+                    zStep = Math.Abs(zStep);
+
+                    //Debug.Log($"After X: {xStep}, Y: {yStep}, Z: {zStep}");
 
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(xStep, yStep, zStep, interpolationType);
-                    resultImage.SetPixel(x, y, pixel);
+                    resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
                 }
             }
 
