@@ -9,15 +9,6 @@ namespace Model
 {
     public static class ModelIntersection
     {
-        /// <summary>
-        /// https://catlikecoding.com/unity/tutorials/procedural-meshes/creating-a-mesh/
-        /// </summary>
-        // public static Mesh CreateIntersectingMesh(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
-        // {
-        //     var points = GetIntersectionPoints(model, slicerPosition, slicerRotation).ToArray();
-        //     return CreateIntersectingMesh(points);
-        // }
-
         public static Mesh? CreateIntersectingMesh(Vector3[] points)
         {
             // cube cross-section has very specific cuts
@@ -230,34 +221,5 @@ namespace Model
 
             return list;
         }
-
-        // public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
-        // {
-        //     return GetIntersectionPoints(model, slicerPosition, slicerRotation)
-        //         .Select(p => model.transform.worldToLocalMatrix.MultiplyPoint(p))
-        //         .Select(newPosition => newPosition + model.Extents)
-        //         .Select(contact => PositionInModel(contact, model, model.Size));
-        // }
-
-        //public static IEnumerable<Vector3> PointsToModelCoordinates(IEnumerable<Vector3> points, Model model)
-        //{
-        //    foreach (var p in points)
-        //    {
-        //        var temp = model.transform.worldToLocalMatrix.MultiplyPoint(p);
-        //        yield return PositionInModel(temp, model);
-        //    }
-        //}
-
-        //private static Vector3 PositionInModel(Vector3 contact, Model model)
-        //{
-        //    var xRelativePosition = (contact.z / model.Size.z) * model.XCount;
-        //    var yRelativePosition = (contact.y / model.Size.y) * model.YCount;
-        //    var zRelativePosition = (contact.x / model.Size.x) * model.ZCount;
-
-        //    return new Vector3(
-        //        Mathf.Round(xRelativePosition),
-        //        Mathf.Round(yRelativePosition),
-        //        Mathf.Round(zRelativePosition));
-        //}
     }
 }
