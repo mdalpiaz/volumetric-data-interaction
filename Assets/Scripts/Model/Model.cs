@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using Constants;
+using Extensions;
 using Helper;
 using Selection;
 using UnityEngine;
@@ -23,12 +24,12 @@ namespace Model
         private OnePlaneCuttingController _onePlaneCuttingController = null!;
 
         private Mesh _originalMesh = null!;
-        
+
+        private Texture2D[] _originalBitmap = null!;
+
         public Selectable Selectable { get; private set; } = null!;
 
         public BoxCollider BoxCollider { get; private set; } = null!;
-
-        public Texture2D[] OriginalBitmap { get; private set; } = null!;
         
         public int XCount { get; private set; }
 
@@ -41,6 +42,47 @@ namespace Model
         public Vector3 Size { get; private set; }
 
         public Vector3 Extents => Size / 2.0f;
+
+        // transform.position is NOT the centerpoint of the model!
+        public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.left()) * Extents.x +
+            transform.TransformDirection(transform.down()) * Extents.y +
+            transform.TransformDirection(transform.backward()) * Extents.z;
+
+        public Vector3 BottomFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.right) * Extents.x +
+            transform.TransformDirection(transform.down()) * Extents.y +
+            transform.TransformDirection(transform.backward()) * Extents.z;
+
+        public Vector3 TopFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.left()) * Extents.x +
+            transform.TransformDirection(transform.up) * Extents.y +
+            transform.TransformDirection(transform.backward()) * Extents.z;
+
+        public Vector3 TopFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.right) * Extents.x +
+            transform.TransformDirection(transform.up) * Extents.y +
+            transform.TransformDirection(transform.backward()) * Extents.z;
+
+        public Vector3 BottomBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.left()) * Extents.x +
+            transform.TransformDirection(transform.down()) * Extents.y +
+            transform.TransformDirection(transform.forward) * Extents.z;
+
+        public Vector3 BottomBackRightCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.right) * Extents.x +
+            transform.TransformDirection(transform.down()) * Extents.y +
+            transform.TransformDirection(transform.forward) * Extents.z;
+
+        public Vector3 TopBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.left()) * Extents.x +
+            transform.TransformDirection(transform.up) * Extents.y +
+            transform.TransformDirection(transform.forward) * Extents.z;
+
+        public Vector3 TopBackRightCorner => transform.TransformPoint(BoxCollider.center) +
+            transform.TransformDirection(transform.right) * Extents.x +
+            transform.TransformDirection(transform.up) * Extents.y +
+            transform.TransformDirection(transform.forward) * Extents.z;
 
         private void Awake()
         {
@@ -57,12 +99,12 @@ namespace Model
             s.z = Mathf.Abs(s.z);
             Size = s;
             
-            OriginalBitmap = InitModel(stackPath);
+            _originalBitmap = InitModel(stackPath);
 
             // we use slices of the XY plane, why was this called XCount if its on the Z axis?
-            ZCount = OriginalBitmap.Length;
-            YCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].height : 0;
-            XCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].width : 0;
+            ZCount = _originalBitmap.Length;
+            YCount = _originalBitmap.Length > 0 ? _originalBitmap[0].height : 0;
+            XCount = _originalBitmap.Length > 0 ? _originalBitmap[0].width : 0;
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
         }
@@ -149,6 +191,16 @@ namespace Model
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
+        }
+
+        public Color GetPixel(int x, int y, int z, InterpolationType interpolation = InterpolationType.Nearest)
+        {
+            return interpolation switch
+            {
+                InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
+                InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
+                _ => throw new NotImplementedException()
+            };
         }
         
         private static Texture2D[] InitModel(string path)
