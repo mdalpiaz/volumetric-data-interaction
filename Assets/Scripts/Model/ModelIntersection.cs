@@ -235,25 +235,25 @@ namespace Model
         //         .Select(contact => PositionInModel(contact, model, model.Size));
         // }
 
-        public static IEnumerable<Vector3> PointsToModelCoordinates(IEnumerable<Vector3> points, Model model)
-        {
-            foreach (var p in points)
-            {
-                var temp = model.transform.worldToLocalMatrix.MultiplyPoint(p);
-                yield return PositionInModel(temp, model);
-            }
-        }
+        //public static IEnumerable<Vector3> PointsToModelCoordinates(IEnumerable<Vector3> points, Model model)
+        //{
+        //    foreach (var p in points)
+        //    {
+        //        var temp = model.transform.worldToLocalMatrix.MultiplyPoint(p);
+        //        yield return PositionInModel(temp, model);
+        //    }
+        //}
 
-        private static Vector3 PositionInModel(Vector3 contact, Model model)
-        {
-            var xRelativePosition = (contact.z / model.Size.z) * model.XCount;
-            var yRelativePosition = (contact.y / model.Size.y) * model.YCount;
-            var zRelativePosition = (contact.x / model.Size.x) * model.ZCount;
+        //private static Vector3 PositionInModel(Vector3 contact, Model model)
+        //{
+        //    var xRelativePosition = (contact.z / model.Size.z) * model.XCount;
+        //    var yRelativePosition = (contact.y / model.Size.y) * model.YCount;
+        //    var zRelativePosition = (contact.x / model.Size.x) * model.ZCount;
 
-            return new Vector3(
-                Mathf.Round(xRelativePosition),
-                Mathf.Round(yRelativePosition),
-                Mathf.Round(zRelativePosition));
-        }
+        //    return new Vector3(
+        //        Mathf.Round(xRelativePosition),
+        //        Mathf.Round(yRelativePosition),
+        //        Mathf.Round(zRelativePosition));
+        //}
     }
 }
