@@ -31,40 +31,37 @@ namespace Slicing
             return true;
         }
         
-        public static Texture2D CalculateIntersectionPlane(Model.Model model, SlicePlaneCoordinates slicePlaneCoordinates, Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Texture2D CalculateIntersectionPlane(Model.Model model, SlicePlaneCoordinates sliceCoords, Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            var resultImage = new Texture2D(slicePlaneCoordinates.Width, slicePlaneCoordinates.Height);
+            var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
 
-            var startPoint = alternativeStartPoint ?? slicePlaneCoordinates.StartPoint;
-            var currVector1 = startPoint;
-            var currVector2 = startPoint;
+            var startPoint = alternativeStartPoint ?? sliceCoords.StartPoint;
 
-            for (var w = 0; w < slicePlaneCoordinates.Width; w++)
+            Debug.Log($"Startpoint: {startPoint}");
+            Debug.DrawRay(startPoint, Vector3.down, Color.yellow, 120);
+            Debug.Log($"Startpoint transformed to local: {model.transform.InverseTransformPoint(startPoint)}");
+
+            for (var x = 0; x < sliceCoords.Width; x++)
             {
-                currVector1.x = (int)Math.Round(startPoint.x + w * slicePlaneCoordinates.XSteps.x, 0);
-                currVector1.y = (int)Math.Round(startPoint.y + w * slicePlaneCoordinates.XSteps.y, 0);
-                currVector1.z = (int)Math.Round(startPoint.z + w * slicePlaneCoordinates.XSteps.z, 0);
-
-                for (var h = 0; h < slicePlaneCoordinates.Height; h++)
+                for (var y = 0; y < sliceCoords.Height; y++)
                 {
-                    currVector2.x = (int)Math.Round(currVector1.x + h * slicePlaneCoordinates.YSteps.x, 0);
-                    currVector2.y = (int)Math.Round(currVector1.y + h * slicePlaneCoordinates.YSteps.y, 0);
-                    currVector2.z = (int)Math.Round(currVector1.z + h * slicePlaneCoordinates.YSteps.z, 0);
+                    // get world position
+                    var position = startPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
-                    var croppedIndex = ValueCropper.CropIntVector(currVector2, model.CountVector);
-                    var currBitmap = model.OriginalBitmap[croppedIndex.x];
+                    // convert position into index
+                    var diff = position - startPoint;
+                    var xStep = Mathf.RoundToInt(diff.x / (model.Size.x / model.XCount));
+                    var yStep = Mathf.RoundToInt(diff.y / (model.Size.y / model.YCount));
+                    var zStep = Mathf.RoundToInt(diff.z / (model.Size.z / model.ZCount));
 
-                    // convert coordinates from top-left to bottom-left
-                    var result = Interpolation.Interpolate(interpolationType, currBitmap, croppedIndex.z, currBitmap.height - croppedIndex.y);
-                    
-                    //if (alternativeStartPoint == null)
-                    //{
-                    //    result = result.MakeBlackTransparent();
-                    //}
-                    // flip the image
-                    resultImage.SetPixel(w, slicePlaneCoordinates.Height - 1 - h, result);
+                    //Debug.Log($"X: {xStep}, Y: {yStep}, Z: {zStep}");
+
+                    // get image at index and then the pixel
+                    var pixel = model.GetPixel(xStep, yStep, zStep, interpolationType);
+                    resultImage.SetPixel(x, y, pixel);
                 }
             }
+
             resultImage.Apply();
             return resultImage;
         }
@@ -176,50 +173,6 @@ namespace Slicing
             var sliceCoords = new SlicePlaneCoordinates(width, height, lowerLeft, textureStepX, textureStepY);
             Debug.Log($"SliceCoords: {sliceCoords}");
             return sliceCoords;
-        }
-
-        private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
-        {
-            if (intersectionPoints.Count < 3)
-            {
-                Debug.LogError("Can't create plane formula with less than 3 points!");
-                return null;
-            }
-
-            // we don't need edge points, we already have them!
-            var planeFormula = new PlaneFormula(intersectionPoints[0], intersectionPoints[1], intersectionPoints[2]);
-
-            var edgePoints = CalculateEdgePoints(planeFormula, model.XCount, model.YCount, model.ZCount).ToList();
-
-            if (edgePoints.Count < 3)
-            {
-                Debug.LogError("Cannot calculate a cutting plane with fewer than 3 coordinates");
-                return null;
-            }
-
-            // TODO what is happening here?
-
-            //edgePoints.ForEach(p => Debug.Log(p.ToString()));
-            var startLeft = GetClosestPoint(edgePoints, intersectionPoints[2]);
-            edgePoints.Remove(startLeft);
-            var startRight = GetClosestPoint(edgePoints, intersectionPoints[3]);
-            edgePoints.Remove(startRight);
-
-            var p1 = startRight; 
-            var p2 = edgePoints[1];
-
-            var diff1 = p1 - startLeft;
-            var diff2 = p2 - startLeft;
-            var (newWidth, newHeight) = GetDimensionsSyncDifferences(ref diff1, ref diff2);
-
-            var width = (int)Math.Round(newWidth, 0); // bigger image if angled -  CalculateAngledPlaneLength(p1 - startLeft, newWidth);
-            var height = (int)Math.Round(newHeight, 0); // bigger image if angled - CalculateAngledPlaneLength(p2 - startLeft, newHeight);
-
-            var xSteps = diff1 / width;
-            var ySteps = diff2 / height;
-            (xSteps, ySteps) = MinimiseSteps(xSteps, ySteps);
-
-            return new SlicePlaneCoordinates(width, height, startLeft, xSteps, ySteps);
         }
         
         private static IEnumerable<Vector3> CalculateEdgePoints(PlaneFormula planeFormula, int x, int y, int z)
