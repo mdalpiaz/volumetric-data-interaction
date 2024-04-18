@@ -59,9 +59,10 @@ namespace Model
             
             OriginalBitmap = InitModel(stackPath);
 
-            XCount = OriginalBitmap.Length;
+            // we use slices of the XY plane, why was this called XCount if its on the Z axis?
+            ZCount = OriginalBitmap.Length;
             YCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].height : 0;
-            ZCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].width : 0;
+            XCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].width : 0;
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
         }
