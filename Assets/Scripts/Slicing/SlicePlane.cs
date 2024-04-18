@@ -73,7 +73,7 @@ namespace Slicing
         {
             if (intersectionPoints.Count < 3)
             {
-                Debug.LogError("Can't create plane formula with less than 3 points!");
+                Debug.LogError("Can't create plane with less than 3 points!");
                 return null;
             }
 
