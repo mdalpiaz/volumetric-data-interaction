@@ -130,36 +130,50 @@ namespace Slicing
             // what we do is:
             // for width we only look at X and Z axis and we get the one with the most pixels
             // for height we DON'T look at the Y height, we compare the point of the lower points with the higher points and count pixels
-            var width = 0;
-            var height = 0;
 
+            // we need to convert the world coordinates of the intersection points
+            // to int-steps based on the model X/Y/Z-Counts
             Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
 
-            var steps = Vector3.zero;
-            steps.x = model.Size.x / model.XCount;
-            steps.y = model.Size.y / model.YCount;
-            steps.z = model.Size.z / model.ZCount;
+            var steps = new Vector3
+            {
+                x = model.Size.x / model.XCount,
+                y = model.Size.y / model.YCount,
+                z = model.Size.z / model.ZCount
+            };
 
             Debug.Log($"Size: {model.Size}, Steps: {steps}");
 
-            var diff = upperRight - lowerLeft;
-            var xSteps = (int)(diff.x / steps.x);
-            var ySteps = (int)(diff.y / steps.y);
-            var zSteps = (int)(diff.z / steps.z);
+            var diffAll = upperRight - lowerLeft;
+            var diffXZ = lowerRight - lowerLeft;
+            //var xSteps = (int)(diffXZ.x / steps.x);
+            //var ySteps = (int)(diffAll.y / steps.y);
+            //var zSteps = (int)(diffXZ.z / steps.z);
 
-            Debug.Log($"Steps X: {xSteps}, Y: {ySteps}, Z: {zSteps}");
+            // this is for calculating steps for height
+            var ySteps = Mathf.RoundToInt(diffAll.y / steps.y);
+            //var forwardStepsX = Mathf.RoundToInt(diffAll.x / steps.x);
+            //var forwardStepsZ = Mathf.RoundToInt(diffAll.z / steps.z);
 
-            // TODO only works, if top and bottom are touching the top and bottom of model
-            // fully vertical slices don't work yet
-            height = ySteps;
-            width = xSteps > zSteps ? xSteps : zSteps;
+            // this is for calculating steps for width
+            var xSteps = Mathf.RoundToInt(diffXZ.x / steps.x);
+            var zSteps = Mathf.RoundToInt(diffXZ.z / steps.z);
+
+            //Debug.Log($"Steps X: {xSteps}, Y: {ySteps}, Z: {zSteps}");
+
+            var height = ySteps;//Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
+            var width = Math.Max(xSteps, zSteps);
+
+            Debug.Log($"Height: {height}, Width: {width}");
 
             // TODO
             // 3) we get the step size using the edge points and width and height
             var textureStepX = (lowerRight - lowerLeft) / width;
-            var textureStepY = (upperRight - lowerLeft) / height;
+            var textureStepY = (upperLeft - lowerLeft) / height;
 
-            var sliceCoords = new SlicePlaneCoordinates(width, height, lowerLeft, textureStepX, Vector3.zero);
+            Debug.Log($"Texture Steps X: {textureStepX}, Y: {textureStepY}");
+
+            var sliceCoords = new SlicePlaneCoordinates(width, height, lowerLeft, textureStepX, textureStepY);
             Debug.Log($"SliceCoords: {sliceCoords}");
             return sliceCoords;
         }
