@@ -113,51 +113,53 @@ namespace Model
                 .Select(p => p.p);
         }
 
+        /// <summary>
+        /// Tests all edges for cuts and returns them.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
         private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            // test ALL edges for cuts and return them
-
+            var list = new List<Vector3>(6);
             var mt = model.transform;
-            // transform.position is NOT the centerpoint of the model!
-            var center = mt.TransformPoint(model.BoxCollider.center);
             var size = model.Size;
-            var extents = model.Extents;
+
+            var forward = mt.TransformDirection(mt.forward);
+            var down = mt.TransformDirection(mt.down());
+            var right = mt.TransformDirection(mt.right);
             
             // this is the normal of the slicer
             var normalVec = slicerRotation * Vector3.back;
             
             // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
             plane = new Plane(normalVec, slicerPosition);
-            
-            var list = new List<Vector3>();
 
             // test Z axis (front - back)
-            var topFrontLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.forward * extents.z;
-            var ray = new Ray(topFrontLeft, mt.backward());
+            var ray = new Ray(model.TopFrontLeftCorner, forward);
             if (plane.Raycast(ray, out var distance) &&
                 distance >= 0 && distance <= size.z)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            var topFrontRight = center + mt.right * extents.x + mt.up * extents.y + mt.forward * extents.z;
-            ray = new Ray(topFrontRight, mt.backward());
+            ray = new Ray(model.TopFrontRightCorner, forward);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            var bottomFrontLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.forward * extents.z;
-            ray = new Ray(bottomFrontLeft, mt.backward());
+            ray = new Ray(model.BottomFrontLeftCorner, forward);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            var bottomFrontRight = center + mt.right * extents.x + mt.down() * extents.y + mt.forward * extents.z;
-            ray = new Ray(bottomFrontRight, mt.backward());
+            ray = new Ray(model.BottomFrontRightCorner, forward);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.z)
             {
@@ -165,30 +167,28 @@ namespace Model
             }
             
             // test Y axis (top - bottom)
-            var topBackLeft = center + mt.left() * extents.x + mt.up * extents.y + mt.backward() * extents.z;
-            ray = new Ray(topBackLeft, mt.down());
+            ray = new Ray(model.TopBackLeftCorner, down);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            ray = new Ray(topFrontLeft, mt.down());
+            ray = new Ray(model.TopFrontLeftCorner, down);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            ray = new Ray(topFrontRight, mt.down());
+            ray = new Ray(model.TopFrontRightCorner, down);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            var topBackRight = center + mt.right * extents.x + mt.up * extents.y + mt.backward() * extents.z;
-            ray = new Ray(topBackRight, mt.down());
+            ray = new Ray(model.TopBackRightCorner, down);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.y)
             {
@@ -196,29 +196,28 @@ namespace Model
             }
 
             // test X axis (left - right)
-            ray = new Ray(topFrontLeft, mt.right);
+            ray = new Ray(model.TopFrontLeftCorner, right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            ray = new Ray(bottomFrontLeft, mt.right);
+            ray = new Ray(model.BottomFrontLeftCorner, right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            ray = new Ray(topBackLeft, mt.right);
+            ray = new Ray(model.TopBackLeftCorner, right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
                 list.Add(ray.GetPoint(distance));
             }
             
-            var bottomBackLeft = center + mt.left() * extents.x + mt.down() * extents.y + mt.backward() * extents.z;
-            ray = new Ray(bottomBackLeft, mt.right);
+            ray = new Ray(model.BottomBackLeftCorner, right);
             if (plane.Raycast(ray, out distance) &&
                 distance >= 0 && distance <= size.x)
             {
@@ -227,7 +226,6 @@ namespace Model
 
             return list;
         }
-
 
         // public static IEnumerable<Vector3> GetNormalisedIntersectionPosition(Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         // {
