@@ -148,6 +148,7 @@ namespace Slicing
             //var zSteps = (int)(diffXZ.z / steps.z);
 
             // this is for calculating steps for height
+            // TODO
             var ySteps = Mathf.RoundToInt(diffAll.y / steps.y);
             //var forwardStepsX = Mathf.RoundToInt(diffAll.x / steps.x);
             //var forwardStepsZ = Mathf.RoundToInt(diffAll.z / steps.z);
