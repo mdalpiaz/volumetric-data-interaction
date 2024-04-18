@@ -96,7 +96,7 @@ namespace Slicing
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();
             transparentMaterial.name = "SliceMaterial";
             transparentMaterial.mainTexture = texture;
-            var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, sliceCoords.StartPoint);
+            //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, sliceCoords.StartPoint);
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
@@ -114,7 +114,7 @@ namespace Slicing
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
             quad.Mesh = mesh;
-            quad.Material = sliceMaterial;
+            quad.Material = transparentMaterial;
         }
         
         public void SetTemporaryCuttingPlaneActive(bool active)
