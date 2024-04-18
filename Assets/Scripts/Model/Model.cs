@@ -44,46 +44,6 @@ namespace Model
         public Vector3 Extents => Size / 2.0f;
 
         // transform.position is NOT the centerpoint of the model!
-        //public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.left()) * Extents.x +
-        //    transform.TransformDirection(transform.down()) * Extents.y +
-        //    transform.TransformDirection(transform.back()) * Extents.z;
-
-        //public Vector3 BottomFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.right) * Extents.x +
-        //    transform.TransformDirection(transform.down()) * Extents.y +
-        //    transform.TransformDirection(transform.back()) * Extents.z;
-
-        //public Vector3 TopFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.left()) * Extents.x +
-        //    transform.TransformDirection(transform.up) * Extents.y +
-        //    transform.TransformDirection(transform.back()) * Extents.z;
-
-        //public Vector3 TopFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.right) * Extents.x +
-        //    transform.TransformDirection(transform.up) * Extents.y +
-        //    transform.TransformDirection(transform.back()) * Extents.z;
-
-        //public Vector3 BottomBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.left()) * Extents.x +
-        //    transform.TransformDirection(transform.down()) * Extents.y +
-        //    transform.TransformDirection(transform.forward) * Extents.z;
-
-        //public Vector3 BottomBackRightCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.right) * Extents.x +
-        //    transform.TransformDirection(transform.down()) * Extents.y +
-        //    transform.TransformDirection(transform.forward) * Extents.z;
-
-        //public Vector3 TopBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.left()) * Extents.x +
-        //    transform.TransformDirection(transform.up) * Extents.y +
-        //    transform.TransformDirection(transform.forward) * Extents.z;
-
-        //public Vector3 TopBackRightCorner => transform.TransformPoint(BoxCollider.center) +
-        //    transform.TransformDirection(transform.right) * Extents.x +
-        //    transform.TransformDirection(transform.up) * Extents.y +
-        //    transform.TransformDirection(transform.forward) * Extents.z;
-
         public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
             transform.left() * Extents.x +
             transform.down() * Extents.y +
