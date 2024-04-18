@@ -89,8 +89,12 @@ namespace Model
             var maxY = points.Max(p => p.y);
             var minZ = points.Min(p => p.z);
             var maxZ = points.Max(p => p.z);
-            
-            var middle = new Vector3((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
+
+            var middle = new Vector3 {
+                x = (minX + maxX) / 2,
+                y = (minY + maxY) / 2,
+                z = (minZ + maxZ) / 2
+            };
 
             var slicerUp = slicerRotation * Vector3.up;
             var slicerLeft = slicerRotation * Vector3.left;
@@ -127,9 +131,9 @@ namespace Model
             var mt = model.transform;
             var size = model.Size;
 
-            var forward = mt.TransformDirection(mt.forward);
-            var down = mt.TransformDirection(mt.down());
-            var right = mt.TransformDirection(mt.right);
+            var forward = mt.forward;
+            var down = mt.down();
+            var right = mt.right;
             
             // this is the normal of the slicer
             var normalVec = slicerRotation * Vector3.back;
