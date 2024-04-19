@@ -52,13 +52,6 @@ namespace Slicing
 
                     //Debug.Log($"Before X: {xStep}, Y: {yStep}, Z: {zStep}");
 
-                    // all steps might wrap around, so we need to correct
-                    xStep = Math.Abs(xStep);
-                    yStep = Math.Abs(yStep);
-                    zStep = Math.Abs(zStep);
-
-                    //Debug.Log($"After X: {xStep}, Y: {yStep}, Z: {zStep}");
-
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType); // z needs correction
                     resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
@@ -154,7 +147,7 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates3Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3)
         {
-            // TODO
+            // TODO convert to 4 point
             return null;
         }
 
@@ -188,7 +181,7 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates6Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Vector3 p5, Vector3 p6)
         {
-            // TODO
+            // TODO convert to 4 point
             return null;
         }
     }
