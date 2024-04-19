@@ -208,6 +208,29 @@ namespace Model
             }
         }
 
+        public Vector3Int WorldPositionToIndex(Vector3 pos)
+        {
+            var localPos = transform.InverseTransformPoint(pos);
+            var localBottomFrontLeft = transform.InverseTransformPoint(BottomFrontLeftCorner);
+            var localtopBackRight = transform.InverseTransformPoint(TopBackRightCorner);
+
+            var localSize = localtopBackRight - localBottomFrontLeft;
+
+            var diff = localPos - localBottomFrontLeft;
+
+            return new Vector3Int
+            {
+                x = Mathf.RoundToInt(diff.x / (localSize.x / XCount)),
+                y = Mathf.RoundToInt(diff.y / (localSize.y / YCount)),
+                z = Mathf.RoundToInt(diff.z / (localSize.z / ZCount))
+            };
+        }
+
+        public Color GetPixel(Vector3Int index, InterpolationType interpolation = InterpolationType.Nearest)
+        {
+            return GetPixel(index.x, index.y, index.z, interpolation);
+        }
+
         /// <summary>
         /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
         /// </summary>

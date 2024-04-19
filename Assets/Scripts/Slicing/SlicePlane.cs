@@ -36,24 +36,19 @@ namespace Slicing
 
             var startPoint = alternativeStartPoint ?? sliceCoords.StartPoint;
 
-            //var x = 0;
-            for (var x = 0; x < sliceCoords.Width; x++)
+            var x = 0;
+            //for (var x = 0; x < sliceCoords.Width; x++)
             {
                 for (var y = 0; y < sliceCoords.Height; y++)
                 {
                     // get world position
                     var position = startPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
-                    // convert position into index
-                    var diff = position - model.BottomFrontLeftCorner;
-                    var xStep = Mathf.RoundToInt(diff.x / model.Steps.x);
-                    var yStep = Mathf.RoundToInt(diff.y / model.Steps.y);
-                    var zStep = Mathf.RoundToInt(diff.z / model.Steps.z);
-
-                    //Debug.Log($"Before X: {xStep}, Y: {yStep}, Z: {zStep}");
+                    var index = model.WorldPositionToIndex(position);
 
                     // get image at index and then the pixel
-                    var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType); // z needs correction
+                    //var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType); // z needs correction
+                    var pixel = model.GetPixel(index, interpolationType);
                     resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
                 }
             }
