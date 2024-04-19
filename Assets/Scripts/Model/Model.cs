@@ -27,6 +27,10 @@ namespace Model
 
         private Texture2D[] _originalBitmap = null!;
 
+        private Vector3 _originalPosition;
+        private Quaternion _originalRotation;
+        private Vector3 _originalScale;
+
         public Selectable Selectable { get; private set; } = null!;
 
         public BoxCollider BoxCollider { get; private set; } = null!;
@@ -107,6 +111,10 @@ namespace Model
             XCount = _originalBitmap.Length > 0 ? _originalBitmap[0].width : 0;
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
+
+            _originalPosition = transform.position;
+            _originalRotation = transform.rotation;
+            _originalScale = transform.localScale;
         }
 
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
@@ -203,6 +211,13 @@ namespace Model
             };
         }
         
+        public void ResetState()
+        {
+            transform.position = _originalPosition;
+            transform.rotation = _originalRotation;
+            transform.localScale = _originalScale;
+        }
+
         private static Texture2D[] InitModel(string path)
         {
             if (!Directory.Exists(path))
