@@ -1,6 +1,5 @@
 ﻿#nullable enable
 
-using System.Linq;
 using Constants;
 using EzySlice;
 using Helper;
@@ -82,10 +81,7 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
             
-            var intersectionPoints = ModelIntersection
-                .GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation)
-                // .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
-                .ToArray();
+            var intersectionPoints = ModelIntersection.GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation);
 
             if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, plane, model, intersectionPoints))
             {
