@@ -129,7 +129,7 @@ namespace Model
             // this is the normal of the slicer
             var normalVec = slicerRotation * Vector3.back;
             
-            // _slicerPosition, because we can give it ANY point on the plane, and it sets itself up automatically
+            // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
             plane = new Plane(normalVec, slicerPosition);
 
             // test Z axis (front - back)
