@@ -4,7 +4,6 @@ using System.Buffers.Binary;
 using System;
 using UnityEngine;
 using System.Text;
-using Helper;
 
 namespace Networking.openIA.Commands
 {
