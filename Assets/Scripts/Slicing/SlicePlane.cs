@@ -155,6 +155,7 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates3Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3)
         {
+            // TODO
             return null;
         }
 
@@ -179,11 +180,16 @@ namespace Slicing
             var textureStepX = (lr - ll) / width;
             var textureStepY = (ul - ll) / height;
 
+            //Debug.DrawRay(ul, Vector3.up, Color.red, 120);
+            //Debug.DrawRay(ll, Vector3.up, Color.green, 120);
+            //Debug.DrawRay(lr, Vector3.up, Color.blue, 120);
+
             return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
         }
 
         private static SlicePlaneCoordinates GetSliceCoordinates6Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Vector3 p5, Vector3 p6)
         {
+            // TODO
             return null;
         }
     }
