@@ -20,7 +20,7 @@ namespace Slicing
             Vector3? alternativeStartPoint = null,
             InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            sliceCoords = GetSliceCoordinatesV2(plane, model, intersectionPoints);
+            sliceCoords = GetSliceCoordinates(plane, model, intersectionPoints);
             if (sliceCoords == null)
             {
                 texture = null;
@@ -73,7 +73,7 @@ namespace Slicing
             return resultImage;
         }
         
-        private static SlicePlaneCoordinates? GetSliceCoordinatesV2(Plane plane, Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        private static SlicePlaneCoordinates? GetSliceCoordinates(Plane plane, Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
             if (intersectionPoints.Count < 3)
             {
