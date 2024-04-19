@@ -60,7 +60,7 @@ namespace Slicing
                     //Debug.Log($"After X: {xStep}, Y: {yStep}, Z: {zStep}");
 
                     // get image at index and then the pixel
-                    var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType);
+                    var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType); // z needs correction
                     resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
                 }
             }
