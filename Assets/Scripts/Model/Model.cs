@@ -40,18 +40,13 @@ namespace Model
 
         public int ZCount { get; private set; }
         
-        public Vector3 CountVector => new(XCount, YCount, ZCount);
+        public Vector3 CountVector { get; private set; }
 
         public Vector3 Size { get; private set; }
 
-        public Vector3 Extents => Size / 2.0f;
+        public Vector3 Extents { get; private set; }
 
-        public Vector3 Steps => new()
-        {
-            x = Size.x / XCount,
-            y = Size.y / YCount,
-            z = Size.z / ZCount
-        };
+        public Vector3 Steps { get; private set; }
 
         // transform.position is NOT the centerpoint of the model!
         public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
@@ -102,13 +97,6 @@ namespace Model
             _renderer = GetComponent<Renderer>();
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
-            // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
-            var s = transform.TransformVector(BoxCollider.size);
-            s.x = Mathf.Abs(s.x);
-            s.y = Mathf.Abs(s.y);
-            s.z = Mathf.Abs(s.z);
-            Size = s;
-            
             _originalBitmap = InitModel(stackPath);
 
             // we use slices of the XY plane, why was this called XCount if its on the Z axis?
@@ -121,6 +109,23 @@ namespace Model
             _originalPosition = transform.position;
             _originalRotation = transform.rotation;
             _originalScale = transform.localScale;
+
+            CountVector = new(XCount, YCount, ZCount);
+
+            // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
+            var s = transform.TransformVector(BoxCollider.size);
+            s.x = Mathf.Abs(s.x);
+            s.y = Mathf.Abs(s.y);
+            s.z = Mathf.Abs(s.z);
+            Size = s;
+            Extents = s / 2.0f;
+
+            Steps = new()
+            {
+                x = Size.x / XCount,
+                y = Size.y / YCount,
+                z = Size.z / ZCount
+            };
         }
 
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
