@@ -67,7 +67,15 @@ namespace Model
             return null;
         }
 
-        public static IEnumerable<Vector3> GetIntersectionPoints(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        /// <summary>
+        /// Get all intersection points of the slicer. The points are sorted by starting at the top and moving counter-clockwise around the center.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
+        public static Vector3[] GetIntersectionPoints(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var points = GetIntersectionPoints_internal(out plane, model, slicerPosition, slicerRotation).ToArray();
             
@@ -106,7 +114,8 @@ namespace Model
                 .Concat(q2)
                 .Concat(q3)
                 .Concat(q4)
-                .Select(p => p.p);
+                .Select(p => p.p)
+                .ToArray();
         }
 
         /// <summary>
