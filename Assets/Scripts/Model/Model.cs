@@ -205,19 +205,32 @@ namespace Model
 
         public Vector3Int WorldPositionToIndex(Vector3 pos)
         {
-            var localPos = transform.InverseTransformPoint(pos);
-            var localBottomFrontLeft = transform.InverseTransformPoint(BottomFrontLeftCorner);
-            var localtopBackRight = transform.InverseTransformPoint(TopBackRightCorner);
+            // every direction needs to be handled itself, because of possible rotations
+            // build up a plane on one model-side -> measure distance to plane -> calculate size to distance aspect and apply it to index
+            // Z
+            var zPlane = new Plane(TopFrontLeftCorner, TopFrontRightCorner, BottomFrontLeftCorner);
+            var ray = new Ray(pos, transform.back());
+            zPlane.Raycast(ray, out var distance);  // plane cannot be parallel!
+            var aspect = distance / Size.z;
+            var zSteps = Mathf.RoundToInt(ZCount * aspect);
 
-            var localSize = localtopBackRight - localBottomFrontLeft;
+            var xPlane = new Plane(TopFrontLeftCorner, TopBackLeftCorner, BottomBackLeftCorner);
+            ray = new Ray(pos, transform.left());
+            xPlane.Raycast(ray, out distance);
+            aspect = distance / Size.x;
+            var xSteps = Mathf.RoundToInt(XCount * aspect);
 
-            var diff = localPos - localBottomFrontLeft;
+            var yPlane = new Plane(BottomBackLeftCorner, BottomBackRightCorner, BottomFrontRightCorner);
+            ray = new Ray(pos, transform.down());
+            yPlane.Raycast(ray, out distance);
+            aspect = distance / Size.y;
+            var ySteps = Mathf.RoundToInt(YCount * aspect);
 
             return new Vector3Int
             {
-                x = Mathf.RoundToInt(diff.x / (localSize.x / XCount)),
-                y = Mathf.RoundToInt(diff.y / (localSize.y / YCount)),
-                z = Mathf.RoundToInt(diff.z / (localSize.z / ZCount))
+                x = xSteps,
+                y = ySteps,
+                z = zSteps
             };
         }
 
