@@ -113,12 +113,8 @@ namespace Model
             CountVector = new(XCount, YCount, ZCount);
 
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
-            var s = transform.TransformVector(BoxCollider.size);
-            s.x = Mathf.Abs(s.x);
-            s.y = Mathf.Abs(s.y);
-            s.z = Mathf.Abs(s.z);
-            Size = s;
-            Extents = s / 2.0f;
+            Size = transform.TransformVector(BoxCollider.size);
+            Extents = Size / 2.0f;
 
             StepSize = new()
             {
