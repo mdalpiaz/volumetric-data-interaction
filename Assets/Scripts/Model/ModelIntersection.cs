@@ -128,6 +128,20 @@ namespace Model
         /// <returns></returns>
         private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
+            static bool HitCheck(out Vector3 hitPoint, Plane plane, Ray ray, float maxDistance)
+            {
+                var result = plane.Raycast(ray, out var distance);
+                if (!(!result && distance == 0) &&  // false AND 0 means plane and raycast are parallel
+                    ((distance >= 0 && distance <= maxDistance) ||
+                    (distance < 0 && distance >= maxDistance)))
+                {
+                    hitPoint = ray.GetPoint(distance);
+                    return true;
+                }
+                hitPoint = Vector3.zero;
+                return false;
+            }
+
             var list = new List<Vector3>(6);
             var mt = model.transform;
             var size = model.Size;
@@ -144,101 +158,77 @@ namespace Model
 
             // test Z axis (front - back)
             var ray = new Ray(model.TopFrontLeftCorner, forward);
-            plane.Raycast(ray, out var distance);
-            if ((distance >= 0 && distance <= size.z) ||
-                (distance <= 0 && distance >= size.z))
+            if (HitCheck(out var point, plane, ray, size.z))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
             
             ray = new Ray(model.TopFrontRightCorner, forward);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.z) ||
-                (distance <= 0 && distance >= size.z))
+            if (HitCheck(out point, plane, ray, size.z))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.BottomFrontLeftCorner, forward);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.z) ||
-                (distance <= 0 && distance >= size.z))
+            if (HitCheck(out point, plane, ray, size.z))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.BottomFrontRightCorner, forward);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.z) ||
-                (distance <= 0 && distance >= size.z))
+            if (HitCheck(out point, plane, ray, size.z))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             // test Y axis (top - bottom)
             ray = new Ray(model.TopBackLeftCorner, down);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.y) ||
-                (distance <= 0 && distance >= size.y))
+            if (HitCheck(out point, plane, ray, size.y))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.TopFrontLeftCorner, down);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.y) ||
-                (distance <= 0 && distance >= size.y))
+            if (HitCheck(out point, plane, ray, size.y))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.TopFrontRightCorner, down);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.y) ||
-                (distance <= 0 && distance >= size.y))
+            if (HitCheck(out point, plane, ray, size.y))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.TopBackRightCorner, down);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.y) ||
-                (distance <= 0 && distance >= size.y))
+            if (HitCheck(out point, plane, ray, size.y))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             // test X axis (left - right)
             ray = new Ray(model.TopFrontLeftCorner, right);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.x) ||
-                (distance <= 0 && distance >= size.x))
+            if (HitCheck(out point, plane, ray, size.x))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.BottomFrontLeftCorner, right);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.x) ||
-                (distance <= 0 && distance >= size.x))
+            if (HitCheck(out point, plane, ray, size.x))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.TopBackLeftCorner, right);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.x) ||
-                (distance <= 0 && distance >= size.x))
+            if (HitCheck(out point, plane, ray, size.x))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             ray = new Ray(model.BottomBackLeftCorner, right);
-            plane.Raycast(ray, out distance);
-            if ((distance >= 0 && distance <= size.x) ||
-                (distance <= 0 && distance >= size.x))
+            if (HitCheck(out point, plane, ray, size.x))
             {
-                list.Add(ray.GetPoint(distance));
+                list.Add(point);
             }
 
             return list;
