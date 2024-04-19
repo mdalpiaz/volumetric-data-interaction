@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Extensions;
 using Helper;
 using UnityEngine;
 
@@ -26,6 +25,7 @@ namespace Slicing
                 texture = null;
                 return false;
             }
+            Debug.Log($"Slice Coords: {sliceCoords}");
 
             texture = CalculateIntersectionPlane(model, sliceCoords, alternativeStartPoint, interpolationType);
             return true;
@@ -36,9 +36,6 @@ namespace Slicing
             var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
 
             var startPoint = alternativeStartPoint ?? sliceCoords.StartPoint;
-
-            Debug.DrawRay(startPoint, Vector3.down, Color.yellow, 120);
-            Debug.DrawRay(model.BottomFrontLeftCorner, Vector3.down, Color.green, 120);
 
             //var x = 0;
             for (var x = 0; x < sliceCoords.Width; x++)
@@ -75,9 +72,22 @@ namespace Slicing
         
         private static SlicePlaneCoordinates? GetSliceCoordinates(Plane plane, Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
-            if (intersectionPoints.Count < 3)
+            // intersectionPoints are pre-sorted counter-clockwise
+            if (intersectionPoints.Count == 3)
             {
-                Debug.LogError("Can't create plane with less than 3 points!");
+                return GetSliceCoordinates3Points(model, intersectionPoints[0], intersectionPoints[1], intersectionPoints[2]);
+            }
+            else if (intersectionPoints.Count == 4)
+            {
+                return GetSliceCoordinates4Points(model, intersectionPoints[0], intersectionPoints[1], intersectionPoints[2]);
+            }
+            else if (intersectionPoints.Count == 6)
+            {
+                return GetSliceCoordinates6Points(model, intersectionPoints[0], intersectionPoints[1], intersectionPoints[2], intersectionPoints[3], intersectionPoints[4], intersectionPoints[5]);
+            }
+            else
+            {
+                Debug.LogError($"Can't create plane with {intersectionPoints.Count} points!");
                 return null;
             }
 
@@ -89,8 +99,8 @@ namespace Slicing
             var down = rotation * Vector3.down;
 
             // yes, they are swapped!
-            //var left = rotation * Vector3.right;
-            //var right = rotation * Vector3.left;
+            var left = rotation * Vector3.right;
+            var right = rotation * Vector3.left;
 
             // to get the left-most point the following algorithm is run:
             // construct a horizontal plane at to bottom-most point
@@ -124,8 +134,8 @@ namespace Slicing
                 return p + up * distance;
             });
 
-            var last = upperPoints.Last();
-            upperPoints = upperPoints.OrderBy(p => Vector3.Distance(last, p)).ToArray();
+            //var last = upperPoints.Last();
+            //upperPoints = upperPoints.OrderBy(p => Vector3.Distance(last, p)).ToArray();
             var upperLeft = upperPoints.Last();
             var upperRight = upperPoints.First();
 
@@ -139,165 +149,42 @@ namespace Slicing
             // to int-steps based on the model X/Y/Z-Counts
             Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
 
-            var steps = new Vector3
-            {
-                x = model.Size.x / model.XCount,
-                y = model.Size.y / model.YCount,
-                z = model.Size.z / model.ZCount
-            };
+            Debug.Log($"Size: {model.Size}, Steps: {model.Steps}");
 
-            Debug.Log($"Size: {model.Size}, Steps: {steps}");
+        }
 
-            var diffAll = upperRight - lowerLeft;
-            var diffXZ = lowerRight - lowerLeft;
-            //var xSteps = (int)(diffXZ.x / steps.x);
-            //var ySteps = (int)(diffAll.y / steps.y);
-            //var zSteps = (int)(diffXZ.z / steps.z);
+        private static SlicePlaneCoordinates GetSliceCoordinates3Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3)
+        {
+            return null;
+        }
+
+        private static SlicePlaneCoordinates GetSliceCoordinates4Points(Model.Model model, Vector3 ul, Vector3 ll, Vector3 lr)
+        {
+            var diffHeight = ul - ll;
+            var diffXZ = lr - ll;
 
             // this is for calculating steps for height
-            // TODO
-            var ySteps = Mathf.RoundToInt(diffAll.y / steps.y);
-            //var forwardStepsX = Mathf.RoundToInt(diffAll.x / steps.x);
-            //var forwardStepsZ = Mathf.RoundToInt(diffAll.z / steps.z);
+            var ySteps = Mathf.RoundToInt(diffHeight.y / model.Steps.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
+            var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.Steps.x));
+            var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.Steps.z));
 
             // this is for calculating steps for width
-            var xSteps = Mathf.RoundToInt(diffXZ.x / steps.x);
-            var zSteps = Mathf.RoundToInt(diffXZ.z / steps.z);
+            var xSteps = Mathf.RoundToInt(diffXZ.x / model.Steps.x);
+            var zSteps = Mathf.RoundToInt(diffXZ.z / model.Steps.z);
 
-            //Debug.Log($"Steps X: {xSteps}, Y: {ySteps}, Z: {zSteps}");
-
-            var height = ySteps;//Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
+            var height = Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
             var width = Math.Max(xSteps, zSteps);
 
-            Debug.Log($"Height: {height}, Width: {width}");
-
-            // TODO
             // 3) we get the step size using the edge points and width and height
-            var textureStepX = (lowerRight - lowerLeft) / width;
-            var textureStepY = (upperLeft - lowerLeft) / height;
+            var textureStepX = (lr - ll) / width;
+            var textureStepY = (ul - ll) / height;
 
-            Debug.Log($"Texture Steps X: {textureStepX}, Y: {textureStepY}");
-
-            var sliceCoords = new SlicePlaneCoordinates(width, height, lowerLeft, textureStepX, textureStepY);
-            Debug.Log($"SliceCoords: {sliceCoords}");
-            return sliceCoords;
-        }
-        
-        private static IEnumerable<Vector3> CalculateEdgePoints(PlaneFormula planeFormula, int x, int y, int z)
-        {
-            var edgePoints = new List<Vector3>();
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, 0, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, y, z));
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(0, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(x, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(0, y, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(x, y, z));
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(0, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(x, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(0, y, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(x, y, z));
-
-            return edgePoints;
-        }
-        
-        /// <summary>
-        /// Method to get height and width dynamically
-        /// Cannot use the biggest differences as these can be from the same coordinates
-        /// Need to choose two coordinate axis
-        /// Additional to the max difference, the additional width/height from possible angles must be calculated
-        /// For this the third axis (which is not height or width) is used
-        /// </summary>
-        private static (float max1, float max2) GetDimensionsSyncDifferences(ref Vector3 diffWidth, ref Vector3 diffHeight)
-        {
-            var listWidth = new List<float>() { diffWidth.x, diffWidth.y, diffWidth.z };
-            var listHeight = new List<float>() { diffHeight.x, diffHeight.y, diffHeight.z };
-            //var indexSum = 3;
-
-            var maxWidthIndex = GetIndexOfAbsHigherValue(listWidth);
-            var maxHeightIndex = GetIndexOfAbsHigherValue(listHeight);
-
-            var width = listWidth[maxWidthIndex];
-            var height = listHeight[maxHeightIndex];
-
-            //var addIndex = (indexSum - maxWidthIndex - maxHeightIndex) % indexSum;
-            //var addWidth = listWidth[addIndex];
-            //var addHeight = listHeight[addIndex];
-
-            var zeroVector = GetCustomZeroVector(maxWidthIndex);
-            if (maxWidthIndex == maxHeightIndex) // cannot use same coordinate for step calculation as a 2d image has 2 coordinates
-            {
-                listWidth.RemoveAt(maxWidthIndex);
-                listHeight.RemoveAt(maxHeightIndex);
-                //indexSum = 1;
-
-                maxWidthIndex = GetIndexOfAbsHigherValue(listWidth);
-                maxHeightIndex = GetIndexOfAbsHigherValue(listHeight);
-                var tempWidth = listWidth[maxWidthIndex];
-                var tempHeight = listHeight[maxHeightIndex];
-
-                if (Math.Abs(tempWidth) > Math.Abs(tempHeight))
-                {
-                    width = tempWidth;
-                    diffWidth.x *= zeroVector.x;
-                    diffWidth.y *= zeroVector.y;
-                    diffWidth.z *= zeroVector.z;
-                    //addIndex = indexSum - maxWidthIndex;
-                }
-                else
-                {
-                    height = tempHeight;
-                    diffHeight.x *= zeroVector.x;
-                    diffHeight.y *= zeroVector.y;
-                    diffHeight.z *= zeroVector.z;
-                    //addIndex = indexSum - maxHeightIndex;
-                }
-
-                //addHeight = listHeight[addIndex];
-                //addWidth = listWidth[addIndex];
-            }
-
-            return (Math.Abs(width), Math.Abs(height));
-            //return (Math.Abs(width) + Math.Abs(addWidth), Math.Abs(height) + Math.Abs(addHeight));
+            return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
         }
 
-        private static (Vector3, Vector3) MinimiseSteps(Vector3 widthSteps, Vector3 heightSteps)
+        private static SlicePlaneCoordinates GetSliceCoordinates6Points(Model.Model model, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Vector3 p5, Vector3 p6)
         {
-            widthSteps.x = Math.Abs(widthSteps.x) < Math.Abs(heightSteps.x) ? 0 : widthSteps.x;
-            heightSteps.x = Math.Abs(heightSteps.x) <= Math.Abs(widthSteps.x) ? 0 : heightSteps.x;
-
-            widthSteps.y = Math.Abs(widthSteps.y) < Math.Abs(heightSteps.y) ? 0 : widthSteps.y;
-            heightSteps.y = Math.Abs(heightSteps.y) <= Math.Abs(widthSteps.y) ? 0 : heightSteps.y;
-
-            widthSteps.z = Math.Abs(widthSteps.z) < Math.Abs(heightSteps.z) ? 0 : widthSteps.z;
-            heightSteps.z = Math.Abs(heightSteps.z) <= Math.Abs(widthSteps.z) ? 0 : heightSteps.z;
-
-            return (widthSteps, heightSteps);
-        }
-
-        private static Vector3 GetClosestPoint(IEnumerable<Vector3> edgePoints, Vector3 targetPoint)
-        {
-            return edgePoints
-                .ToDictionary(p => p, p => Vector3.Distance(p, targetPoint))
-                .OrderBy(p => p.Value)
-                .First()
-                .Key;
-        }
-        
-        private static Vector3 GetCustomZeroVector(int zeroOnIndex) => new(
-            zeroOnIndex == 0 ? 0 : 1,
-            zeroOnIndex == 1 ? 0 : 1,
-            zeroOnIndex == 2 ? 0 : 1);
-
-        private static int GetIndexOfAbsHigherValue(IList<float> values)
-        {
-            var min = values.Min();
-            var max = values.Max();
-            return values.IndexOf(Mathf.Abs(min) > max ? min : max);
+            return null;
         }
     }
 }
