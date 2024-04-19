@@ -46,7 +46,7 @@ namespace Model
 
         public Vector3 Extents { get; private set; }
 
-        public Vector3 Steps { get; private set; }
+        public Vector3 StepSize { get; private set; }
 
         // transform.position is NOT the centerpoint of the model!
         public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
@@ -120,7 +120,7 @@ namespace Model
             Size = s;
             Extents = s / 2.0f;
 
-            Steps = new()
+            StepSize = new()
             {
                 x = Size.x / XCount,
                 y = Size.y / YCount,

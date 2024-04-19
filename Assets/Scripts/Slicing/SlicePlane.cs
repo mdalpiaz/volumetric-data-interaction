@@ -141,7 +141,7 @@ namespace Slicing
             // to int-steps based on the model X/Y/Z-Counts
             Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
 
-            Debug.Log($"Size: {model.Size}, Steps: {model.Steps}");
+            Debug.Log($"Size: {model.Size}, Steps: {model.StepSize}");
 
         }
 
@@ -157,13 +157,13 @@ namespace Slicing
             var diffXZ = lr - ll;
 
             // this is for calculating steps for height
-            var ySteps = Mathf.RoundToInt(diffHeight.y / model.Steps.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
-            var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.Steps.x));
-            var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.Steps.z));
+            var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
+            var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.StepSize.x));
+            var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.StepSize.z));
 
             // this is for calculating steps for width
-            var xSteps = Mathf.RoundToInt(diffXZ.x / model.Steps.x);
-            var zSteps = Mathf.RoundToInt(diffXZ.z / model.Steps.z);
+            var xSteps = Mathf.RoundToInt(diffXZ.x / model.StepSize.x);
+            var zSteps = Mathf.RoundToInt(diffXZ.z / model.StepSize.z);
 
             var height = Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
             var width = Math.Max(xSteps, zSteps);
