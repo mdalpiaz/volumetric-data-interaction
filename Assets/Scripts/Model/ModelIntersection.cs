@@ -144,87 +144,99 @@ namespace Model
 
             // test Z axis (front - back)
             var ray = new Ray(model.TopFrontLeftCorner, forward);
-            if (plane.Raycast(ray, out var distance) &&
-                distance >= 0 && distance <= size.z)
+            plane.Raycast(ray, out var distance);
+            if ((distance >= 0 && distance <= size.z) ||
+                (distance <= 0 && distance >= size.z))
             {
                 list.Add(ray.GetPoint(distance));
             }
             
             ray = new Ray(model.TopFrontRightCorner, forward);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.z)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.z) ||
+                (distance <= 0 && distance >= size.z))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.BottomFrontLeftCorner, forward);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.z)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.z) ||
+                (distance <= 0 && distance >= size.z))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.BottomFrontRightCorner, forward);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.z)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.z) ||
+                (distance <= 0 && distance >= size.z))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             // test Y axis (top - bottom)
             ray = new Ray(model.TopBackLeftCorner, down);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.y)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.y) ||
+                (distance <= 0 && distance >= size.y))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.TopFrontLeftCorner, down);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.y)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.y) ||
+                (distance <= 0 && distance >= size.y))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.TopFrontRightCorner, down);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.y)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.y) ||
+                (distance <= 0 && distance >= size.y))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.TopBackRightCorner, down);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.y)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.y) ||
+                (distance <= 0 && distance >= size.y))
             {
                 list.Add(ray.GetPoint(distance));
             }
 
             // test X axis (left - right)
             ray = new Ray(model.TopFrontLeftCorner, right);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.x)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.x) ||
+                (distance <= 0 && distance >= size.x))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.BottomFrontLeftCorner, right);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.x)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.x) ||
+                (distance <= 0 && distance >= size.x))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.TopBackLeftCorner, right);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.x)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.x) ||
+                (distance <= 0 && distance >= size.x))
             {
                 list.Add(ray.GetPoint(distance));
             }
-            
+
             ray = new Ray(model.BottomBackLeftCorner, right);
-            if (plane.Raycast(ray, out distance) &&
-                distance >= 0 && distance <= size.x)
+            plane.Raycast(ray, out distance);
+            if ((distance >= 0 && distance <= size.x) ||
+                (distance <= 0 && distance >= size.x))
             {
                 list.Add(ray.GetPoint(distance));
             }
