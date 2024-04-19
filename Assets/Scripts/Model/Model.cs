@@ -207,14 +207,29 @@ namespace Model
             }
         }
 
+        /// <summary>
+        /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="interpolation"></param>
+        /// <returns></returns>
         public Color GetPixel(int x, int y, int z, InterpolationType interpolation = InterpolationType.Nearest)
         {
-            return interpolation switch
+            try
             {
-                InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
-                InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
-                _ => throw new NotImplementedException()
-            };
+                return interpolation switch
+                {
+                    InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
+                    InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
+                    _ => throw new NotImplementedException()
+                };
+            }
+            catch
+            {
+                return Color.black;
+            }
         }
         
         public void ResetState()
