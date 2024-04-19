@@ -36,8 +36,8 @@ namespace Slicing
 
             var startPoint = alternativeStartPoint ?? sliceCoords.StartPoint;
 
-            var x = 0;
-            //for (var x = 0; x < sliceCoords.Width; x++)
+            //var x = 0;
+            for (var x = 0; x < sliceCoords.Width; x++)
             {
                 for (var y = 0; y < sliceCoords.Height; y++)
                 {
