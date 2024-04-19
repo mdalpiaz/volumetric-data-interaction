@@ -46,9 +46,9 @@ namespace Slicing
 
                     // convert position into index
                     var diff = position - model.BottomFrontLeftCorner;
-                    var xStep = Mathf.RoundToInt(diff.x / (model.Size.x / model.XCount));
-                    var yStep = Mathf.RoundToInt(diff.y / (model.Size.y / model.YCount));
-                    var zStep = Mathf.RoundToInt(diff.z / (model.Size.z / model.ZCount));
+                    var xStep = Mathf.RoundToInt(diff.x / model.Steps.x);
+                    var yStep = Mathf.RoundToInt(diff.y / model.Steps.y);
+                    var zStep = Mathf.RoundToInt(diff.z / model.Steps.z);
 
                     //Debug.Log($"Before X: {xStep}, Y: {yStep}, Z: {zStep}");
 
