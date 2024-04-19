@@ -80,10 +80,10 @@ namespace Slicing
                 return;
             }
             AudioManager.Instance.PlayCameraSound();
-            
+
             var intersectionPoints = ModelIntersection.GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation);
 
-            if (!SlicePlane.CalculateIntersectionPlane(out var sliceCoords, out var texture, plane, model, intersectionPoints))
+            if (!SlicePlane.CalculateIntersectionPlane(out _, out var texture, plane, model, intersectionPoints))
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
                 return;
@@ -100,7 +100,6 @@ namespace Slicing
             Destroy(lowerHull);
             SetTemporaryCuttingPlaneActive(true);
 
-            //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
             var mesh = ModelIntersection.CreateIntersectingMesh(intersectionPoints);
             if (mesh == null)
             {
