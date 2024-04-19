@@ -40,8 +40,6 @@ namespace Model
 
         public int ZCount { get; private set; }
         
-        public Vector3 CountVector { get; private set; }
-
         public Vector3 Size { get; private set; }
 
         public Vector3 Extents { get; private set; }
@@ -110,12 +108,9 @@ namespace Model
             _originalRotation = transform.rotation;
             _originalScale = transform.localScale;
 
-            CountVector = new(XCount, YCount, ZCount);
-
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
             Size = transform.TransformVector(BoxCollider.size);
             Extents = Size / 2.0f;
-
             StepSize = new()
             {
                 x = Size.x / XCount,
