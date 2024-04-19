@@ -47,6 +47,13 @@ namespace Model
 
         public Vector3 Extents => Size / 2.0f;
 
+        public Vector3 Steps => new()
+        {
+            x = Size.x / XCount,
+            y = Size.y / YCount,
+            z = Size.z / ZCount
+        };
+
         // transform.position is NOT the centerpoint of the model!
         public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
             transform.left() * Extents.x +
