@@ -144,17 +144,24 @@ namespace Model
 
             var list = new List<Vector3>(6);
             var mt = model.transform;
-            var size = model.Size;
+            var size = mt.InverseTransformVector(model.Size);
 
-            var forward = mt.forward;
-            var down = mt.down();
-            var right = mt.right;
-            
+            //var forward = mt.forward;
+            //var down = mt.down();
+            //var right = mt.right;
+
+            var forward = Vector3.forward;
+            var down = Vector3.down;
+            var right = Vector3.right;
+
             // this is the normal of the slicer
             var normalVec = slicerRotation * Vector3.back;
-            
+
+            normalVec = mt.InverseTransformVector(normalVec);
+            var localPosition = mt.InverseTransformPoint(slicerPosition);
+
             // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
-            plane = new Plane(normalVec, slicerPosition);
+            plane = new Plane(normalVec, localPosition);
 
             // test Z axis (front - back)
             var ray = new Ray(model.TopFrontLeftCorner, forward);

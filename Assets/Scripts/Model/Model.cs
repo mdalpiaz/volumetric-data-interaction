@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using Constants;
 using Extensions;
 using Selection;
@@ -47,45 +48,21 @@ namespace Model
         public Vector3 StepSize { get; private set; }
 
         // transform.position is NOT the centerpoint of the model!
-        public Vector3 BottomFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.left() * Extents.x +
-            transform.down() * Extents.y +
-            transform.back() * Extents.z;
+        public Vector3 BottomFrontLeftCorner { get; private set; }
 
-        public Vector3 BottomFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.right * Extents.x +
-            transform.down() * Extents.y +
-            transform.back() * Extents.z;
+        public Vector3 BottomFrontRightCorner { get; private set; }
 
-        public Vector3 TopFrontLeftCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.left() * Extents.x +
-            transform.up * Extents.y +
-            transform.back() * Extents.z;
+        public Vector3 TopFrontLeftCorner { get; private set; }
 
-        public Vector3 TopFrontRightCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.right * Extents.x +
-            transform.up * Extents.y +
-            transform.back() * Extents.z;
+        public Vector3 TopFrontRightCorner { get; private set; }
 
-        public Vector3 BottomBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.left() * Extents.x +
-            transform.down() * Extents.y +
-            transform.forward * Extents.z;
+        public Vector3 BottomBackLeftCorner { get; private set; }
 
-        public Vector3 BottomBackRightCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.right * Extents.x +
-            transform.down() * Extents.y +
-            transform.forward * Extents.z;
+        public Vector3 BottomBackRightCorner { get; private set; }
 
-        public Vector3 TopBackLeftCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.left() * Extents.x +
-            transform.up * Extents.y +
-            transform.forward * Extents.z;
+        public Vector3 TopBackLeftCorner { get; private set; }
 
-        public Vector3 TopBackRightCorner => transform.TransformPoint(BoxCollider.center) +
-            transform.right * Extents.x +
-            transform.up * Extents.y +
-            transform.forward * Extents.z;
+        public Vector3 TopBackRightCorner { get; private set; }
 
         private void Awake()
         {
@@ -111,11 +88,42 @@ namespace Model
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
             Size = transform.TransformVector(BoxCollider.size);
             Extents = Size / 2.0f;
+
+            //var localSize = transform.InverseTransformPoint(Size);
+            //StepSize = new()
+            //{
+            //    x = localSize.x / XCount,
+            //    y = localSize.y / YCount,
+            //    z = localSize.z / ZCount
+            //};
+
+            // this code gets ALL corner points and sorts them locally, so we can easily determin to which corner which point belongs
+            // this code has already been tested and is CORRECT
+            var points = new Vector3[8];
+            var center = transform.TransformPoint(BoxCollider.center);
+            points[0] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.down() * Extents.y + transform.back() * Extents.z);
+            points[1] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.down() * Extents.y + transform.forward * Extents.z);
+            points[2] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.up * Extents.y + transform.back() * Extents.z);
+            points[3] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.up * Extents.y + transform.forward * Extents.z);
+            points[4] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.down() * Extents.y + transform.back() * Extents.z);
+            points[5] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.down() * Extents.y + transform.forward * Extents.z);
+            points[6] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.up * Extents.y + transform.back() * Extents.z);
+            points[7] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.up * Extents.y + transform.forward * Extents.z);
+
+            BottomBackLeftCorner =   points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
+            BottomBackRightCorner =  points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
+            BottomFrontLeftCorner =  points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderBy(p => p.z).First();
+            BottomFrontRightCorner = points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderBy(p => p.z).First();
+            TopBackLeftCorner =      points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderByDescending(p => p.z).First();
+            TopBackRightCorner =     points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderByDescending(p => p.z).First();
+            TopFrontLeftCorner =     points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
+            TopFrontRightCorner =    points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
+
             StepSize = new()
             {
-                x = Size.x / XCount,
-                y = Size.y / YCount,
-                z = Size.z / ZCount
+                x = (BottomBackRightCorner.x - BottomBackLeftCorner.x) / XCount,
+                y = (TopBackLeftCorner.y - BottomBackLeftCorner.y) / YCount,
+                z = (BottomBackLeftCorner.z - BottomFrontLeftCorner.z) / ZCount
             };
         }
 
@@ -205,32 +213,16 @@ namespace Model
 
         public Vector3Int WorldPositionToIndex(Vector3 pos)
         {
-            // every direction needs to be handled itself, because of possible rotations
-            // build up a plane on one model-side -> measure distance to plane -> calculate size to distance aspect and apply it to index
-            // Z
-            var zPlane = new Plane(TopFrontLeftCorner, TopFrontRightCorner, BottomFrontLeftCorner);
-            var ray = new Ray(pos, transform.back());
-            zPlane.Raycast(ray, out var distance);  // plane cannot be parallel!
-            var aspect = distance / Size.z;
-            var zSteps = Mathf.RoundToInt(ZCount * aspect);
+            var localPos = transform.InverseTransformPoint(pos);
+            var bfl = transform.InverseTransformPoint(BottomFrontLeftCorner);
 
-            var xPlane = new Plane(TopFrontLeftCorner, TopBackLeftCorner, BottomBackLeftCorner);
-            ray = new Ray(pos, transform.left());
-            xPlane.Raycast(ray, out distance);
-            aspect = distance / Size.x;
-            var xSteps = Mathf.RoundToInt(XCount * aspect);
-
-            var yPlane = new Plane(BottomBackLeftCorner, BottomBackRightCorner, BottomFrontRightCorner);
-            ray = new Ray(pos, transform.down());
-            yPlane.Raycast(ray, out distance);
-            aspect = distance / Size.y;
-            var ySteps = Mathf.RoundToInt(YCount * aspect);
+            var diff = localPos - bfl;
 
             return new Vector3Int
             {
-                x = xSteps,
-                y = ySteps,
-                z = zSteps
+                x = Mathf.RoundToInt(diff.x / StepSize.x),
+                y = Mathf.RoundToInt(diff.y / StepSize.y),
+                z = Mathf.RoundToInt(diff.z / StepSize.z)
             };
         }
 
