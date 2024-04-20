@@ -3605,6 +3605,41 @@ PrefabInstance:
       propertyPath: plane
       value: 
       objectReference: {fileID: 500436827}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.10898664
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.16553026
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 0.46463788
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.0043188967
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.023771137
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.04257691
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: stackPath
