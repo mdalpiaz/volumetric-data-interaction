@@ -148,6 +148,10 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates4Points(Model.Model model, Vector3 ul, Vector3 ll, Vector3 lr)
         {
+            Debug.DrawRay(ul, Vector3.down, Color.yellow, 120);
+            Debug.DrawRay(ll, Vector3.down, Color.green, 120);
+            Debug.DrawRay(lr, Vector3.down, Color.blue, 120);
+
             var diffHeight = ul - ll;
             var diffXZ = lr - ll;
 

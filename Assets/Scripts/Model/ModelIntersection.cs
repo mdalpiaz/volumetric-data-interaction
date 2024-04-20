@@ -99,6 +99,9 @@ namespace Model
             var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
 
+            Debug.DrawRay(Vector3.zero, slicerUp, Color.blue, 120);
+            Debug.DrawRay(Vector3.zero, slicerLeft, Color.red, 120);
+
             var pointsInQuadrants = points
                 .Select(p => (p, Vector3.Normalize(p - middle)))
                 .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
