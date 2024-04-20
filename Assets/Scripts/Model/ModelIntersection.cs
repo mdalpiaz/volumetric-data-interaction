@@ -95,7 +95,7 @@ namespace Model
                 z = (minZ + maxZ) / 2
             };
 
-            var rotation = Quaternion.LookRotation(plane.flipped.normal);
+            var rotation = Quaternion.LookRotation(plane.normal);
             var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
 
