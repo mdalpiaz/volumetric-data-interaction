@@ -331,16 +331,7 @@ namespace Slicing
 
             var list = new List<Vector3>(6);
             var mt = model.transform;
-            // TODO why size?
-            var size = mt.InverseTransformVector(model.Size);
-
-            //var forward = mt.forward;
-            //var down = mt.down();
-            //var right = mt.right;
-
-            var forward = Vector3.forward;
-            var down = Vector3.down;
-            var right = Vector3.right;
+            var size = model.Size;
 
             // this is the normal of the slicer
             var normalVec = slicerRotation * Vector3.back;
@@ -358,75 +349,75 @@ namespace Slicing
             plane = new Plane(normalVec, localPosition);
 
             // test Z axis (front - back)
-            var ray = new Ray(model.TopFrontLeftCorner, forward);
+            var ray = new Ray(model.TopFrontLeftCorner, Vector3.forward);
             if (HitCheck(out var point, plane, ray, size.z))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.TopFrontRightCorner, forward);
+            ray = new Ray(model.TopFrontRightCorner, Vector3.forward);
             if (HitCheck(out point, plane, ray, size.z))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.BottomFrontLeftCorner, forward);
+            ray = new Ray(model.BottomFrontLeftCorner, Vector3.forward);
             if (HitCheck(out point, plane, ray, size.z))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.BottomFrontRightCorner, forward);
+            ray = new Ray(model.BottomFrontRightCorner, Vector3.forward);
             if (HitCheck(out point, plane, ray, size.z))
             {
                 list.Add(point);
             }
 
             // test Y axis (top - bottom)
-            ray = new Ray(model.TopBackLeftCorner, down);
+            ray = new Ray(model.TopBackLeftCorner, Vector3.down);
             if (HitCheck(out point, plane, ray, size.y))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.TopFrontLeftCorner, down);
+            ray = new Ray(model.TopFrontLeftCorner, Vector3.down);
             if (HitCheck(out point, plane, ray, size.y))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.TopFrontRightCorner, down);
+            ray = new Ray(model.TopFrontRightCorner, Vector3.down);
             if (HitCheck(out point, plane, ray, size.y))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.TopBackRightCorner, down);
+            ray = new Ray(model.TopBackRightCorner, Vector3.down);
             if (HitCheck(out point, plane, ray, size.y))
             {
                 list.Add(point);
             }
 
             // test X axis (left - right)
-            ray = new Ray(model.TopFrontLeftCorner, right);
+            ray = new Ray(model.TopFrontLeftCorner, Vector3.right);
             if (HitCheck(out point, plane, ray, size.x))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.BottomFrontLeftCorner, right);
+            ray = new Ray(model.BottomFrontLeftCorner, Vector3.right);
             if (HitCheck(out point, plane, ray, size.x))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.TopBackLeftCorner, right);
+            ray = new Ray(model.TopBackLeftCorner, Vector3.right);
             if (HitCheck(out point, plane, ray, size.x))
             {
                 list.Add(point);
             }
 
-            ray = new Ray(model.BottomBackLeftCorner, right);
+            ray = new Ray(model.BottomBackLeftCorner, Vector3.right);
             if (HitCheck(out point, plane, ray, size.x))
             {
                 list.Add(point);
