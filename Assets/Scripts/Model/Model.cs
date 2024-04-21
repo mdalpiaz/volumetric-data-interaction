@@ -43,8 +43,6 @@ namespace Model
         
         public Vector3 Size { get; private set; }
 
-        public Vector3 Extents { get; private set; }
-
         public Vector3 StepSize { get; private set; }
 
         // transform.position is NOT the centerpoint of the model!
@@ -86,8 +84,8 @@ namespace Model
             _originalScale = transform.localScale;
 
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
-            Size = transform.TransformVector(BoxCollider.size);
-            Extents = Size / 2.0f;
+            var worldSize = transform.TransformVector(BoxCollider.size);
+            var worldExtents = worldSize / 2.0f;
 
             //var localSize = transform.InverseTransformPoint(Size);
             //StepSize = new()
@@ -101,14 +99,14 @@ namespace Model
             // this code has already been tested and is CORRECT
             var points = new Vector3[8];
             var center = transform.TransformPoint(BoxCollider.center);
-            points[0] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.down() * Extents.y + transform.back() * Extents.z);
-            points[1] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.down() * Extents.y + transform.forward * Extents.z);
-            points[2] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.up * Extents.y + transform.back() * Extents.z);
-            points[3] = transform.InverseTransformPoint(center + transform.left() * Extents.x + transform.up * Extents.y + transform.forward * Extents.z);
-            points[4] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.down() * Extents.y + transform.back() * Extents.z);
-            points[5] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.down() * Extents.y + transform.forward * Extents.z);
-            points[6] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.up * Extents.y + transform.back() * Extents.z);
-            points[7] = transform.InverseTransformPoint(center + transform.right * Extents.x + transform.up * Extents.y + transform.forward * Extents.z);
+            points[0] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
+            points[1] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
+            points[2] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
+            points[3] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
+            points[4] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
+            points[5] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
+            points[6] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
+            points[7] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
 
             BottomBackLeftCorner =   points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
             BottomBackRightCorner =  points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
@@ -119,11 +117,18 @@ namespace Model
             TopFrontLeftCorner =     points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
             TopFrontRightCorner =    points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
 
+            Size = new()
+            {
+                x = BottomBackRightCorner.x - BottomBackLeftCorner.x,
+                y = TopBackLeftCorner.y - BottomBackLeftCorner.y,
+                z = BottomBackLeftCorner.z - BottomFrontLeftCorner.z
+            };
+
             StepSize = new()
             {
-                x = (BottomBackRightCorner.x - BottomBackLeftCorner.x) / XCount,
-                y = (TopBackLeftCorner.y - BottomBackLeftCorner.y) / YCount,
-                z = (BottomBackLeftCorner.z - BottomFrontLeftCorner.z) / ZCount
+                x = Size.x / XCount,
+                y = Size.y / YCount,
+                z = Size.z / ZCount
             };
         }
 
