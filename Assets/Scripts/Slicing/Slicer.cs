@@ -17,9 +17,6 @@ namespace Slicing
         
         [SerializeField]
         private GameObject temporaryCuttingPlane = null!;
-
-        [SerializeField]
-        private GameObject sectionQuad = null!;
         
         [SerializeField]
         private Material materialTemporarySlice = null!;
@@ -67,7 +64,6 @@ namespace Slicing
             var cachedTransform = transform;
             var model = ModelManager.Instance.CurrentModel;
             var modelGo = model.gameObject;
-            var sectionQuadTransform = sectionQuad.transform;
             
             var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
             if (slicedObject == null)
@@ -77,7 +73,7 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            if (!SlicePlane.Slice(out var mesh, out var texture, model, sectionQuadTransform))
+            if (!SlicePlane.Slice(out var mesh, out var texture, model, transform))
             {
                 Debug.LogWarning("Cannot slice!");
                 return;
