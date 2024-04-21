@@ -50,7 +50,6 @@ namespace Slicing
         {
             var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
 
-            //var x = 0;
             for (var x = 0; x < sliceCoords.Width; x++)
             {
                 for (var y = 0; y < sliceCoords.Height; y++)
@@ -58,7 +57,7 @@ namespace Slicing
                     // get world position
                     var position = sliceCoords.StartPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
-                    var index = model.WorldPositionToIndex(position);
+                    var index = model.LocalPositionToIndex(position);
 
                     // get image at index and then the pixel
                     //var pixel = model.GetPixel(xStep, yStep, zStep - 1, interpolationType); // z needs correction

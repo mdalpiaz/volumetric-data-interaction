@@ -211,12 +211,9 @@ namespace Model
             }
         }
 
-        public Vector3Int WorldPositionToIndex(Vector3 pos)
+        public Vector3Int LocalPositionToIndex(Vector3 pos)
         {
-            var localPos = transform.InverseTransformPoint(pos);
-            var bfl = transform.InverseTransformPoint(BottomFrontLeftCorner);
-
-            var diff = localPos - bfl;
+            var diff = pos - BottomFrontLeftCorner;
 
             return new Vector3Int
             {
