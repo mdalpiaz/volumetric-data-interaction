@@ -161,16 +161,11 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates4Points(Model.Model model, Vector3 ul, Vector3 ll, Vector3 lr)
         {
-            Debug.DrawLine(ul, ll, Color.red, 120);
-            Debug.DrawLine(ll, lr, Color.red, 120);
-
             var diffHeight = ul - ll;
             var diffXZ = lr - ll;
 
             // this is for calculating steps for height
             var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
-
-            Debug.DrawLine(ll, new() { x = ll.x, y = ll.y + diffHeight.y, z = ll.z }, Color.yellow, 120);
 
             var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.StepSize.x));
             var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.StepSize.z));
@@ -352,6 +347,12 @@ namespace Slicing
 
             normalVec = mt.InverseTransformVector(normalVec);
             var localPosition = mt.InverseTransformPoint(slicerPosition);
+
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.yellow, 120);
+            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.yellow, 120);
+            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.yellow, 120);
+
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontLeftCorner + size, Color.red, 120);
 
             // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
             plane = new Plane(normalVec, localPosition);
