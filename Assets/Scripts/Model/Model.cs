@@ -15,9 +15,6 @@ namespace Model
     {
         [SerializeField]
         private string stackPath = StringConstants.XStackPath;
-        
-        [SerializeField]
-        private MeshFilter sectionQuad = null!;
 
         private MeshFilter _meshFilter = null!;
         private Renderer _renderer = null!;

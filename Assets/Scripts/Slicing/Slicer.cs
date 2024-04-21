@@ -3,7 +3,6 @@
 using Constants;
 using EzySlice;
 using Model;
-using System.Linq;
 using UnityEngine;
 
 namespace Slicing
@@ -21,9 +20,6 @@ namespace Slicing
 
         [SerializeField]
         private GameObject sectionQuad = null!;
-
-        [SerializeField]
-        private GameObject cuttingPlane = null!;
         
         [SerializeField]
         private Material materialTemporarySlice = null!;
