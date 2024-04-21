@@ -10,26 +10,43 @@ namespace Slicing
 {
     public static class SlicePlane
     {
-        public static bool CalculateIntersectionPlane(
-            [NotNullWhen(true)] out SlicePlaneCoordinates? sliceCoords,
+        public static bool Slice(
+            [NotNullWhen(true)] out Mesh? mesh,
             [NotNullWhen(true)] out Texture2D? texture,
-            Plane plane,
-            Model.Model model, IReadOnlyList<Vector3> intersectionPoints,
-            Vector3? alternativeStartPoint = null,
+            Model.Model model,
+            Transform transform,
             InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            sliceCoords = GetSliceCoordinates(plane, model, intersectionPoints);
+            var points = GetIntersectionPoints(model, transform.position, transform.rotation);
+
+            var sliceCoords = CreateSlicePlaneCoordinates(model, points);
             if (sliceCoords == null)
             {
+                Debug.LogWarning("Intersection image can't be calculated!");
                 texture = null;
+                mesh = null;
                 return false;
             }
 
-            texture = CalculateIntersectionPlane(model, sliceCoords, alternativeStartPoint, interpolationType);
+            texture = CreateSliceTexture(model, sliceCoords, interpolationType);
+
+            // convert to world coordinates
+            for (var i = 0; i < points.Length; i++)
+            {
+                points[i] = model.transform.TransformPoint(points[i]);
+            }
+
+            mesh = CreateMesh(points);
+            if (mesh == null)
+            {
+                Debug.LogWarning($"Cannot create mesh! Number of points: {points.Length}");
+                return false;
+            }
+
             return true;
         }
         
-        public static Texture2D CalculateIntersectionPlane(Model.Model model, SlicePlaneCoordinates sliceCoords, Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Texture2D CreateSliceTexture(Model.Model model, SlicePlaneCoordinates sliceCoords, InterpolationType interpolationType = InterpolationType.Nearest)
         {
             var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
 
@@ -56,7 +73,7 @@ namespace Slicing
             return resultImage;
         }
         
-        private static SlicePlaneCoordinates? GetSliceCoordinates(Plane plane, Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        public static SlicePlaneCoordinates? CreateSlicePlaneCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
         {
             // intersectionPoints are pre-sorted counter-clockwise
             if (intersectionPoints.Count == 3)
@@ -77,65 +94,65 @@ namespace Slicing
                 return null;
             }
 
-            // get bottom left edge (get left-most point and bottom-most point and check where they meet on the plane)
-            var forward = plane.normal;
-            var rotation = Quaternion.LookRotation(forward);
+            //// get bottom left edge (get left-most point and bottom-most point and check where they meet on the plane)
+            //var forward = plane.normal;
+            //var rotation = Quaternion.LookRotation(forward);
 
-            var up = rotation * Vector3.up;
-            var down = rotation * Vector3.down;
+            //var up = rotation * Vector3.up;
+            //var down = rotation * Vector3.down;
 
-            // yes, they are swapped!
-            var left = rotation * Vector3.right;
-            var right = rotation * Vector3.left;
+            //// yes, they are swapped!
+            //var left = rotation * Vector3.right;
+            //var right = rotation * Vector3.left;
 
-            // to get the left-most point the following algorithm is run:
-            // construct a horizontal plane at to bottom-most point
-            // for every intersection point, raycast with the down direction until the plane is hit (we get the distance to the bottom)
-            // move all points onto the new plane
-            // now get the left-most point
+            //// to get the left-most point the following algorithm is run:
+            //// construct a horizontal plane at to bottom-most point
+            //// for every intersection point, raycast with the down direction until the plane is hit (we get the distance to the bottom)
+            //// move all points onto the new plane
+            //// now get the left-most point
 
-            // 1) get start point at the bottom left
-            var minPoint = intersectionPoints.Select(p => p.y).Min();
-            var lowerPlane = new Plane(Vector3.up, -minPoint);
-            var lowerPoints = intersectionPoints.Select(p =>
-            {
-                var ray = new Ray(p, down);
-                lowerPlane.Raycast(ray, out var distance);
-                return p + down * distance;
-            });
+            //// 1) get start point at the bottom left
+            //var minPoint = intersectionPoints.Select(p => p.y).Min();
+            //var lowerPlane = new Plane(Vector3.up, -minPoint);
+            //var lowerPoints = intersectionPoints.Select(p =>
+            //{
+            //    var ray = new Ray(p, down);
+            //    lowerPlane.Raycast(ray, out var distance);
+            //    return p + down * distance;
+            //});
 
-            // we take the first point as base measurement and compare with all other points
-            var first = lowerPoints.First();
-            lowerPoints = lowerPoints.OrderBy(p => Vector3.Distance(first, p)).ToArray();
-            var lowerLeft = lowerPoints.First();
-            var lowerRight = lowerPoints.Last();
+            //// we take the first point as base measurement and compare with all other points
+            //var first = lowerPoints.First();
+            //lowerPoints = lowerPoints.OrderBy(p => Vector3.Distance(first, p)).ToArray();
+            //var lowerLeft = lowerPoints.First();
+            //var lowerRight = lowerPoints.Last();
 
-            // 1.5) and also at the top right to calculate the difference
-            var maxPoint = intersectionPoints.Select(p => p.y).Max();
-            var upperPlane = new Plane(Vector3.up, -maxPoint);
-            var upperPoints = intersectionPoints.Select(p =>
-            {
-                var ray = new Ray(p, up);
-                upperPlane.Raycast(ray, out var distance);
-                return p + up * distance;
-            });
+            //// 1.5) and also at the top right to calculate the difference
+            //var maxPoint = intersectionPoints.Select(p => p.y).Max();
+            //var upperPlane = new Plane(Vector3.up, -maxPoint);
+            //var upperPoints = intersectionPoints.Select(p =>
+            //{
+            //    var ray = new Ray(p, up);
+            //    upperPlane.Raycast(ray, out var distance);
+            //    return p + up * distance;
+            //});
 
-            //var last = upperPoints.Last();
-            //upperPoints = upperPoints.OrderBy(p => Vector3.Distance(last, p)).ToArray();
-            var upperLeft = upperPoints.Last();
-            var upperRight = upperPoints.First();
+            ////var last = upperPoints.Last();
+            ////upperPoints = upperPoints.OrderBy(p => Vector3.Distance(last, p)).ToArray();
+            //var upperLeft = upperPoints.Last();
+            //var upperRight = upperPoints.First();
 
-            // TODO
-            // 2) we get the width and height of the new texture
-            // what we do is:
-            // for width we only look at X and Z axis and we get the one with the most pixels
-            // for height we DON'T look at the Y height, we compare the point of the lower points with the higher points and count pixels
+            //// TODO
+            //// 2) we get the width and height of the new texture
+            //// what we do is:
+            //// for width we only look at X and Z axis and we get the one with the most pixels
+            //// for height we DON'T look at the Y height, we compare the point of the lower points with the higher points and count pixels
 
-            // we need to convert the world coordinates of the intersection points
-            // to int-steps based on the model X/Y/Z-Counts
-            Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
+            //// we need to convert the world coordinates of the intersection points
+            //// to int-steps based on the model X/Y/Z-Counts
+            //Debug.Log($"X: {model.XCount}, Y: {model.YCount}, Z: {model.ZCount}");
 
-            Debug.Log($"Size: {model.Size}, Steps: {model.StepSize}");
+            //Debug.Log($"Size: {model.Size}, Steps: {model.StepSize}");
 
         }
 
@@ -185,7 +202,7 @@ namespace Slicing
             return null;
         }
 
-        public static Mesh? CreateIntersectingMesh(Vector3[] points)
+        private static Mesh? CreateMesh(Vector3[] points)
         {
             // cube cross-section has very specific cuts
             // we need to construct the smallest rectangle with all the points on the corner
@@ -252,9 +269,9 @@ namespace Slicing
         /// <param name="slicerPosition"></param>
         /// <param name="slicerRotation"></param>
         /// <returns></returns>
-        public static Vector3[] GetIntersectionPoints(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        public static Vector3[] GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var points = GetIntersectionPoints_internal(out plane, model, slicerPosition, slicerRotation).ToArray();
+            var points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToArray();
 
             // we need to sort the points by angle, so that the mesh later on will be visible
             // to find the right order of the points
