@@ -88,7 +88,7 @@ namespace Slicing
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
             model.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
             Destroy(lowerHull);
-            SetTemporaryCuttingPlaneActive(true);
+            SetCuttingActive(true);
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
@@ -96,24 +96,25 @@ namespace Slicing
             quad.Material = transparentMaterial;
         }
         
-        public void SetTemporaryCuttingPlaneActive(bool active)
+        public void SetCuttingActive(bool active)
         {
             temporaryCuttingPlane.SetActive(active);
+            var model = ModelManager.Instance.CurrentModel;
 
             if (active)
             {
-                ModelManager.Instance.CurrentModel.SetCuttingPlane(temporaryCuttingPlane);
+                model.SetCuttingPlane(temporaryCuttingPlane);
             }
 
-            ModelManager.Instance.CurrentModel.SetCuttingPlaneActive(active);
+            model.SetCuttingPlaneActive(active);
 
             if (active)
             {
-                ModelManager.Instance.CurrentModel.SetModelMaterial(materialTemporarySlice, materialShader);
+                model.SetModelMaterial(materialTemporarySlice, materialShader);
             }
             else
             {
-                ModelManager.Instance.CurrentModel.SetModelMaterial(materialWhite);
+                model.SetModelMaterial(materialWhite);
             }
         }
     }

@@ -209,7 +209,7 @@ namespace Networking.Tablet
                 case MenuMode.None:
                     if (_menuMode == MenuMode.Analysis)
                     {
-                        slicer.SetTemporaryCuttingPlaneActive(false);
+                        slicer.SetCuttingActive(false);
                     }
                     else
                     {
@@ -227,7 +227,7 @@ namespace Networking.Tablet
                     isSnapshotSelected = Selected != null && Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
-                    slicer.SetTemporaryCuttingPlaneActive(true);
+                    slicer.SetCuttingActive(true);
                     mappingAnchor.StopMapping();
                     break;
                 default:
