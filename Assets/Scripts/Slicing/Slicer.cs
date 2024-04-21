@@ -81,11 +81,9 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            var intersectionPoints = SlicePlane.GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation);
-
-            if (!SlicePlane.CalculateIntersectionPlane(out _, out var texture, plane, model, intersectionPoints))
+            if (!SlicePlane.Slice(out var mesh, out var texture, model, sectionQuadTransform))
             {
-                Debug.LogWarning("Intersection image can't be calculated!");
+                Debug.LogWarning("Cannot slice!");
                 return;
             }
 
@@ -99,15 +97,6 @@ namespace Slicing
             model.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
             Destroy(lowerHull);
             SetTemporaryCuttingPlaneActive(true);
-
-            intersectionPoints = intersectionPoints.Select(p => model.transform.TransformPoint(p)).ToArray();
-
-            var mesh = SlicePlane.CreateIntersectingMesh(intersectionPoints);
-            if (mesh == null)
-            {
-                Debug.LogWarning($"Cannot create mesh! Number of points: {intersectionPoints.Length}");
-                return;
-            }
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";

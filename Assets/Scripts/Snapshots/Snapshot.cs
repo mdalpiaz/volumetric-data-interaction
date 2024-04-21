@@ -128,7 +128,7 @@ namespace Snapshots
             newCoordsPosition.x += value;
             PlaneCoordinates.StartPoint = newCoordsPosition;
             
-            var texture = SlicePlane.CalculateIntersectionPlane(model, PlaneCoordinates);
+            var texture = SlicePlane.CreateSliceTexture(model, PlaneCoordinates);
             
             SetIntersectionChild(texture, PlaneCoordinates.StartPoint, model);
 
