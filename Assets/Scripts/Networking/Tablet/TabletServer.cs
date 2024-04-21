@@ -410,11 +410,8 @@ namespace Networking.Tablet
             {
                 return;
             }
-            
-            var buffer = new byte[2];
-            buffer[0] = Categories.MenuMode;
-            buffer[1] = (byte)mode;
-            await _tabletStream.WriteAsync(buffer);
+
+            await _tabletStream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
         }
     }
 }
