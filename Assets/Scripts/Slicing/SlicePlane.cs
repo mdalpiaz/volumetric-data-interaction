@@ -24,7 +24,6 @@ namespace Slicing
                 texture = null;
                 return false;
             }
-            Debug.Log($"Slice Coords: {sliceCoords}");
 
             texture = CalculateIntersectionPlane(model, sliceCoords, alternativeStartPoint, interpolationType);
             return true;
@@ -148,15 +147,17 @@ namespace Slicing
 
         private static SlicePlaneCoordinates GetSliceCoordinates4Points(Model.Model model, Vector3 ul, Vector3 ll, Vector3 lr)
         {
-            Debug.DrawRay(ul, Vector3.down, Color.yellow, 120);
-            Debug.DrawRay(ll, Vector3.down, Color.green, 120);
-            Debug.DrawRay(lr, Vector3.down, Color.blue, 120);
+            Debug.DrawLine(ul, ll, Color.red, 120);
+            Debug.DrawLine(ll, lr, Color.red, 120);
 
             var diffHeight = ul - ll;
             var diffXZ = lr - ll;
 
             // this is for calculating steps for height
             var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
+
+            Debug.DrawLine(ll, new() { x = ll.x, y = ll.y + diffHeight.y, z = ll.z }, Color.yellow, 120);
+
             var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.StepSize.x));
             var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.StepSize.z));
 
@@ -182,6 +183,241 @@ namespace Slicing
         {
             // TODO convert to 4 point
             return null;
+        }
+
+        public static Mesh? CreateIntersectingMesh(Vector3[] points)
+        {
+            // cube cross-section has very specific cuts
+            // we need to construct the smallest rectangle with all the points on the corner
+            // and the up vector can only move up and rotate down by 90 degrees.
+            // it can NOT be rotated otherwise! (no roll, only pitch and yaw)
+
+            Debug.Log($"Intersection points: {points.Length}");
+            if (points.Length == 3)
+            {
+                //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.magenta, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.red, 120);
+
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] { Vector2.zero, Vector2.right, Vector2.up }
+                };
+            }
+            if (points.Length == 4)
+            {
+                //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
+                //Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
+
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1, 0, 3, 2,   // mesh faces in both directions
+                        1, 2, 0, 2, 3, 0 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
+                };
+            }
+            if (points.Length == 6)
+            {
+                // ordering triangles the right way now gets much harder
+                //Debug.DrawRay(points[0], Vector3.forward, Color.magenta, 120);
+                //Debug.DrawRay(points[1], Vector3.forward, Color.blue, 120);
+                //Debug.DrawRay(points[2], Vector3.forward, Color.green, 120);
+                //Debug.DrawRay(points[3], Vector3.forward, Color.yellow, 120);
+                //Debug.DrawRay(points[4], Vector3.forward, new Color(1.0f, 0.65f, 0.0f, 1.0f), 120);
+                //Debug.DrawRay(points[5], Vector3.forward, Color.red, 120);
+
+                return new Mesh
+                {
+                    vertices = points,
+                    triangles = new int[] { 0, 2, 1, 0, 5, 2, 5, 3, 2, 5, 4, 3 },
+                    normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back, Vector3.back },
+                    uv = new Vector2[] { }
+                };
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get all intersection points of the slicer. The points are sorted by starting at the top and moving counter-clockwise around the center.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
+        public static Vector3[] GetIntersectionPoints(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        {
+            var points = GetIntersectionPoints_internal(out plane, model, slicerPosition, slicerRotation).ToArray();
+
+            // we need to sort the points by angle, so that the mesh later on will be visible
+            // to find the right order of the points
+            // we can find the middle point and then calculate the angle between all points
+            var minX = points.Min(p => p.x);
+            var maxX = points.Max(p => p.x);
+            var minY = points.Min(p => p.y);
+            var maxY = points.Max(p => p.y);
+            var minZ = points.Min(p => p.z);
+            var maxZ = points.Max(p => p.z);
+
+            var middle = new Vector3
+            {
+                x = (minX + maxX) / 2,
+                y = (minY + maxY) / 2,
+                z = (minZ + maxZ) / 2
+            };
+
+            var rotation = Quaternion.LookRotation(plane.normal);
+            var slicerUp = rotation * Vector3.up;
+            var slicerLeft = rotation * Vector3.left;
+
+            var pointsInQuadrants = points
+                .Select(p => (p, Vector3.Normalize(p - middle)))
+                .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
+                .ToArray();
+
+            // the quadrants go: top left, bottom left, bottom right, top right
+            var q1 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q2 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q3 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: < 0 }).OrderBy(p => p.Item2);
+            var q4 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: < 0 }).OrderBy(p => p.Item2);
+
+            return q1
+                .Concat(q2)
+                .Concat(q3)
+                .Concat(q4)
+                .Select(p => p.p)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Tests all edges for cuts and returns them.
+        /// </summary>
+        /// <param name="plane"></param>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
+        private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        {
+            static bool HitCheck(out Vector3 hitPoint, Plane plane, Ray ray, float maxDistance)
+            {
+                var result = plane.Raycast(ray, out var distance);
+                if (!(!result && distance == 0) &&  // false AND 0 means plane and raycast are parallel
+                    ((distance >= 0 && distance <= maxDistance) ||
+                    (distance < 0 && distance >= maxDistance)))
+                {
+                    hitPoint = ray.GetPoint(distance);
+                    return true;
+                }
+                hitPoint = Vector3.zero;
+                return false;
+            }
+
+            var list = new List<Vector3>(6);
+            var mt = model.transform;
+            // TODO why size?
+            var size = mt.InverseTransformVector(model.Size);
+
+            //var forward = mt.forward;
+            //var down = mt.down();
+            //var right = mt.right;
+
+            var forward = Vector3.forward;
+            var down = Vector3.down;
+            var right = Vector3.right;
+
+            // this is the normal of the slicer
+            var normalVec = slicerRotation * Vector3.back;
+
+            normalVec = mt.InverseTransformVector(normalVec);
+            var localPosition = mt.InverseTransformPoint(slicerPosition);
+
+            // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
+            plane = new Plane(normalVec, localPosition);
+
+            // test Z axis (front - back)
+            var ray = new Ray(model.TopFrontLeftCorner, forward);
+            if (HitCheck(out var point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopFrontRightCorner, forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontLeftCorner, forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontRightCorner, forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            // test Y axis (top - bottom)
+            ray = new Ray(model.TopBackLeftCorner, down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopFrontLeftCorner, down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopFrontRightCorner, down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopBackRightCorner, down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            // test X axis (left - right)
+            ray = new Ray(model.TopFrontLeftCorner, right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontLeftCorner, right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopBackLeftCorner, right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomBackLeftCorner, right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            return list;
         }
     }
 }

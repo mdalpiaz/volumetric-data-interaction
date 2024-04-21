@@ -3,6 +3,7 @@
 using Constants;
 using EzySlice;
 using Model;
+using System.Linq;
 using UnityEngine;
 
 namespace Slicing
@@ -80,7 +81,7 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            var intersectionPoints = ModelIntersection.GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation);
+            var intersectionPoints = SlicePlane.GetIntersectionPoints(out var plane, model, sectionQuadTransform.position, sectionQuadTransform.rotation);
 
             if (!SlicePlane.CalculateIntersectionPlane(out _, out var texture, plane, model, intersectionPoints))
             {
@@ -99,10 +100,13 @@ namespace Slicing
             Destroy(lowerHull);
             SetTemporaryCuttingPlaneActive(true);
 
-            var mesh = ModelIntersection.CreateIntersectingMesh(intersectionPoints);
+            intersectionPoints = intersectionPoints.Select(p => model.transform.TransformPoint(p)).ToArray();
+
+            var mesh = SlicePlane.CreateIntersectingMesh(intersectionPoints);
             if (mesh == null)
             {
                 Debug.LogWarning($"Cannot create mesh! Number of points: {intersectionPoints.Length}");
+                return;
             }
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
