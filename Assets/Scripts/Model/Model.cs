@@ -84,14 +84,6 @@ namespace Model
             var worldSize = transform.TransformVector(BoxCollider.size);
             var worldExtents = worldSize / 2.0f;
 
-            //var localSize = transform.InverseTransformPoint(Size);
-            //StepSize = new()
-            //{
-            //    x = localSize.x / XCount,
-            //    y = localSize.y / YCount,
-            //    z = localSize.z / ZCount
-            //};
-
             // this code gets ALL corner points and sorts them locally, so we can easily determin to which corner which point belongs
             // this code has already been tested and is CORRECT
             var points = new Vector3[8];
@@ -114,14 +106,14 @@ namespace Model
             TopFrontLeftCorner =     points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
             TopFrontRightCorner =    points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
 
-            Size = new()
+            Size = new Vector3
             {
                 x = BottomBackRightCorner.x - BottomBackLeftCorner.x,
                 y = TopBackLeftCorner.y - BottomBackLeftCorner.y,
                 z = BottomBackLeftCorner.z - BottomFrontLeftCorner.z
             };
 
-            StepSize = new()
+            StepSize = new Vector3
             {
                 x = Size.x / XCount,
                 y = Size.y / YCount,
