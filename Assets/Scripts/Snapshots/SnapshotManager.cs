@@ -204,17 +204,18 @@ namespace Snapshots
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
+            
             var intersectionPoints = SlicePlane.GetIntersectionPoints(model, slicerPosition, slicerRotation);
-            AudioManager.Instance.PlayCameraSound();
-
-            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, intersectionPoints);
-            if (sliceCoords == null)
+            if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
-
+            
+            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, intersectionPoints);
             var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+            
+            AudioManager.Instance.PlayCameraSound();
             
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
