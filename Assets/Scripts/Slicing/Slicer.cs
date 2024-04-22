@@ -73,12 +73,17 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            if (!SlicePlane.Slice(out var mesh, out var texture, model, transform))
+            var points = SlicePlane.GetIntersectionPoints(model, transform.position, transform.rotation);
+            if (points == null)
             {
-                Debug.LogWarning("Cannot slice!");
+                Debug.LogWarning("Intersection image can't be calculated!");
                 return;
             }
-
+            
+            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
+            var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+            var mesh = SlicePlane.CreateMesh(model, points);
+            
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();
             transparentMaterial.name = "SliceMaterial";
             transparentMaterial.mainTexture = texture;
