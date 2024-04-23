@@ -61,10 +61,22 @@ namespace Slicing
         
         public static SlicePlaneCoordinates CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
         {
+            Debug.DrawRay(points.LowerLeft, Vector3.forward / 4.0f, Color.yellow, 120);
+            Debug.DrawRay(model.transform.TransformPoint(points.LowerLeft), Vector3.forward / 4.0f, Color.yellow, 120);
+            
+            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
+            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
+            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue, 120);
+            
+            Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue, 120);
+            Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue, 120);
+            Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue, 120);
+            
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
             var lr = points.LowerRight;
             
+            // TODO this method needs to be reworked, as the coordinates are not quite right yet
             var diffHeight = ul - ll;
             var diffXZ = lr - ll;
 
@@ -85,7 +97,15 @@ namespace Slicing
             var textureStepX = (lr - ll) / width;
             var textureStepY = (ul - ll) / height;
 
-            return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
+            var sliceCoords =  new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
+            
+            Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width, Color.green, 120);
+            Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height, Color.green, 120);
+            
+            Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width), Color.green, 120);
+            Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height), Color.green, 120);
+
+            return sliceCoords;
         }
 
         public static Texture2D CreateSliceTexture(Model.Model model, SlicePlaneCoordinates sliceCoords, InterpolationType interpolationType = InterpolationType.Nearest)
@@ -103,7 +123,7 @@ namespace Slicing
 
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(index, interpolationType);
-                    resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
+                    resultImage.SetPixel(x, y, pixel);
                 }
             }
 
