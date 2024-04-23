@@ -76,8 +76,7 @@ namespace Networking.Screens
 
         public async Task Send(Transform tracker, Texture2D data)
         {
-            var screen = FindScreen(tracker);
-            if (screen == -1)
+            if (!FindScreen(out var screen, tracker))
             {
                 return;
             }
@@ -104,23 +103,32 @@ namespace Networking.Screens
             await stream.WriteAsync(bytes);
         }
 
-        private int FindScreen(Transform tracker)
+        private bool FindScreen(out int id, Transform tracker)
         {
             if (screens.Count == 0)
             {
-                return -1;
+                id = 0;
+                return false;
             } 
             
             var tPos = tracker.position;
             var tRot = Vector3.Normalize(tracker.up);
 
-            return screens
+            var possibleScreens = screens
                 .Select(s => (s.id, CalculateAngleToScreen(tPos, tRot, s.transform.position)))
                 .Where(s => s.Item2 <= ConeAngleDegree)
                 .OrderBy(s => s.Item2)
-                .DefaultIfEmpty((-1, 0.0f))
-                .First()
-                .Item1;
+                .Select(s => s.id)
+                .ToList();
+
+            if (!possibleScreens.Any())
+            {
+                id = 0;
+                return false;
+            }
+
+            id = possibleScreens.First();
+            return true;
         }
 
         private static float CalculateAngleToScreen(Vector3 trackerPosition, Vector3 trackerRotation, Vector3 screenPosition)
