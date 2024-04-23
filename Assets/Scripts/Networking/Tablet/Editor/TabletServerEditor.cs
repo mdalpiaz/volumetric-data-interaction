@@ -1,9 +1,8 @@
 using System.Reflection;
-using Networking.Tablet;
 using UnityEditor;
 using UnityEngine;
 
-namespace Networking.Editor
+namespace Networking.Tablet.Editor
 {
     [CustomEditor(typeof(TabletServer))]
     public class TabletServerEditor : UnityEditor.Editor

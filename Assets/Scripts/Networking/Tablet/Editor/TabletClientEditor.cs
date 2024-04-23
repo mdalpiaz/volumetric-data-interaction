@@ -1,8 +1,7 @@
-using Networking.Tablet;
 using UnityEditor;
 using UnityEngine;
 
-namespace Networking.Editor
+namespace Networking.Tablet.Editor
 {
     [CustomEditor(typeof(TabletClient))]
     public class TabletClientEditor : UnityEditor.Editor
