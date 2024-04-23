@@ -3015,7 +3015,7 @@ PrefabInstance:
     - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: stackPath
-      value: C:\DevProjects\volume data\5segments_stack
+      value: C:\Users\p42652\Desktop\Wels fiber slices\StackYZ
       objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
