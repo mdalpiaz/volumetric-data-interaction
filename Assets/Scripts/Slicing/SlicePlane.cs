@@ -18,13 +18,13 @@ namespace Slicing
         /// <returns></returns>
         public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToArray();
-            if (points.Length < 3)
+            IReadOnlyList<Vector3> points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToList();
+            if (points.Count < 3)
             {
                 Debug.LogError($"Cannot create proper intersection with less than 3 points!");
                 return null;
             }
-            if (points.Length != 4)
+            if (points.Count != 4)
             {
                 points = ConvertTo4Points(points);
             }
@@ -41,7 +41,7 @@ namespace Slicing
             var pointsInQuadrants = points
                 .Select(p => (p, Vector3.Normalize(p - middle)))
                 .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
-                .ToArray();
+                .ToList();
 
             // the quadrants go: top left, bottom left, bottom right, top right
             var q1 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
@@ -54,7 +54,7 @@ namespace Slicing
                 .Concat(q3)
                 .Concat(q4)
                 .Select(p => p.p)
-                .ToArray();
+                .ToList();
 
             return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
         }
@@ -149,7 +149,7 @@ namespace Slicing
         /// <param name="slicerPosition"></param>
         /// <param name="slicerRotation"></param>
         /// <returns></returns>
-        private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        private static IEnumerable<Vector3> GetIntersectionPoints_internal(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var list = new List<Vector3>(6);
             var mt = model.transform;
@@ -267,7 +267,7 @@ namespace Slicing
             return points.Aggregate((p1, p2) => p1 + p2) / points.Count;
         }
         
-        private static Vector3[] ConvertTo4Points(IReadOnlyList<Vector3> points)
+        private static IReadOnlyList<Vector3> ConvertTo4Points(IReadOnlyList<Vector3> points)
         {
             var rotation = Quaternion.LookRotation(new Plane(points[0], points[1], points[2]).normal);
             var left = rotation * Vector3.left;
@@ -290,12 +290,12 @@ namespace Slicing
                 })
                 .OrderBy(p => p.d)
                 .Select(p => p.p)
-                .ToArray();
+                .ToList();
 
             var leftPoint = sortedPoints.First();
             var rightPoint = sortedPoints.Last();
 
-            sortedPoints = points.OrderBy(p => p.y).ToArray();
+            sortedPoints = points.OrderBy(p => p.y).ToList();
             var topPoint = sortedPoints.Last();
             var bottomPoint = sortedPoints.First();
 
