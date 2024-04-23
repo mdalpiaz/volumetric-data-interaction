@@ -3,222 +3,319 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions;
-using Helper;
 using UnityEngine;
 
 namespace Slicing
 {
-    public class SlicePlane
+    public static class SlicePlane
     {
-        private readonly Model.Model _model;
-        
-        public SlicePlaneCoordinates SlicePlaneCoordinates { get; }
-        
-        private SlicePlane(Model.Model model, SlicePlaneCoordinates plane)
+        /// <summary>
+        /// Get all intersection points of the slicer. The points are sorted by starting at the top and moving counter-clockwise around the center.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
+        public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            _model = model;
-            SlicePlaneCoordinates = plane;
-        }
-        
-        public static SlicePlane? Create(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
-        {
-            var plane = GetSliceCoordinates(model, intersectionPoints);
-            return plane == null ? null : Create(model, plane);
-        }
-
-        public static SlicePlane Create(Model.Model model, SlicePlaneCoordinates plane) => new(model, plane);
-        
-        public Texture2D CalculateIntersectionPlane(Vector3? alternativeStartPoint = null, InterpolationType interpolationType = InterpolationType.Nearest)
-        {
-            var resultImage = new Texture2D(SlicePlaneCoordinates.Width, SlicePlaneCoordinates.Height);
-
-            var startPoint = alternativeStartPoint ?? SlicePlaneCoordinates.StartPoint;
-            var currVector1 = startPoint;
-            var currVector2 = startPoint;
-
-            for (var w = 0; w < SlicePlaneCoordinates.Width; w++)
+            var points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToArray();
+            if (points.Length < 3)
             {
-                currVector1.x = (int)Math.Round(startPoint.x + w * SlicePlaneCoordinates.XSteps.x, 0);
-                currVector1.y = (int)Math.Round(startPoint.y + w * SlicePlaneCoordinates.XSteps.y, 0);
-                currVector1.z = (int)Math.Round(startPoint.z + w * SlicePlaneCoordinates.XSteps.z, 0);
+                Debug.LogError($"Cannot create proper intersection with less than 3 points!");
+                return null;
+            }
+            if (points.Length != 4)
+            {
+                points = ConvertTo4Points(points);
+            }
 
-                for (var h = 0; h < SlicePlaneCoordinates.Height; h++)
+            // we need to sort the points by angle, so that the mesh later on will be visible
+            // to find the right order of the points
+            // we can find the middle point and then calculate the angle between all points
+            var middle = GetCenterPoint(points);
+
+            var rotation = Quaternion.LookRotation(plane.normal);
+            var slicerUp = rotation * Vector3.up;
+            var slicerLeft = rotation * Vector3.left;
+
+            var pointsInQuadrants = points
+                .Select(p => (p, Vector3.Normalize(p - middle)))
+                .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
+                .ToArray();
+
+            // the quadrants go: top left, bottom left, bottom right, top right
+            var q1 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q2 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
+            var q3 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: < 0 }).OrderBy(p => p.Item2);
+            var q4 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: < 0 }).OrderBy(p => p.Item2);
+
+            var newPoints = q1
+                .Concat(q2)
+                .Concat(q3)
+                .Concat(q4)
+                .Select(p => p.p)
+                .ToArray();
+
+            return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
+        }
+        
+        public static SlicePlaneCoordinates CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
+        {
+            var ul = points.UpperLeft;
+            var ll = points.LowerLeft;
+            var lr = points.LowerRight;
+            
+            var diffHeight = ul - ll;
+            var diffXZ = lr - ll;
+
+            // this is for calculating steps for height
+            var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
+
+            var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.StepSize.x));
+            var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.StepSize.z));
+
+            // this is for calculating steps for width
+            var xSteps = Mathf.RoundToInt(diffXZ.x / model.StepSize.x);
+            var zSteps = Mathf.RoundToInt(diffXZ.z / model.StepSize.z);
+
+            var height = Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
+            var width = Math.Max(xSteps, zSteps);
+
+            // 3) we get the step size using the edge points and width and height
+            var textureStepX = (lr - ll) / width;
+            var textureStepY = (ul - ll) / height;
+
+            return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
+        }
+
+        public static Texture2D CreateSliceTexture(Model.Model model, SlicePlaneCoordinates sliceCoords, InterpolationType interpolationType = InterpolationType.Nearest)
+        {
+            var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
+
+            for (var x = 0; x < sliceCoords.Width; x++)
+            {
+                for (var y = 0; y < sliceCoords.Height; y++)
                 {
-                    currVector2.x = (int)Math.Round(currVector1.x + h * SlicePlaneCoordinates.YSteps.x, 0);
-                    currVector2.y = (int)Math.Round(currVector1.y + h * SlicePlaneCoordinates.YSteps.y, 0);
-                    currVector2.z = (int)Math.Round(currVector1.z + h * SlicePlaneCoordinates.YSteps.z, 0);
+                    // get world position
+                    var position = sliceCoords.StartPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
-                    var croppedIndex = ValueCropper.CropIntVector(currVector2, _model.CountVector);
-                    var currBitmap = _model.OriginalBitmap[croppedIndex.x];
+                    var index = model.LocalPositionToIndex(position);
 
-                    // convert coordinates from top-left to bottom-left
-                    var result = Interpolation.Interpolate(interpolationType, currBitmap, croppedIndex.z, currBitmap.height - croppedIndex.y);
-                    
-                    if (alternativeStartPoint == null)
-                    {
-                        result = result.MakeBlackTransparent();
-                    }
-                    // flip the image
-                    resultImage.SetPixel(w, SlicePlaneCoordinates.Height - 1 - h, result);
+                    // get image at index and then the pixel
+                    var pixel = model.GetPixel(index, interpolationType);
+                    resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
                 }
             }
+
             resultImage.Apply();
             return resultImage;
         }
         
-        private static SlicePlaneCoordinates? GetSliceCoordinates(Model.Model model, IReadOnlyList<Vector3> intersectionPoints)
+        public static Mesh CreateMesh(Model.Model model, IntersectionPoints points)
         {
-            if (intersectionPoints.Count < 3)
+            // convert to world coordinates
+            var worldPoints = new IntersectionPoints(
+                model.transform.TransformPoint(points.UpperLeft),
+                model.transform.TransformPoint(points.LowerLeft),
+                model.transform.TransformPoint(points.LowerRight),
+                model.transform.TransformPoint(points.UpperRight));
+            
+            //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
+            //Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
+            //Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
+            //Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
+
+            var arr = new Vector3[4];
+            arr[0] = worldPoints.UpperLeft;
+            arr[1] = worldPoints.LowerLeft;
+            arr[2] = worldPoints.LowerRight;
+            arr[3] = worldPoints.UpperRight;
+            
+            return new Mesh
             {
-                Debug.LogError("Can't create plane formula with less than 3 points!");
-                return null;
-            }
-            var planeFormula = new PlaneFormula(intersectionPoints[0], intersectionPoints[1], intersectionPoints[2]);
-
-            var edgePoints = CalculateEdgePoints(planeFormula, model.XCount, model.YCount, model.ZCount).ToList();
-
-            if (edgePoints.Count < 3)
-            {
-                Debug.LogError("Cannot calculate a cutting plane with fewer than 3 coordinates");
-                return null;
-            }
-
-            //edgePoints.ForEach(p => Debug.Log(p.ToString()));
-            var startLeft = GetClosestPoint(edgePoints, intersectionPoints[2]);
-            edgePoints.Remove(startLeft);
-            var startRight = GetClosestPoint(edgePoints, intersectionPoints[3]);
-            edgePoints.Remove(startRight);
-
-            var p1 = startRight; 
-            var p2 = edgePoints[1];
-
-            var diff1 = p1 - startLeft;
-            var diff2 = p2 - startLeft;
-            var (newWidth, newHeight) = GetDimensionsSyncDifferences(ref diff1, ref diff2);
-
-            var width = (int)Math.Round(newWidth, 0); // bigger image if angled -  CalculateAngledPlaneLength(p1 - startLeft, newWidth);
-            var height = (int)Math.Round(newHeight, 0); // bigger image if angled - CalculateAngledPlaneLength(p2 - startLeft, newHeight);
-
-            var xSteps = diff1 / width;
-            var ySteps = diff2 / height;
-            (xSteps, ySteps) = MinimiseSteps(xSteps, ySteps);
-
-            return new SlicePlaneCoordinates(width, height, startLeft, xSteps, ySteps);
-        }
-        
-        private static IEnumerable<Vector3> CalculateEdgePoints(PlaneFormula planeFormula, int x, int y, int z)
-        {
-            var edgePoints = new List<Vector3>();
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, 0, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidXVectorOnPlane(x, y, z));
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(0, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(x, y, 0));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(0, y, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidYVectorOnPlane(x, y, z));
-
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(0, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(x, 0, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(0, y, z));
-            edgePoints.AddIfNotNull(planeFormula.GetValidZVectorOnPlane(x, y, z));
-
-            return edgePoints;
+                vertices = arr,
+                triangles = new int[] { 0, 2, 1, 0, 3, 2,   // mesh faces in both directions
+                    1, 2, 0, 2, 3, 0 },
+                normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
+                uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
+            };
         }
         
         /// <summary>
-        /// Method to get height and width dynamically
-        /// Cannot use the biggest differences as these can be from the same coordinates
-        /// Need to choose two coordinate axis
-        /// Additional to the max difference, the additional width/height from possible angles must be calculated
-        /// For this the third axis (which is not height or width) is used
+        /// Tests all edges for cuts and returns them.
         /// </summary>
-        private static (float max1, float max2) GetDimensionsSyncDifferences(ref Vector3 diffWidth, ref Vector3 diffHeight)
+        /// <param name="plane"></param>
+        /// <param name="model"></param>
+        /// <param name="slicerPosition"></param>
+        /// <param name="slicerRotation"></param>
+        /// <returns></returns>
+        private static List<Vector3> GetIntersectionPoints_internal(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var listWidth = new List<float>() { diffWidth.x, diffWidth.y, diffWidth.z };
-            var listHeight = new List<float>() { diffHeight.x, diffHeight.y, diffHeight.z };
-            //var indexSum = 3;
+            var list = new List<Vector3>(6);
+            var mt = model.transform;
+            var size = model.Size;
 
-            var maxWidthIndex = GetIndexOfAbsHigherValue(listWidth);
-            var maxHeightIndex = GetIndexOfAbsHigherValue(listHeight);
+            // this is the normal of the slicer
+            var normalVec = slicerRotation * Vector3.back;
 
-            var width = listWidth[maxWidthIndex];
-            var height = listHeight[maxHeightIndex];
+            normalVec = mt.InverseTransformVector(normalVec);
+            var localPosition = mt.InverseTransformPoint(slicerPosition);
 
-            //var addIndex = (indexSum - maxWidthIndex - maxHeightIndex) % indexSum;
-            //var addWidth = listWidth[addIndex];
-            //var addHeight = listHeight[addIndex];
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.yellow, 120);
+            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.yellow, 120);
+            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.yellow, 120);
 
-            var zeroVector = GetCustomZeroVector(maxWidthIndex);
-            if (maxWidthIndex == maxHeightIndex) // cannot use same coordinate for step calculation as a 2d image has 2 coordinates
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontLeftCorner + size, Color.red, 120);
+
+            // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
+            plane = new Plane(normalVec, localPosition);
+
+            // test Z axis (front - back)
+            var ray = new Ray(model.TopFrontLeftCorner, Vector3.forward);
+            if (HitCheck(out var point, plane, ray, size.z))
             {
-                listWidth.RemoveAt(maxWidthIndex);
-                listHeight.RemoveAt(maxHeightIndex);
-                //indexSum = 1;
-
-                maxWidthIndex = GetIndexOfAbsHigherValue(listWidth);
-                maxHeightIndex = GetIndexOfAbsHigherValue(listHeight);
-                var tempWidth = listWidth[maxWidthIndex];
-                var tempHeight = listHeight[maxHeightIndex];
-
-                if (Math.Abs(tempWidth) > Math.Abs(tempHeight))
-                {
-                    width = tempWidth;
-                    diffWidth.x *= zeroVector.x;
-                    diffWidth.y *= zeroVector.y;
-                    diffWidth.z *= zeroVector.z;
-                    //addIndex = indexSum - maxWidthIndex;
-                }
-                else
-                {
-                    height = tempHeight;
-                    diffHeight.x *= zeroVector.x;
-                    diffHeight.y *= zeroVector.y;
-                    diffHeight.z *= zeroVector.z;
-                    //addIndex = indexSum - maxHeightIndex;
-                }
-
-                //addHeight = listHeight[addIndex];
-                //addWidth = listWidth[addIndex];
+                list.Add(point);
             }
 
-            return (Math.Abs(width), Math.Abs(height));
-            //return (Math.Abs(width) + Math.Abs(addWidth), Math.Abs(height) + Math.Abs(addHeight));
+            ray = new Ray(model.TopFrontRightCorner, Vector3.forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontLeftCorner, Vector3.forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontRightCorner, Vector3.forward);
+            if (HitCheck(out point, plane, ray, size.z))
+            {
+                list.Add(point);
+            }
+
+            // test Y axis (top - bottom)
+            ray = new Ray(model.TopBackLeftCorner, Vector3.down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopFrontLeftCorner, Vector3.down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopFrontRightCorner, Vector3.down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopBackRightCorner, Vector3.down);
+            if (HitCheck(out point, plane, ray, size.y))
+            {
+                list.Add(point);
+            }
+
+            // test X axis (left - right)
+            ray = new Ray(model.TopFrontLeftCorner, Vector3.right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomFrontLeftCorner, Vector3.right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.TopBackLeftCorner, Vector3.right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            ray = new Ray(model.BottomBackLeftCorner, Vector3.right);
+            if (HitCheck(out point, plane, ray, size.x))
+            {
+                list.Add(point);
+            }
+
+            return list;
+
+            static bool HitCheck(out Vector3 hitPoint, Plane plane, Ray ray, float maxDistance)
+            {
+                var result = plane.Raycast(ray, out var distance);
+                if (!(!result && distance == 0) &&  // false AND 0 means plane and raycast are parallel
+                    ((distance >= 0 && distance <= maxDistance) ||
+                     (distance < 0 && distance >= maxDistance)))
+                {
+                    hitPoint = ray.GetPoint(distance);
+                    return true;
+                }
+                hitPoint = Vector3.zero;
+                return false;
+            }
         }
 
-        private static (Vector3, Vector3) MinimiseSteps(Vector3 widthSteps, Vector3 heightSteps)
+        private static Vector3 GetCenterPoint(IReadOnlyCollection<Vector3> points)
         {
-            widthSteps.x = Math.Abs(widthSteps.x) < Math.Abs(heightSteps.x) ? 0 : widthSteps.x;
-            heightSteps.x = Math.Abs(heightSteps.x) <= Math.Abs(widthSteps.x) ? 0 : heightSteps.x;
-
-            widthSteps.y = Math.Abs(widthSteps.y) < Math.Abs(heightSteps.y) ? 0 : widthSteps.y;
-            heightSteps.y = Math.Abs(heightSteps.y) <= Math.Abs(widthSteps.y) ? 0 : heightSteps.y;
-
-            widthSteps.z = Math.Abs(widthSteps.z) < Math.Abs(heightSteps.z) ? 0 : widthSteps.z;
-            heightSteps.z = Math.Abs(heightSteps.z) <= Math.Abs(widthSteps.z) ? 0 : heightSteps.z;
-
-            return (widthSteps, heightSteps);
+            return points.Aggregate((p1, p2) => p1 + p2) / points.Count;
         }
         
-        private static Vector3 GetClosestPoint(IEnumerable<Vector3> edgePoints, Vector3 targetPoint) => edgePoints
-            .ToDictionary(p => p, p => Vector3.Distance(p, targetPoint))
-            .OrderBy(p => p.Value)
-            .First()
-            .Key;
-        
-        private static Vector3 GetCustomZeroVector(int zeroOnIndex) => new(
-            zeroOnIndex == 0 ? 0 : 1,
-            zeroOnIndex == 1 ? 0 : 1,
-            zeroOnIndex == 2 ? 0 : 1);
-
-        private static int GetIndexOfAbsHigherValue(IList<float> values)
+        private static Vector3[] ConvertTo4Points(IReadOnlyList<Vector3> points)
         {
-            var min = values.Min();
-            var max = values.Max();
-            return values.IndexOf(Mathf.Abs(min) > max ? min : max);
+            var rotation = Quaternion.LookRotation(new Plane(points[0], points[1], points[2]).normal);
+            var left = rotation * Vector3.left;
+            var right = rotation * Vector3.right;
+            
+            Debug.DrawLine(points[0], points[1], Color.blue, 120);
+            Debug.DrawLine(points[1], points[2], Color.blue, 120);
+            Debug.DrawLine(points[2], points[0], Color.blue, 120);
+            
+            // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
+            // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
+            // Debug.DrawRay(middle, rotation * Vector3.forward, Color.red, 120);
+
+            var plane = new Plane(right, points[0]);
+            var sortedPoints = points.Select(p =>
+                {
+                    var ray = new Ray(p, left);
+                    plane.Raycast(ray, out var d);
+                    return (p, d);
+                })
+                .OrderBy(p => p.d)
+                .Select(p => p.p)
+                .ToArray();
+
+            var leftPoint = sortedPoints.First();
+            var rightPoint = sortedPoints.Last();
+
+            sortedPoints = points.OrderBy(p => p.y).ToArray();
+            var topPoint = sortedPoints.Last();
+            var bottomPoint = sortedPoints.First();
+
+            var corners = new Vector3[4];
+            
+            plane.SetNormalAndPosition(right, leftPoint);
+            plane.Raycast(new Ray(topPoint, left), out var distance);
+            corners[0] = topPoint + distance * left;
+
+            plane.Raycast(new Ray(bottomPoint, left), out distance);
+            corners[1] = bottomPoint + distance * left;
+
+            plane.SetNormalAndPosition(left, rightPoint);
+            plane.Raycast(new Ray(bottomPoint, right), out distance);
+            corners[2] = bottomPoint + distance * right;
+
+            plane.Raycast(new Ray(topPoint, right), out distance);
+            corners[3] = topPoint + distance * right;
+            
+            return corners;
         }
     }
 }

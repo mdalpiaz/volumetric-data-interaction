@@ -2,6 +2,11 @@
 
 namespace Slicing
 {
+    /// <summary>
+    /// This class defines the parameters needed for creating the texture of the slice.
+    /// Width and Height are the size in pixels of the texture.
+    /// XSteps and YSteps is the size of ONE step in either X or Y direction ON THE TEXTURE. They are used to translate 2D coordinates of the texture into 3D world coordinates.
+    /// </summary>
     public class SlicePlaneCoordinates
     {
         public int Width { get; }
@@ -17,6 +22,11 @@ namespace Slicing
             StartPoint = startPoint;
             XSteps = xSteps;
             YSteps = ySteps;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Width)}: {Width}, {nameof(Height)}: {Height}, {nameof(StartPoint)}: {StartPoint}, {nameof(XSteps)}: {XSteps}, {nameof(YSteps)}: {YSteps}";
         }
     }
 }

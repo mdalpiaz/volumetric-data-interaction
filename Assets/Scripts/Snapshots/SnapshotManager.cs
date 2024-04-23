@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Constants;
-using Helper;
 using Model;
 using Networking;
 using Networking.openIA;
 using Networking.openIA.Commands;
+using Slicing;
 using UnityEngine;
 
 namespace Snapshots
@@ -204,19 +204,24 @@ namespace Snapshots
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
-            var slicePlane = model.GenerateSlicePlane(slicerPosition, slicerRotation);
-            if (slicePlane == null)
+            
+            var intersectionPoints = SlicePlane.GetIntersectionPoints(model, slicerPosition, slicerRotation);
+            if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
             
-            var texture = slicePlane.CalculateIntersectionPlane();
+            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, intersectionPoints);
+            var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+            
+            AudioManager.Instance.PlayCameraSound();
+            
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
-            snapshot.SetIntersectionChild(texture, slicePlane.SlicePlaneCoordinates.StartPoint, model);
-            snapshot.PlaneCoordinates = slicePlane.SlicePlaneCoordinates;
+            snapshot.SetIntersectionChild(texture, sliceCoords.StartPoint, model);
+            snapshot.PlaneCoordinates = sliceCoords;
         
             var mainTransform = interfaceController.Main.transform;
             var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);

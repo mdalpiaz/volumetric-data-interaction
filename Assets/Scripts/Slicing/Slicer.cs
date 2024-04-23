@@ -2,7 +2,6 @@
 
 using Constants;
 using EzySlice;
-using Helper;
 using Model;
 using UnityEngine;
 
@@ -16,12 +15,6 @@ namespace Slicing
         [SerializeField]
         private CutQuad cutQuadPrefab = null!;
         
-        [SerializeField]
-        private GameObject temporaryCuttingPlane = null!;
-
-        [SerializeField]
-        private GameObject sectionQuad = null!;
-
         [SerializeField]
         private GameObject cuttingPlane = null!;
         
@@ -37,14 +30,7 @@ namespace Slicing
         [SerializeField]
         private Shader materialShader = null!;
         
-        private MeshFilter _cuttingPlaneMeshFilter = null!;
-        
         private bool _isTouched;
-
-        private void Awake()
-        {
-            _cuttingPlaneMeshFilter = cuttingPlane.GetComponent<MeshFilter>();
-        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -78,66 +64,62 @@ namespace Slicing
             var cachedTransform = transform;
             var model = ModelManager.Instance.CurrentModel;
             var modelGo = model.gameObject;
-
-            var sectionQuadTransform = sectionQuad.transform;
-            var slicePlane = model.GenerateSlicePlane(sectionQuadTransform.position, sectionQuadTransform.rotation);
-            if (slicePlane == null)
-            {
-                Debug.LogWarning("Intersection image can't be calculated!");
-                return;
-            }
-
-            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
-            transparentMaterial.name = "SliceMaterial";
-            transparentMaterial.mainTexture = slicePlane.CalculateIntersectionPlane();
-            //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, slicePlane.SlicePlaneCoordinates.StartPoint);
-
+            
             var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
             if (slicedObject == null)
             {
                 Debug.LogError("Nothing sliced");
                 return;
             }
+            AudioManager.Instance.PlayCameraSound();
+
+            var points = SlicePlane.GetIntersectionPoints(model, transform.position, transform.rotation);
+            if (points == null)
+            {
+                Debug.LogWarning("Intersection image can't be calculated!");
+                return;
+            }
+            
+            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
+            var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+            var mesh = SlicePlane.CreateMesh(model, points);
+            
+            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
+            transparentMaterial.name = "SliceMaterial";
+            transparentMaterial.mainTexture = texture;
+            //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, sliceCoords.StartPoint);
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
             model.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
             Destroy(lowerHull);
-            SetTemporaryCuttingPlaneActive(true);
-
-            //SetIntersectionMesh(Model.Model newModel, Material intersectionTexture)
-            var cuttingPlaneTransform = _cuttingPlaneMeshFilter.transform;
-            var mesh = new ModelIntersection(model,
-                cuttingPlaneTransform.position,
-                cuttingPlaneTransform.rotation,
-                cuttingPlaneTransform.localToWorldMatrix,
-                _cuttingPlaneMeshFilter)
-                .CreateIntersectingMesh();
+            SetCuttingActive(true);
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
             quad.name = "cut";
             quad.Mesh = mesh;
-            //quad.Material = sliceMaterial;
+            quad.Material = transparentMaterial;
         }
         
-        public void SetTemporaryCuttingPlaneActive(bool active)
+        public void SetCuttingActive(bool active)
         {
-            temporaryCuttingPlane.SetActive(active);
+            cuttingPlane.SetActive(active);
+            var model = ModelManager.Instance.CurrentModel;
 
             if (active)
             {
-                ModelManager.Instance.CurrentModel.SetCuttingPlane(temporaryCuttingPlane);
+                model.SetCuttingPlane(cuttingPlane);
             }
 
-            ModelManager.Instance.CurrentModel.SetCuttingPlaneActive(active);
+            model.SetCuttingPlaneActive(active);
 
             if (active)
             {
-                ModelManager.Instance.CurrentModel.SetModelMaterial(materialTemporarySlice, materialShader);
+                model.SetModelMaterial(materialTemporarySlice, materialShader);
             }
             else
             {
-                ModelManager.Instance.CurrentModel.SetModelMaterial(materialWhite);
+                model.SetModelMaterial(materialWhite);
             }
         }
     }

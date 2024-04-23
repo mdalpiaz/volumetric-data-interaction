@@ -17,7 +17,12 @@ namespace Model
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                CurrentModel = GetActiveModel() ?? throw new NullReferenceException("No active Model found!");
+                var model = GetActiveModel();
+                if (model == null)
+                {
+                    throw new NullReferenceException("No active Model found!");
+                }
+                CurrentModel = model;
             }
             else
             {
@@ -40,6 +45,9 @@ namespace Model
 
         public void ChangeModel(string nameToCheck)
         {
+            // reset the model beforehand, so manipulations are not replicated when switching back to the model
+            ResetState();
+
             for (var i = 0; i < transform.childCount; i++)
             {
                 gameObject.SetActive(false);
@@ -52,7 +60,7 @@ namespace Model
         
         public void ResetState()
         {
-            // TODO
+            CurrentModel.ResetState();
         }
 
         private Model? GetActiveModel()

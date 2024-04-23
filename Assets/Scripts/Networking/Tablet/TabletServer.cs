@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Extensions;
-using Helper;
 using Model;
 using Networking.Screens;
 using Slicing;
@@ -90,7 +89,15 @@ namespace Networking.Tablet
         {
             Debug.Log($"TabletServer started on port {port}");
             _server.Start();
-            _tabletClient = await _server.AcceptTcpClientAsync();
+            try
+            {
+                _tabletClient = await _server.AcceptTcpClientAsync();
+            }
+            catch
+            {
+                Debug.Log("Tablet never connected.");
+                return;
+            }
             Debug.Log("Client connected");
             _tabletStream = _tabletClient.GetStream();
 
@@ -202,7 +209,7 @@ namespace Networking.Tablet
                 case MenuMode.None:
                     if (_menuMode == MenuMode.Analysis)
                     {
-                        slicer.SetTemporaryCuttingPlaneActive(false);
+                        slicer.SetCuttingActive(false);
                     }
                     else
                     {
@@ -220,7 +227,7 @@ namespace Networking.Tablet
                     isSnapshotSelected = Selected != null && Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
-                    slicer.SetTemporaryCuttingPlaneActive(true);
+                    slicer.SetCuttingActive(true);
                     mappingAnchor.StopMapping();
                     break;
                 default:
@@ -403,11 +410,8 @@ namespace Networking.Tablet
             {
                 return;
             }
-            
-            var buffer = new byte[2];
-            buffer[0] = Categories.MenuMode;
-            buffer[1] = (byte)mode;
-            await _tabletStream.WriteAsync(buffer);
+
+            await _tabletStream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
         }
     }
 }

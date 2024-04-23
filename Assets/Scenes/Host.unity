@@ -2709,12 +2709,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1659761148 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 774969352872881135, guid: a4c392a7b279f8044a295d9c90e86a98,
-    type: 3}
-  m_PrefabInstance: {fileID: 2899917703023114335}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1717915040
 GameObject:
   m_ObjectHideFlags: 0
@@ -2999,12 +2993,12 @@ PrefabInstance:
         type: 3}
       propertyPath: sectionQuad
       value: 
-      objectReference: {fileID: 2899917703023114336}
+      objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: sectionQuadMeshFilter
       value: 
-      objectReference: {fileID: 2899917703023114336}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 342293c18dcff8c40b8afc38bddac6ad, type: 3}
 --- !u!1001 &2334987735148006714
@@ -3256,7 +3250,7 @@ PrefabInstance:
         type: 3}
       propertyPath: sectionQuad
       value: 
-      objectReference: {fileID: 1659761148}
+      objectReference: {fileID: 0}
     - target: {fileID: 2899917701585282407, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: cuttingPlane
@@ -3298,15 +3292,24 @@ PrefabInstance:
       propertyPath: m_PresetInfoIsWorld
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6070751581031738678, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070751581031738682, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_Name
+      value: SlicingShaderQuad
+      objectReference: {fileID: 0}
+    - target: {fileID: 6070751581031738682, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2768085287744816495, guid: a4c392a7b279f8044a295d9c90e86a98, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a4c392a7b279f8044a295d9c90e86a98, type: 3}
---- !u!33 &2899917703023114336 stripped
-MeshFilter:
-  m_CorrespondingSourceObject: {fileID: 3672761963672331604, guid: a4c392a7b279f8044a295d9c90e86a98,
-    type: 3}
-  m_PrefabInstance: {fileID: 2899917703023114335}
-  m_PrefabAsset: {fileID: 0}
 --- !u!82 &2899917703023114337 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 4903270158340479561, guid: a4c392a7b279f8044a295d9c90e86a98,
@@ -3605,26 +3608,61 @@ PrefabInstance:
       propertyPath: plane
       value: 
       objectReference: {fileID: 500436827}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.117977664
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.17544109
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Size.z
+      value: 0.46463788
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.0036597922
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.y
+      value: -0.028726548
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.04257691
+      objectReference: {fileID: 0}
+    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: stackPath
-      value: C:\DevProjects\volume data\Stack_converted
+      value: C:\Users\p42652\Desktop\Janine_VIVE_Data\Data\Stack_converted
       objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: sectionQuad
       value: 
-      objectReference: {fileID: 2899917703023114336}
+      objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: sectionQuadMeshFilter
       value: 
-      objectReference: {fileID: 2899917703023114336}
+      objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: _sectionQuadMeshFilter
       value: 
-      objectReference: {fileID: 2899917703023114336}
+      objectReference: {fileID: 0}
     - target: {fileID: 5906740283371962224, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: m_Name
@@ -3639,6 +3677,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
@@ -3689,6 +3742,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c19878c87f2626499691d6d67d9edb1, type: 3}
@@ -3790,7 +3848,7 @@ PrefabInstance:
         type: 3}
       propertyPath: sectionQuad
       value: 
-      objectReference: {fileID: 1659761148}
+      objectReference: {fileID: 0}
     - target: {fileID: 7125839906098874227, guid: 481fa3b9691bdfa4cb115414591b3281,
         type: 3}
       propertyPath: tabletOverlay

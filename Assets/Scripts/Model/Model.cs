@@ -4,39 +4,33 @@ using System;
 using System.IO;
 using System.Linq;
 using Constants;
-using Helper;
+using Extensions;
 using Selection;
-using Slicing;
 using UnityEngine;
 
 namespace Model
 {
-    /// <summary>
-    /// Add scs.rsp to be able to use Bitmaps in Unity
-    /// https://forum.unity.com/threads/using-bitmaps-in-unity.899168/
-    /// </summary>
     [RequireComponent(typeof(Selectable))]
     public class Model : MonoBehaviour
     {
         [SerializeField]
         private string stackPath = StringConstants.XStackPath;
-        
-        [SerializeField]
-        private MeshFilter sectionQuad = null!;
 
         private MeshFilter _meshFilter = null!;
         private Renderer _renderer = null!;
         private OnePlaneCuttingController _onePlaneCuttingController = null!;
 
         private Mesh _originalMesh = null!;
-        
-        private const float CropThreshold = 0.1f;
+
+        private Texture2D[] _originalBitmap = null!;
+
+        private Vector3 _originalPosition;
+        private Quaternion _originalRotation;
+        private Vector3 _originalScale;
 
         public Selectable Selectable { get; private set; } = null!;
 
         public BoxCollider BoxCollider { get; private set; } = null!;
-
-        public Texture2D[] OriginalBitmap { get; private set; } = null!;
         
         public int XCount { get; private set; }
 
@@ -44,7 +38,26 @@ namespace Model
 
         public int ZCount { get; private set; }
         
-        public Vector3 CountVector => new(XCount, YCount, ZCount);
+        public Vector3 Size { get; private set; }
+
+        public Vector3 StepSize { get; private set; }
+
+        // transform.position is NOT the centerpoint of the model!
+        public Vector3 BottomFrontLeftCorner { get; private set; }
+
+        public Vector3 BottomFrontRightCorner { get; private set; }
+
+        public Vector3 TopFrontLeftCorner { get; private set; }
+
+        public Vector3 TopFrontRightCorner { get; private set; }
+
+        public Vector3 BottomBackLeftCorner { get; private set; }
+
+        public Vector3 BottomBackRightCorner { get; private set; }
+
+        public Vector3 TopBackLeftCorner { get; private set; }
+
+        public Vector3 TopBackRightCorner { get; private set; }
 
         private void Awake()
         {
@@ -53,38 +66,59 @@ namespace Model
             BoxCollider = GetComponent<BoxCollider>();
             _renderer = GetComponent<Renderer>();
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
-            
-            OriginalBitmap = InitModel(stackPath);
 
-            XCount = OriginalBitmap.Length;
-            YCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].height : 0;
-            ZCount = OriginalBitmap.Length > 0 ? OriginalBitmap[0].width : 0;
+            _originalBitmap = InitModel(stackPath);
+
+            // we use slices of the XY plane, why was this called XCount if its on the Z axis?
+            ZCount = _originalBitmap.Length;
+            YCount = _originalBitmap.Length > 0 ? _originalBitmap[0].height : 0;
+            XCount = _originalBitmap.Length > 0 ? _originalBitmap[0].width : 0;
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
-        }
 
-        public SlicePlane? GenerateSlicePlane(Vector3 slicerPosition, Quaternion slicerRotation)
-        {
-            var matrix = Matrix4x4.TRS(slicerPosition, slicerRotation, Vector3.one);
+            _originalPosition = transform.position;
+            _originalRotation = transform.rotation;
+            _originalScale = transform.localScale;
 
-            // TODO only works, if the sectionQuad's center is inside the model
-            var validIntersectionPoints = new ModelIntersection(this,
-                slicerPosition,
-                slicerRotation,
-                sectionQuad.transform.localToWorldMatrix,
-                sectionQuad)
-                .GetNormalisedIntersectionPosition()
-                .Select(p => ValueCropper.ApplyThresholdCrop(p, CountVector, CropThreshold))
-                .ToArray();
-            var slicePlane = SlicePlane.Create(this, validIntersectionPoints);
-            if (slicePlane == null)
+            // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
+            var worldSize = transform.TransformVector(BoxCollider.size);
+            var worldExtents = worldSize / 2.0f;
+
+            // this code gets ALL corner points and sorts them locally, so we can easily determin to which corner which point belongs
+            // this code has already been tested and is CORRECT
+            var points = new Vector3[8];
+            var center = transform.TransformPoint(BoxCollider.center);
+            points[0] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
+            points[1] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
+            points[2] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
+            points[3] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
+            points[4] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
+            points[5] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
+            points[6] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
+            points[7] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
+
+            BottomBackLeftCorner =   points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
+            BottomBackRightCorner =  points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
+            BottomFrontLeftCorner =  points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderBy(p => p.z).First();
+            BottomFrontRightCorner = points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderBy(p => p.z).First();
+            TopBackLeftCorner =      points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderByDescending(p => p.z).First();
+            TopBackRightCorner =     points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderByDescending(p => p.z).First();
+            TopFrontLeftCorner =     points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
+            TopFrontRightCorner =    points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
+
+            Size = new Vector3
             {
-                Debug.LogWarning("SlicePlane couldn't be created");
-                return null;
-            }
-            
-            AudioManager.Instance.PlayCameraSound();
-            return slicePlane;
+                x = BottomBackRightCorner.x - BottomBackLeftCorner.x,
+                y = TopBackLeftCorner.y - BottomBackLeftCorner.y,
+                z = BottomBackLeftCorner.z - BottomFrontLeftCorner.z
+            };
+
+            StepSize = new Vector3
+            {
+                x = Size.x / XCount,
+                y = Size.y / YCount,
+                z = Size.z / ZCount
+            };
         }
 
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
@@ -170,7 +204,56 @@ namespace Model
                 Destroy(transform.GetChild(i).gameObject);
             }
         }
+
+        public Vector3Int LocalPositionToIndex(Vector3 pos)
+        {
+            var diff = pos - BottomFrontLeftCorner;
+
+            return new Vector3Int
+            {
+                x = Mathf.RoundToInt(diff.x / StepSize.x),
+                y = Mathf.RoundToInt(diff.y / StepSize.y),
+                z = Mathf.RoundToInt(diff.z / StepSize.z)
+            };
+        }
+
+        public Color GetPixel(Vector3Int index, InterpolationType interpolation = InterpolationType.Nearest)
+        {
+            return GetPixel(index.x, index.y, index.z, interpolation);
+        }
+
+        /// <summary>
+        /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="interpolation"></param>
+        /// <returns></returns>
+        public Color GetPixel(int x, int y, int z, InterpolationType interpolation = InterpolationType.Nearest)
+        {
+            try
+            {
+                return interpolation switch
+                {
+                    InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
+                    InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
+                    _ => throw new NotImplementedException()
+                };
+            }
+            catch
+            {
+                return Color.black;
+            }
+        }
         
+        public void ResetState()
+        {
+            transform.position = _originalPosition;
+            transform.rotation = _originalRotation;
+            transform.localScale = _originalScale;
+        }
+
         private static Texture2D[] InitModel(string path)
         {
             if (!Directory.Exists(path))

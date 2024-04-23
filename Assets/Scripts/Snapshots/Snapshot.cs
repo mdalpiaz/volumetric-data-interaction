@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using Helper;
 using Model;
 using Selection;
 using Slicing;
@@ -128,12 +127,10 @@ namespace Snapshots
             var newCoordsPosition = PlaneCoordinates.StartPoint;
             newCoordsPosition.x += value;
             PlaneCoordinates.StartPoint = newCoordsPosition;
-            var slicePlane = SlicePlane.Create(model, PlaneCoordinates);
-
-            var texture = slicePlane.CalculateIntersectionPlane();
             
-            SetIntersectionChild(texture, slicePlane.SlicePlaneCoordinates.StartPoint, model);
-            PlaneCoordinates = slicePlane.SlicePlaneCoordinates;
+            var texture = SlicePlane.CreateSliceTexture(model, PlaneCoordinates);
+            
+            SetIntersectionChild(texture, PlaneCoordinates.StartPoint, model);
 
             // value is unity coordinates
             var boxColliderSize = model.BoxCollider.size;
