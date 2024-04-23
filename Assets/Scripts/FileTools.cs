@@ -48,19 +48,17 @@ public static class FileTools
         return texture;
     }
 
-    public static void SaveScreenPositions(IEnumerable<Vector3> positions)
+    public static void SaveScreenPositions(IEnumerable<ScreenPosition> positions)
     {
-        var vectors = positions.Select(Vector3Simple.FromVector3).ToArray();
-        var json = JsonConvert.SerializeObject(vectors);
         var path = Path.Join(Application.persistentDataPath, "/screens.dat");
 
         var serializer = new JsonSerializer();
         using var streamWriter = new StreamWriter(path, false, Encoding.UTF8);
         using var jsonWriter = new JsonTextWriter(streamWriter);
-        serializer.Serialize(jsonWriter, vectors);
+        serializer.Serialize(jsonWriter, positions.ToArray());
     }
 
-    public static bool LoadScreenPositions(out Vector3[] positions)
+    public static IEnumerable<ScreenPosition> LoadScreenPositions()
     {
         var path = Path.Join(Application.persistentDataPath, "/screens.dat");
 
@@ -70,14 +68,11 @@ public static class FileTools
             using var file = new FileStream(path, FileMode.Open);
             using var streamReader = new StreamReader(file);
             using var jsonReader = new JsonTextReader(streamReader);
-            var simplePositions = serializer.Deserialize<Vector3Simple[]>(jsonReader);
-            positions = simplePositions.Select(Vector3Simple.ToVector3).ToArray();
-            return true;
+            return serializer.Deserialize<ScreenPosition[]>(jsonReader);
         }
         catch
         {
-            positions = null;
-            return false;
+            return Enumerable.Empty<ScreenPosition>();
         }
     }
 }
