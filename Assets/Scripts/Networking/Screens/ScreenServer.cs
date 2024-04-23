@@ -111,11 +111,11 @@ namespace Networking.Screens
                 return false;
             } 
             
-            var tPos = tracker.position;
-            var tRot = Vector3.Normalize(tracker.up);
+            var trackerPosition = tracker.position;
+            var trackerRotation = Vector3.Normalize(tracker.up);
 
             var possibleScreens = screens
-                .Select(s => (s.ID, CalculateAngleToScreen(tPos, tRot, s.transform.position)))
+                .Select(s => (s.ID, CalculateAngleToScreen(trackerPosition, trackerRotation, s.transform.position)))
                 .Where(s => s.Item2 <= ConeAngleDegree)
                 .OrderBy(s => s.Item2)
                 .Select(s => s.ID)
