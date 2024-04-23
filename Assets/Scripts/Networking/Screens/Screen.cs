@@ -1,12 +1,12 @@
-using System;
 using UnityEngine;
 
 namespace Networking.Screens
 {
-    [Serializable]
-    public struct Screen
+    public class Screen : MonoBehaviour
     {
-        public int id;
-        public Transform transform;
+        [SerializeField]
+        private int id;
+
+        public int ID => id;
     }
 }

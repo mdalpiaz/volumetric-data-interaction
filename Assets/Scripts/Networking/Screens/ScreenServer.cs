@@ -115,10 +115,10 @@ namespace Networking.Screens
             var tRot = Vector3.Normalize(tracker.up);
 
             var possibleScreens = screens
-                .Select(s => (s.id, CalculateAngleToScreen(tPos, tRot, s.transform.position)))
+                .Select(s => (s.ID, CalculateAngleToScreen(tPos, tRot, s.transform.position)))
                 .Where(s => s.Item2 <= ConeAngleDegree)
                 .OrderBy(s => s.Item2)
-                .Select(s => s.id)
+                .Select(s => s.ID)
                 .ToList();
 
             if (!possibleScreens.Any())
