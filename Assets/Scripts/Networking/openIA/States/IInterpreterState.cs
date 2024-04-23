@@ -3,6 +3,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using UnityEngine;
+// ReSharper disable IdentifierTypo
 
 namespace Networking.openIA.States
 {
