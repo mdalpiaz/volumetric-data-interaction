@@ -335,7 +335,7 @@ namespace Networking.Tablet
                 && Direction.Up == DirectionMethods.GetDirectionDegree(angle)
                 && Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
-                await ScreenServer.Instance.Send(tablet.transform, snapshot.SnapshotTexture);
+                await ScreenServer.Instance.Send(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
             }
             else if (_menuMode == MenuMode.Analysis)
             {

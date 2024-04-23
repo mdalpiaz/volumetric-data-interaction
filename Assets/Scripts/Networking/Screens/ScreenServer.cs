@@ -74,9 +74,9 @@ namespace Networking.Screens
             _server.Stop();
         }
 
-        public async Task Send(Transform tracker, Texture2D data)
+        public async Task Send(Vector3 trackerPosition, Vector3 trackerPointDirection, Texture2D data)
         {
-            if (!FindScreen(out var screen, tracker))
+            if (!FindScreen(out var screen, trackerPosition, trackerPointDirection))
             {
                 return;
             }
@@ -103,7 +103,7 @@ namespace Networking.Screens
             await stream.WriteAsync(bytes);
         }
 
-        private bool FindScreen(out int id, Transform tracker)
+        private bool FindScreen(out int id, Vector3 trackerPosition, Vector3 trackerPointDirection)
         {
             if (screens.Count == 0)
             {
@@ -111,11 +111,8 @@ namespace Networking.Screens
                 return false;
             } 
             
-            var trackerPosition = tracker.position;
-            var trackerRotation = Vector3.Normalize(tracker.up);
-
             var possibleScreens = screens
-                .Select(s => (s.ID, CalculateAngleToScreen(trackerPosition, trackerRotation, s.transform.position)))
+                .Select(s => (s.ID, CalculateAngleToScreen(trackerPosition, trackerPointDirection, s.transform.position)))
                 .Where(s => s.Item2 <= ConeAngleDegree)
                 .OrderBy(s => s.Item2)
                 .Select(s => s.ID)
