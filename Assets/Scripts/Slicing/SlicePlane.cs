@@ -24,10 +24,10 @@ namespace Slicing
                 Debug.LogError($"Cannot create proper intersection with less than 3 points!");
                 return null;
             }
-            if (points.Count != 4)
-            {
+            // if (points.Count != 4)
+            // {
                 points = ConvertTo4Points(points).ToList();
-            }
+            // }
 
             // we need to sort the points by angle, so that the mesh later on will be visible
             // to find the right order of the points
@@ -61,16 +61,15 @@ namespace Slicing
         
         public static SlicePlaneCoordinates CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
         {
-            Debug.DrawRay(points.LowerLeft, Vector3.forward / 4.0f, Color.yellow, 120);
-            Debug.DrawRay(model.transform.TransformPoint(points.LowerLeft), Vector3.forward / 4.0f, Color.yellow, 120);
-            
             Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
             Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
             Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue, 120);
+            Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.yellow, 120);
             
             Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue, 120);
             Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue, 120);
             Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue, 120);
+            Debug.DrawLine(model.transform.TransformPoint(points.UpperRight), model.transform.TransformPoint(points.UpperLeft), Color.yellow, 120);
             
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
@@ -97,7 +96,7 @@ namespace Slicing
             var textureStepX = (lr - ll) / width;
             var textureStepY = (ul - ll) / height;
 
-            var sliceCoords =  new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
+            var sliceCoords = new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
             
             Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width, Color.green, 120);
             Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height, Color.green, 120);
@@ -116,7 +115,7 @@ namespace Slicing
             {
                 for (var y = 0; y < sliceCoords.Height; y++)
                 {
-                    // get world position
+                    // get local position
                     var position = sliceCoords.StartPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
 
                     var index = model.LocalPositionToIndex(position);
@@ -181,11 +180,11 @@ namespace Slicing
             normalVec = mt.InverseTransformVector(normalVec);
             var localPosition = mt.InverseTransformPoint(slicerPosition);
 
-            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.yellow, 120);
-            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.yellow, 120);
-            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.yellow, 120);
-
-            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontLeftCorner + size, Color.red, 120);
+            // Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.yellow, 120);
+            // Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.yellow, 120);
+            // Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.yellow, 120);
+            //
+            // Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontLeftCorner + size, Color.red, 120);
 
             // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
             plane = new Plane(normalVec, localPosition);
@@ -287,15 +286,16 @@ namespace Slicing
             return points.Aggregate((p1, p2) => p1 + p2) / points.Count;
         }
         
-        private static IReadOnlyList<Vector3> ConvertTo4Points(IReadOnlyList<Vector3> points)
+        private static IEnumerable<Vector3> ConvertTo4Points(IReadOnlyList<Vector3> points)
         {
             var rotation = Quaternion.LookRotation(new Plane(points[0], points[1], points[2]).normal);
             var left = rotation * Vector3.left;
             var right = rotation * Vector3.right;
-            
-            Debug.DrawLine(points[0], points[1], Color.blue, 120);
-            Debug.DrawLine(points[1], points[2], Color.blue, 120);
-            Debug.DrawLine(points[2], points[0], Color.blue, 120);
+
+            for (var i = 0; i < points.Count; i++)
+            {
+                Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red, 120);
+            }
             
             // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
             // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
