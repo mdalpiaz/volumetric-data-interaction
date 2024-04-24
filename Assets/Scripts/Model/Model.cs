@@ -232,19 +232,18 @@ namespace Model
         /// <returns></returns>
         public Color GetPixel(int x, int y, int z, InterpolationType interpolation = InterpolationType.Nearest)
         {
-            try
-            {
-                return interpolation switch
-                {
-                    InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
-                    InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
-                    _ => throw new NotImplementedException()
-                };
-            }
-            catch
+            if (x >= XCount || y >= YCount || z >= ZCount ||
+                x < 0 || y < 0 || z < 0)
             {
                 return Color.black;
             }
+            
+            return interpolation switch
+            {
+                InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
+                InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
+                _ => throw new NotImplementedException()
+            };
         }
         
         public void ResetState()
