@@ -18,7 +18,7 @@ namespace Slicing
         /// <returns></returns>
         public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            IReadOnlyList<Vector3> points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToList();
+            var points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToList();
             if (points.Count < 3)
             {
                 Debug.LogError($"Cannot create proper intersection with less than 3 points!");
@@ -26,7 +26,7 @@ namespace Slicing
             }
             if (points.Count != 4)
             {
-                points = ConvertTo4Points(points);
+                points = ConvertTo4Points(points).ToList();
             }
 
             // we need to sort the points by angle, so that the mesh later on will be visible
