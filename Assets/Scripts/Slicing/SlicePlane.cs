@@ -18,24 +18,36 @@ namespace Slicing
         /// <returns></returns>
         public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var points = GetIntersectionPoints_internal(out var plane, model, slicerPosition, slicerRotation).ToList();
+            // this is the normal of the slicer
+            var normalVector = model.transform.InverseTransformVector(slicerRotation * Vector3.back);
+            var localPosition = model.transform.InverseTransformPoint(slicerPosition);
+            var plane = new Plane(normalVector, localPosition);
+            
+            var points = GetIntersectionPoints_internal(model, plane).ToList();
             if (points.Count < 3)
             {
-                Debug.LogError($"Cannot create proper intersection with less than 3 points!");
+                Debug.LogError("Cannot create proper intersection with less than 3 points!");
                 return null;
             }
-            // TODO
-            // if (points.Count != 4)
-            // {
+            if (points.Count != 4)
+            {
                 points = ConvertTo4Points(points).ToList();
-            // }
+            }
 
             // we need to sort the points by angle, so that the mesh later on will be visible
             // to find the right order of the points
-            // we can find the middle point and then calculate the angle between all points
+            // we can find the middle point and then calculate the dot product between all points
             var middle = GetCenterPoint(points);
 
-            var rotation = Quaternion.LookRotation(plane.normal);
+            // we only take the plane if it faces up (normal points down), else we just flip it
+            // the rotation section is CORRECT
+            var normal = plane.normal;
+            if (normal.y > 0)
+            {
+                normal = plane.flipped.normal;
+            }
+            
+            var rotation = Quaternion.LookRotation(normal);
             var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
 
@@ -57,20 +69,28 @@ namespace Slicing
                 .Select(p => p.p)
                 .ToList();
 
-            return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
+            Debug.DrawRay(middle, slicerLeft, Color.blue);
+            
+            var intPoints = new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
+
+            Debug.DrawLine(intPoints.UpperLeft, intPoints.LowerLeft, Color.red);
+            Debug.DrawLine(intPoints.LowerLeft, intPoints.LowerRight, Color.yellow);
+            Debug.DrawLine(intPoints.LowerRight, intPoints.UpperRight, Color.green);
+            
+            return intPoints;
         }
         
         public static SlicePlaneCoordinates? CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
         {
-            // Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
-            // Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
-            // Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue, 120);
-            // Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.yellow, 120);
+            // Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
+            // Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue);
+            // Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue);
+            // Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.yellow);
             //
-            // Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue, 120);
-            // Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue, 120);
-            // Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue, 120);
-            // Debug.DrawLine(model.transform.TransformPoint(points.UpperRight), model.transform.TransformPoint(points.UpperLeft), Color.yellow, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue);
+            // Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue);
+            // Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue);
+            // Debug.DrawLine(model.transform.TransformPoint(points.UpperRight), model.transform.TransformPoint(points.UpperLeft), Color.yellow);
             
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
@@ -83,16 +103,34 @@ namespace Slicing
             // this is for calculating steps for height
             var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
 
-            var forwardStepsX = Math.Abs(Mathf.RoundToInt(diffHeight.x / model.StepSize.x));
-            var forwardStepsZ = Math.Abs(Mathf.RoundToInt(diffHeight.z / model.StepSize.z));
+            var forwardStepsX = Mathf.RoundToInt(diffHeight.x / model.StepSize.x);
+            var forwardStepsZ = Mathf.RoundToInt(diffHeight.z / model.StepSize.z);
 
             // this is for calculating steps for width
             var xSteps = Mathf.RoundToInt(diffXZ.x / model.StepSize.x);
             var zSteps = Mathf.RoundToInt(diffXZ.z / model.StepSize.z);
 
-            var height = Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
-            var width = Math.Max(xSteps, zSteps);
+            var height = ySteps;
+            if (Math.Abs(forwardStepsX) > Math.Abs(height))
+            {
+                height = forwardStepsX;
+            }
+
+            if (Math.Abs(forwardStepsZ) > Math.Abs(height))
+            {
+                height = forwardStepsZ;
+            }
+
+            var width = xSteps;
+            if (Math.Abs(zSteps) > Math.Abs(width))
+            {
+                width = zSteps;
+            }
             
+            // 3) we get the step size using the edge points and width and height
+            var textureStepX = diffXZ / width;
+            var textureStepY = diffHeight / height;
+
             Debug.Log($"Width: {width}, Height: {height}");
 
             if (width == 0 || height == 0)
@@ -100,40 +138,40 @@ namespace Slicing
                 return null;
             }
 
-            // 3) we get the step size using the edge points and width and height
-            var textureStepX = (lr - ll) / width;
-            var textureStepY = (ul - ll) / height;
-
             var sliceCoords = new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
             
-            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width, Color.green, 120);
-            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height, Color.green, 120);
+            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XStep * sliceCoords.Width, Color.blue);
+            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YStep * sliceCoords.Height, Color.blue);
             //
-            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width), Color.green, 120);
-            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height), Color.green, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.XStep * sliceCoords.Width), Color.blue);
+            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.YStep * sliceCoords.Height), Color.blue);
 
             return sliceCoords;
         }
 
         public static Texture2D CreateSliceTexture(Model.Model model, SlicePlaneCoordinates sliceCoords, InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            var resultImage = new Texture2D(sliceCoords.Width, sliceCoords.Height);
-
-            for (var x = 0; x < sliceCoords.Width; x++)
+            var resultImage = new Texture2D(Math.Abs(sliceCoords.Width), Math.Abs(sliceCoords.Height));
+            
+            var adjustedXStep = sliceCoords.XStep * (sliceCoords.Width > 0 ? 1 : -1);
+            var adjustedYStep = sliceCoords.YStep * (sliceCoords.Height > 0 ? 1 : -1);
+            
+            for (var x = 0; x < Math.Abs(sliceCoords.Width); x++)
             {
-                for (var y = 0; y < sliceCoords.Height; y++)
+                for (var y = 0; y < Math.Abs(sliceCoords.Height); y++)
                 {
                     // get local position
-                    var position = sliceCoords.StartPoint + sliceCoords.XSteps * x + sliceCoords.YSteps * y;
+                    var position = sliceCoords.StartPoint + adjustedXStep * x + adjustedYStep * y;
 
                     var index = model.LocalPositionToIndex(position);
 
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(index, interpolationType);
-                    resultImage.SetPixel(x, y, pixel);
+                    // images are permanently flipped, so we unflip them
+                    resultImage.SetPixel(sliceCoords.Width - x - 1, y, pixel);
                 }
             }
-
+            
             resultImage.Apply();
             return resultImage;
         }
@@ -146,11 +184,6 @@ namespace Slicing
                 model.transform.TransformPoint(points.LowerLeft),
                 model.transform.TransformPoint(points.LowerRight),
                 model.transform.TransformPoint(points.UpperRight));
-            
-            //Debug.DrawRay(points[0], Vector3.forward, Color.blue, 120);
-            //Debug.DrawRay(points[1], Vector3.forward, Color.green, 120);
-            //Debug.DrawRay(points[2], Vector3.forward, Color.yellow, 120);
-            //Debug.DrawRay(points[3], Vector3.forward, Color.red, 120);
 
             var arr = new Vector3[4];
             arr[0] = worldPoints.UpperLeft;
@@ -162,7 +195,7 @@ namespace Slicing
             {
                 vertices = arr,
                 triangles = new int[] { 0, 2, 1, 0, 3, 2,   // mesh faces in both directions
-                    1, 2, 0, 2, 3, 0 },
+                    0, 1, 2, 0, 2, 3 },
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
                 uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
             };
@@ -171,31 +204,13 @@ namespace Slicing
         /// <summary>
         /// Tests all edges for cuts and returns them.
         /// </summary>
-        /// <param name="plane"></param>
         /// <param name="model"></param>
-        /// <param name="slicerPosition"></param>
-        /// <param name="slicerRotation"></param>
+        /// <param name="plane"></param>
         /// <returns></returns>
-        private static IEnumerable<Vector3> GetIntersectionPoints_internal(out Plane plane, Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        private static IEnumerable<Vector3> GetIntersectionPoints_internal(Model.Model model, Plane plane)
         {
             var list = new List<Vector3>(6);
-            var mt = model.transform;
             var size = model.Size;
-
-            // this is the normal of the slicer
-            var normalVec = slicerRotation * Vector3.back;
-
-            normalVec = mt.InverseTransformVector(normalVec);
-            var localPosition = mt.InverseTransformPoint(slicerPosition);
-
-            // Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.yellow, 120);
-            // Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.yellow, 120);
-            // Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.yellow, 120);
-            //
-            // Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontLeftCorner + size, Color.red, 120);
-
-            // slicerPosition, because we can give it ANY point that is on the plane, and it sets itself up automatically
-            plane = new Plane(normalVec, localPosition);
 
             // test Z axis (front - back)
             var ray = new Ray(model.TopFrontLeftCorner, Vector3.forward);
@@ -300,10 +315,10 @@ namespace Slicing
             var left = rotation * Vector3.left;
             var right = rotation * Vector3.right;
 
-            // for (var i = 0; i < points.Count; i++)
-            // {
-            //     Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red, 120);
-            // }
+            for (var i = 0; i < points.Count; i++)
+            {
+                Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
+            }
             
             // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
             // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
