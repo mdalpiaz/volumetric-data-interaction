@@ -29,16 +29,7 @@ namespace Slicing
                 Debug.LogError("Cannot create proper intersection with less than 3 points!");
                 return null;
             }
-            if (points.Count != 4)
-            {
-                points = ConvertTo4Points(points).ToList();
-            }
-
-            // we need to sort the points by angle, so that the mesh later on will be visible
-            // to find the right order of the points
-            // we can find the middle point and then calculate the dot product between all points
-            var middle = GetCenterPoint(points);
-
+            
             // we only take the plane if it faces up (normal points down), else we just flip it
             // the rotation section is CORRECT
             var normal = plane.normal;
@@ -50,6 +41,16 @@ namespace Slicing
             var rotation = Quaternion.LookRotation(normal);
             var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
+            
+            if (points.Count != 4)
+            {
+                points = ConvertTo4Points(rotation, points).ToList();
+            }
+
+            // we need to sort the points by angle, so that the mesh later on will be visible
+            // to find the right order of the points
+            // we can find the middle point and then calculate the dot product between all points
+            var middle = GetCenterPoint(points);
 
             var pointsInQuadrants = points
                 .Select(p => (p, Vector3.Normalize(p - middle)))
@@ -309,16 +310,15 @@ namespace Slicing
             return points.Aggregate((p1, p2) => p1 + p2) / points.Count;
         }
         
-        private static IEnumerable<Vector3> ConvertTo4Points(IReadOnlyList<Vector3> points)
+        private static IEnumerable<Vector3> ConvertTo4Points(Quaternion planeRotation, IReadOnlyList<Vector3> points)
         {
-            var rotation = Quaternion.LookRotation(new Plane(points[0], points[1], points[2]).normal);
-            var left = rotation * Vector3.left;
-            var right = rotation * Vector3.right;
+            var left = planeRotation * Vector3.left;
+            var right = planeRotation * Vector3.right;
 
-            for (var i = 0; i < points.Count; i++)
-            {
-                Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
-            }
+            // for (var i = 0; i < points.Count; i++)
+            // {
+            //     Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
+            // }
             
             // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
             // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
