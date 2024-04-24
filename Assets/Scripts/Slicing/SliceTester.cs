@@ -42,23 +42,21 @@ namespace Slicing
         {
             while (true)
             {
-                try
+                var points = SlicePlane.GetIntersectionPoints(model, slicer.position, slicer.rotation);
+                if (points == null)
                 {
-                    var points = SlicePlane.GetIntersectionPoints(model, slicer.position, slicer.rotation);
-                    if (points == null)
-                    {
-                        yield return null;
-                        continue;
-                    }
+                    yield return null;
+                    continue;
+                }
 
-                    var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
-                    var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
-                    _mat.mainTexture = texture;
-                }
-                finally
+                var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
+                if (sliceCoords == null)
                 {
-                    
+                    yield return null;
+                    continue;
                 }
+                var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+                _mat.mainTexture = texture;
                 yield return null;
             }
         }

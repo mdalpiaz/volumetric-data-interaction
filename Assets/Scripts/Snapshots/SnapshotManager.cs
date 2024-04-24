@@ -213,6 +213,12 @@ namespace Snapshots
             }
             
             var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, intersectionPoints);
+            if (sliceCoords == null)
+            {
+                Debug.LogWarning("SliceCoords can't be calculated!");
+                return null;
+            }
+            
             var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
             
             AudioManager.Instance.PlayCameraSound();

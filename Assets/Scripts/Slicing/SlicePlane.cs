@@ -60,7 +60,7 @@ namespace Slicing
             return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
         }
         
-        public static SlicePlaneCoordinates CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
+        public static SlicePlaneCoordinates? CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
         {
             // Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
             // Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
@@ -92,6 +92,13 @@ namespace Slicing
 
             var height = Math.Max(Math.Max(ySteps, forwardStepsX), forwardStepsZ);
             var width = Math.Max(xSteps, zSteps);
+            
+            Debug.Log($"Width: {width}, Height: {height}");
+
+            if (width == 0 || height == 0)
+            {
+                return null;
+            }
 
             // 3) we get the step size using the edge points and width and height
             var textureStepX = (lr - ll) / width;

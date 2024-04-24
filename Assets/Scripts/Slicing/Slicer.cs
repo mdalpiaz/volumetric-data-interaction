@@ -81,6 +81,11 @@ namespace Slicing
             }
             
             var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
+            if (sliceCoords == null)
+            {
+                Debug.LogWarning("SliceCoords can't be calculated!");
+                return;
+            }
             var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
             var mesh = SlicePlane.CreateMesh(model, points);
             
