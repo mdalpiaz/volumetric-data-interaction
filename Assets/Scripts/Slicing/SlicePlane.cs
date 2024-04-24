@@ -44,8 +44,7 @@ namespace Slicing
             
             if (points.Count != 4)
             {
-                return null;
-                // points = ConvertTo4Points(rotation, points).ToList();
+                points = ConvertTo4Points(rotation, points).ToList();
             }
 
             // we need to sort the points by angle, so that the mesh later on will be visible
@@ -98,15 +97,10 @@ namespace Slicing
             var ll = points.LowerLeft;
             var lr = points.LowerRight;
             
-            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.white);
-            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.black);
-            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.black);
-            
             // TODO this method needs to be reworked, as the coordinates are not quite right yet
             var diffHeight = ul - ll;
             var diffXZ = lr - ll;
 
-            // TODO BUG STEPSIZES ARE ALL WORLD AND DIFFS ARE LOCAL!!!
             // this is for calculating steps for height
             var ySteps = Mathf.RoundToInt(diffHeight.y / model.StepSize.y);    // Math.Abs is not needed, ySteps is ALWAYS from bottom to top
 
