@@ -24,6 +24,7 @@ namespace Slicing
                 Debug.LogError($"Cannot create proper intersection with less than 3 points!");
                 return null;
             }
+            // TODO
             // if (points.Count != 4)
             // {
                 points = ConvertTo4Points(points).ToList();
@@ -61,15 +62,15 @@ namespace Slicing
         
         public static SlicePlaneCoordinates CreateSlicePlaneCoordinates(Model.Model model, IntersectionPoints points)
         {
-            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
-            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
-            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue, 120);
-            Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.yellow, 120);
-            
-            Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue, 120);
-            Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue, 120);
-            Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue, 120);
-            Debug.DrawLine(model.transform.TransformPoint(points.UpperRight), model.transform.TransformPoint(points.UpperLeft), Color.yellow, 120);
+            // Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue, 120);
+            // Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.blue, 120);
+            // Debug.DrawLine(points.LowerRight, points.UpperRight, Color.blue, 120);
+            // Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.yellow, 120);
+            //
+            // Debug.DrawLine(model.transform.TransformPoint(points.UpperLeft), model.transform.TransformPoint(points.LowerLeft), Color.blue, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(points.LowerLeft), model.transform.TransformPoint(points.LowerRight), Color.blue, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(points.LowerRight), model.transform.TransformPoint(points.UpperRight), Color.blue, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(points.UpperRight), model.transform.TransformPoint(points.UpperLeft), Color.yellow, 120);
             
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
@@ -98,11 +99,11 @@ namespace Slicing
 
             var sliceCoords = new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
             
-            Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width, Color.green, 120);
-            Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height, Color.green, 120);
-            
-            Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width), Color.green, 120);
-            Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height), Color.green, 120);
+            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width, Color.green, 120);
+            // Debug.DrawLine(sliceCoords.StartPoint, sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height, Color.green, 120);
+            //
+            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.XSteps * sliceCoords.Width), Color.green, 120);
+            // Debug.DrawLine(model.transform.TransformPoint(sliceCoords.StartPoint), model.transform.TransformPoint(sliceCoords.StartPoint + sliceCoords.YSteps * sliceCoords.Height), Color.green, 120);
 
             return sliceCoords;
         }
@@ -292,10 +293,10 @@ namespace Slicing
             var left = rotation * Vector3.left;
             var right = rotation * Vector3.right;
 
-            for (var i = 0; i < points.Count; i++)
-            {
-                Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red, 120);
-            }
+            // for (var i = 0; i < points.Count; i++)
+            // {
+            //     Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red, 120);
+            // }
             
             // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
             // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
