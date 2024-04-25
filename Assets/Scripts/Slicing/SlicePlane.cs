@@ -315,14 +315,14 @@ namespace Slicing
             var left = planeRotation * Vector3.left;
             var right = planeRotation * Vector3.right;
 
-            // for (var i = 0; i < points.Count; i++)
-            // {
-            //     Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
-            // }
-            
-            // Debug.DrawRay(middle, rotation * Vector3.up, Color.green, 120);
-            // Debug.DrawRay(middle, rotation * Vector3.right, Color.yellow, 120);
-            // Debug.DrawRay(middle, rotation * Vector3.forward, Color.red, 120);
+            for (var i = 0; i < points.Count; i++)
+            {
+                Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
+            }
+
+            Debug.DrawRay(Vector3.zero, planeRotation * Vector3.up, Color.green);
+            Debug.DrawRay(Vector3.zero, planeRotation * Vector3.right, Color.yellow);
+            Debug.DrawRay(Vector3.zero, planeRotation * Vector3.forward, Color.red);
 
             var plane = new Plane(right, points[0]);
             var sortedPoints = points.Select(p =>
@@ -344,19 +344,21 @@ namespace Slicing
 
             var corners = new Vector3[4];
             
-            plane.SetNormalAndPosition(right, leftPoint);
+            plane.SetNormalAndPosition(left, leftPoint);
             plane.Raycast(new Ray(topPoint, left), out var distance);
             corners[0] = topPoint + distance * left;
 
             plane.Raycast(new Ray(bottomPoint, left), out distance);
             corners[1] = bottomPoint + distance * left;
 
-            plane.SetNormalAndPosition(left, rightPoint);
+            plane.SetNormalAndPosition(right, rightPoint);
             plane.Raycast(new Ray(bottomPoint, right), out distance);
             corners[2] = bottomPoint + distance * right;
 
             plane.Raycast(new Ray(topPoint, right), out distance);
             corners[3] = topPoint + distance * right;
+
+            // TODO debug
             
             return corners;
         }
