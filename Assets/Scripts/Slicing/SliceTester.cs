@@ -56,7 +56,9 @@ namespace Slicing
                     continue;
                 }
                 var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+                var oldTexture = _mat.mainTexture;
                 _mat.mainTexture = texture;
+                Destroy(oldTexture);
                 yield return null;
             }
         }
