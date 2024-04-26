@@ -48,6 +48,7 @@ namespace Slicing
                     yield return null;
                     continue;
                 }
+                yield return null;
 
                 var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
                 if (sliceCoords == null)
@@ -55,6 +56,8 @@ namespace Slicing
                     yield return null;
                     continue;
                 }
+                yield return null;
+
                 var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
                 var oldTexture = _mat.mainTexture;
                 _mat.mainTexture = texture;
