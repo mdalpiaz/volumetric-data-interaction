@@ -47,32 +47,4 @@ public static class FileTools
         texture.LoadImage(File.ReadAllBytes(path));
         return texture;
     }
-
-    public static void SaveScreenPositions(IEnumerable<ScreenPosition> positions)
-    {
-        var path = Path.Join(Application.persistentDataPath, "/screens.dat");
-
-        var serializer = new JsonSerializer();
-        using var streamWriter = new StreamWriter(path, false, Encoding.UTF8);
-        using var jsonWriter = new JsonTextWriter(streamWriter);
-        serializer.Serialize(jsonWriter, positions.ToArray());
-    }
-
-    public static IEnumerable<ScreenPosition> LoadScreenPositions()
-    {
-        var path = Path.Join(Application.persistentDataPath, "/screens.dat");
-
-        try
-        {
-            var serializer = new JsonSerializer();
-            using var file = new FileStream(path, FileMode.Open);
-            using var streamReader = new StreamReader(file);
-            using var jsonReader = new JsonTextReader(streamReader);
-            return serializer.Deserialize<ScreenPosition[]>(jsonReader);
-        }
-        catch
-        {
-            return Enumerable.Empty<ScreenPosition>();
-        }
-    }
 }
