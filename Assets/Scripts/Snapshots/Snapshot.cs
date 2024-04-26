@@ -25,7 +25,9 @@ namespace Snapshots
 
         public GameObject OriginPlane { get; set; } = null!;
 
-        public SlicePlaneCoordinates PlaneCoordinates { get; set; } = null!;
+        public Dimension Dimension { get; set; } = null!;
+
+        public IntersectionPoints IntersectionPoints { get; set; } = null!;
 
         public Texture2D SnapshotTexture
         {
@@ -124,13 +126,34 @@ namespace Snapshots
             var model = ModelManager.Instance.CurrentModel;
 
             // value is pixels
-            var newCoordsPosition = PlaneCoordinates.StartPoint;
-            newCoordsPosition.x += value;
-            PlaneCoordinates.StartPoint = newCoordsPosition;
+            IntersectionPoints.UpperLeft = new Vector3()
+            {
+                x = IntersectionPoints.UpperLeft.x + value,
+                y = IntersectionPoints.UpperLeft.y,
+                z = IntersectionPoints.UpperLeft.z
+            };
+            IntersectionPoints.LowerLeft = new Vector3()
+            {
+                x = IntersectionPoints.LowerLeft.x + value,
+                y = IntersectionPoints.LowerLeft.y,
+                z = IntersectionPoints.LowerLeft.z
+            };
+            IntersectionPoints.LowerRight = new Vector3()
+            {
+                x = IntersectionPoints.LowerRight.x + value,
+                y = IntersectionPoints.LowerRight.y,
+                z = IntersectionPoints.LowerRight.z
+            };
+            IntersectionPoints.UpperRight = new Vector3()
+            {
+                x = IntersectionPoints.UpperRight.x + value,
+                y = IntersectionPoints.UpperRight.y,
+                z = IntersectionPoints.UpperRight.z
+            };
             
-            var texture = SlicePlane.CreateSliceTexture(model, PlaneCoordinates);
+            var texture = SlicePlane.CreateSliceTexture(model, Dimension, IntersectionPoints);
             
-            SetIntersectionChild(texture, PlaneCoordinates.StartPoint, model);
+            SetIntersectionChild(texture, IntersectionPoints.LowerLeft, model);
 
             // value is unity coordinates
             var boxColliderSize = model.BoxCollider.size;

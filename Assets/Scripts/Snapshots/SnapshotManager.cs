@@ -212,22 +212,23 @@ namespace Snapshots
                 return null;
             }
             
-            var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, intersectionPoints);
-            if (sliceCoords == null)
+            var dimension = SlicePlane.GetTextureDimension(model, intersectionPoints);
+            if (dimension == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return null;
             }
             
-            var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+            var texture = SlicePlane.CreateSliceTexture(model, dimension, intersectionPoints);
             
             AudioManager.Instance.PlayCameraSound();
             
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
-            snapshot.SetIntersectionChild(texture, sliceCoords.StartPoint, model);
-            snapshot.PlaneCoordinates = sliceCoords;
+            snapshot.IntersectionPoints = intersectionPoints;
+            snapshot.Dimension = dimension;
+            snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
         
             var mainTransform = interfaceController.Main.transform;
             var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);

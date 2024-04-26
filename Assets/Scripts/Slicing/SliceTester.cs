@@ -48,17 +48,15 @@ namespace Slicing
                     yield return null;
                     continue;
                 }
-                yield return null;
 
-                var sliceCoords = SlicePlane.CreateSlicePlaneCoordinates(model, points);
-                if (sliceCoords == null)
+                var dimension = SlicePlane.GetTextureDimension(model, points);
+                if (dimension == null)
                 {
                     yield return null;
                     continue;
                 }
-                yield return null;
 
-                var texture = SlicePlane.CreateSliceTexture(model, sliceCoords);
+                var texture = SlicePlane.CreateSliceTexture(model, dimension, points);
                 var oldTexture = _mat.mainTexture;
                 _mat.mainTexture = texture;
                 Destroy(oldTexture);
