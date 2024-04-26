@@ -53,10 +53,10 @@ namespace Slicing
             //var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
             
-            if (points.Count != 4)
-            {
+            //if (points.Count != 4)
+            //{
                 points = ConvertTo4Points(rotation, points).ToList();
-            }
+            //}
 
             // points from here are always 4
 
@@ -70,8 +70,8 @@ namespace Slicing
             var topPoints = heightSortedPoints.Take(2).ToList();
             var bottomPoints = heightSortedPoints.Reverse().Take(2).ToList();
 
-            Debug.DrawLine(topPoints[0], topPoints[1], Color.magenta);
-            Debug.DrawLine(bottomPoints[0], bottomPoints[1], Color.yellow);
+            //Debug.DrawLine(topPoints[0], topPoints[1], Color.magenta);
+            //Debug.DrawLine(bottomPoints[0], bottomPoints[1], Color.yellow);
 
             var testPlane = new Plane(slicerLeft, 0);
             testPlane.Raycast(new Ray(topPoints[0], slicerLeft), out var distance0);
@@ -152,8 +152,14 @@ namespace Slicing
             var xSteps = Mathf.RoundToInt(diffXZ.x / model.StepSize.x);
             var zSteps = Mathf.RoundToInt(diffXZ.z / model.StepSize.z);
 
-            var height = Math.Max(Math.Max(Math.Abs(ySteps), Math.Abs(forwardStepsX)), Math.Abs(forwardStepsZ));
-            var width = Math.Max(Math.Abs(xSteps), Math.Abs(zSteps));
+            return new Dimensions
+            {
+                Width = Math.Max(Math.Abs(xSteps), Math.Abs(zSteps)),
+                Height = Math.Max(Math.Max(Math.Abs(ySteps), Math.Abs(forwardStepsX)), Math.Abs(forwardStepsZ))
+            };
+
+            //var height = Math.Max(Math.Max(Math.Abs(ySteps), Math.Abs(forwardStepsX)), Math.Abs(forwardStepsZ));
+            //var width = Math.Max(Math.Abs(xSteps), Math.Abs(zSteps));
 
             //var height = ySteps;
             //if (Math.Abs(forwardStepsX) > Math.Abs(height))
@@ -173,15 +179,15 @@ namespace Slicing
             //}
             
             // 3) we get the step size using the edge points and width and height
-            var textureStepX = diffXZ / width;
-            var textureStepY = diffHeight / height;
+            //var textureStepX = diffXZ / width;
+            //var textureStepY = diffHeight / height;
 
-            Debug.Log($"Width: {width}, Height: {height}");
+            //Debug.Log($"Width: {width}, Height: {height}");
 
-            if (width == 0 || height == 0)
-            {
-                return null;
-            }
+            //if (width == 0 || height == 0)
+            //{
+            //    return null;
+            //}
 
             //if (width < 0)
             //{
@@ -195,8 +201,6 @@ namespace Slicing
             //    textureStepY *= -1;
             //}
 
-            return new Dimensions { Width = width, Height = height };
-
             //return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
         }
 
@@ -204,26 +208,48 @@ namespace Slicing
         {
             var resultImage = new Texture2D(dimension.Width, dimension.Height);
 
-            var adjustedXStep = (points.LowerRight - points.LowerLeft) / dimension.Width;// * (dimension.Width > 0 ? 1 : -1);
-            var adjustedYStep = (points.UpperLeft - points.LowerLeft) / dimension.Height;// * (dimension.Height > 0 ? 1 : -1);
+            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
+            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
+            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
+            Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
-            var startPoint = points.LowerLeft;
-            if (dimension.Width < 0)
-            {
-                startPoint += dimension.Width * adjustedXStep;
-            }
-            if (dimension.Height < 0)
-            {
-                startPoint += dimension.Height * adjustedYStep;
-            }
+            //var adjustedXStep = (points.LowerRight - points.LowerLeft) / dimension.Width;// * (dimension.Width > 0 ? 1 : -1);
+            //var adjustedYStep = (points.UpperLeft - points.LowerLeft) / dimension.Height;// * (dimension.Height > 0 ? 1 : -1);
+
+            //var startPoint = points.LowerLeft;
+            //if (dimension.Width < 0)
+            //{
+            //    startPoint += dimension.Width * adjustedXStep;
+            //}
+            //if (dimension.Height < 0)
+            //{
+            //    startPoint += dimension.Height * adjustedYStep;
+            //}
 
             for (var x = 0; x < dimension.Width; x++)
             {
                 //var y = 0;
                 for (var y = 0; y < dimension.Height; y++)
                 {
-                    // get local position
-                    var position = startPoint + adjustedXStep * x + adjustedYStep * y;
+                    // special case: the sides DO NOT form a trapezoid, all sides can have different sizes
+
+                    // we get the percentage of x and y positions
+                    var xPercent = x / (float)(dimension.Width - 1);
+                    var yPercent = y / (float)(dimension.Height - 1);
+
+                    // then we get BOTH points of the x and y axis (x -> left and right, y -> up and down)
+                    var bottomDistance = points.LowerRight - points.LowerLeft;
+                    var bottomX = points.LowerLeft + bottomDistance * xPercent;
+
+                    var topDistance = points.UpperRight - points.UpperLeft;
+                    var topX = points.UpperLeft + topDistance * xPercent;
+
+                    var heightDelta = topX - bottomX;
+                    var position = bottomX + heightDelta * yPercent;
+
+                    //var position = points.LowerLeft + startPoint + adjustedXStep * x + adjustedYStep * y;
+
+                    // we connect the points and the intersection is the right position
 
                     var index = model.LocalPositionToIndex(position);
 
@@ -231,8 +257,8 @@ namespace Slicing
 
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(index, interpolationType);
-                    var realX = dimension.Width > 0 ? dimension.Width - x - 1 : x;
-                    resultImage.SetPixel(realX, y, pixel);
+                    //var realX = dimension.Width > 0 ? dimension.Width - x - 1 : x;
+                    resultImage.SetPixel(x, y, pixel);
                 }
             }
             
