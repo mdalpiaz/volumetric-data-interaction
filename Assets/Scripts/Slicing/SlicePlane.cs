@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Slicing
@@ -18,20 +19,25 @@ namespace Slicing
         /// <returns></returns>
         public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
-            Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
-            Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
-            Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
+            var task = GetIntersectionPointsAsync(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
+            task.Wait();
+            return task.Result;
+        }
 
-            Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
-            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
+        public static Task<IntersectionPoints?> GetIntersectionPointsAsync(Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        {
+            //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
+            //Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
 
-            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
-            Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
+            //Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
+
+            //Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
+            //Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
 
             // this is the normal of the slicer
-            var normalVector = model.transform.InverseTransformVector(slicerRotation * Vector3.back);
-            var localPosition = model.transform.InverseTransformPoint(slicerPosition);
             var plane = new Plane(normalVector, localPosition);
 
             // we only take the plane if it faces up (normal points down), else we just flip it
@@ -50,7 +56,7 @@ namespace Slicing
             if (points.Count < 3)
             {
                 Debug.LogError("Cannot create proper intersection with less than 3 points!");
-                return null;
+                return Task.FromResult<IntersectionPoints?>(null);
             }
             
             points = ConvertTo4Points(rotation, points).ToList();
@@ -93,13 +99,13 @@ namespace Slicing
                 bottomRight = bottomPoints[0];
             }
 
-            return new IntersectionPoints
+            return Task.FromResult<IntersectionPoints?>(new IntersectionPoints
             {
                 UpperLeft = topLeft,
                 LowerLeft = bottomLeft,
                 LowerRight = bottomRight,
                 UpperRight = topRight
-            };
+            });
         }
         
         public static Dimensions? GetTextureDimension(Model.Model model, IntersectionPoints points)
@@ -153,14 +159,14 @@ namespace Slicing
         {
             var resultImage = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
 
-            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
-            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
-            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
-            Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
+            //Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
+            //Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
+            //Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
+            //Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
-            var start = points.LowerRight;
-            var xStep = ((points.LowerRight - points.LowerLeft) / Math.Abs(dimensions.Width)) * -1;
-            var yStep = (points.UpperLeft - points.LowerLeft) / (Math.Abs(dimensions.Height));
+            var start = points.LowerLeft;
+            var xStep = (points.LowerRight - points.LowerLeft) / Math.Abs(dimensions.Width);
+            var yStep = (points.UpperLeft - points.LowerLeft) / Math.Abs(dimensions.Height);
 
             for (var x = 0; x < Math.Abs(dimensions.Width); x++)
             {
@@ -206,11 +212,9 @@ namespace Slicing
             return new Mesh
             {
                 vertices = arr,
-                triangles = new int[] { 0, 2, 1, 0, 3, 2,   // mesh faces in both directions
-                    //0, 1, 2, 0, 2, 3
-                    },
+                triangles = new int[] { 0, 2, 1, 0, 3, 2 },
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
-                uv = new Vector2[] { Vector2.one, Vector2.right, Vector2.zero, Vector2.up }
+                uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
             };
         }
         
@@ -317,11 +321,6 @@ namespace Slicing
             }
         }
 
-        private static Vector3 GetCenterPoint(IReadOnlyCollection<Vector3> points)
-        {
-            return points.Aggregate((p1, p2) => p1 + p2) / points.Count;
-        }
-        
         private static IEnumerable<Vector3> ConvertTo4Points(Quaternion planeRotation, IReadOnlyList<Vector3> points)
         {
             var left = planeRotation * Vector3.left;

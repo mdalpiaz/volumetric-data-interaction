@@ -1,6 +1,9 @@
 #nullable enable
 
+using PimDeWitte.UnityMainThreadDispatcher;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Slicing
@@ -18,6 +21,8 @@ namespace Slicing
         private MeshRenderer _meshRenderer = null!;
 
         private IEnumerator _coroutine = null!;
+
+        private SemaphoreSlim _sem = new(0, 1);
 
         private void Awake()
         {
@@ -42,25 +47,44 @@ namespace Slicing
         {
             while (true)
             {
-                var points = SlicePlane.GetIntersectionPoints(model, slicer.position, slicer.rotation);
-                if (points == null)
+                slicer.GetPositionAndRotation(out var position, out var rotation);
+                var slicerPositionLocal = model.transform.InverseTransformPoint(position);
+                var slicerRotationNormal = model.transform.InverseTransformVector(rotation * Vector3.back);
+                Texture2D? texture = null;
+                var task = Task.Run(async () =>
                 {
-                    yield return null;
-                    continue;
-                }
+                    Debug.Log("Starting task");
+                    var points = await SlicePlane.GetIntersectionPointsAsync(model, slicerPositionLocal, slicerRotationNormal);
+                    if (points == null)
+                    {
+                        return;
+                    }
+                    Debug.Log("got points");
 
-                var dimensions = SlicePlane.GetTextureDimension(model, points);
-                if (dimensions == null)
+                    var dimensions = SlicePlane.GetTextureDimension(model, points);
+                    if (dimensions == null)
+                    {
+                        return;
+                    }
+                    Debug.Log("got dimensions");
+
+                    await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
+                    {
+                        texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
+                        _sem.Release();
+                    });
+                    await _sem.WaitAsync();
+                });
+                
+                yield return new WaitUntil(() => task.IsCompleted);
+
+                if (texture != null)
                 {
-                    yield return null;
-                    continue;
+                    var oldTexture = _mat.mainTexture;
+                    _mat.mainTexture = texture;
+                    Destroy(oldTexture);
+                    texture = null;
                 }
-
-                var texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
-                var oldTexture = _mat.mainTexture;
-                _mat.mainTexture = texture;
-                Destroy(oldTexture);
-                yield return null;
             }
         }
     }
