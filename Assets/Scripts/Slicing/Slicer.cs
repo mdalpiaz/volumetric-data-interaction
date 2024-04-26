@@ -80,13 +80,13 @@ namespace Slicing
                 return;
             }
             
-            var dimension = SlicePlane.GetTextureDimension(model, points);
-            if (dimension == null)
+            var dimensions = SlicePlane.GetTextureDimension(model, points);
+            if (dimensions == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return;
             }
-            var texture = SlicePlane.CreateSliceTexture(model, dimension, points);
+            var texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
             var mesh = SlicePlane.CreateMesh(model, points);
             
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();

@@ -212,14 +212,14 @@ namespace Snapshots
                 return null;
             }
             
-            var dimension = SlicePlane.GetTextureDimension(model, intersectionPoints);
-            if (dimension == null)
+            var dimensions = SlicePlane.GetTextureDimension(model, intersectionPoints);
+            if (dimensions == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return null;
             }
             
-            var texture = SlicePlane.CreateSliceTexture(model, dimension, intersectionPoints);
+            var texture = SlicePlane.CreateSliceTexture(model, dimensions, intersectionPoints);
             
             AudioManager.Instance.PlayCameraSound();
             
@@ -227,7 +227,7 @@ namespace Snapshots
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
             snapshot.IntersectionPoints = intersectionPoints;
-            snapshot.Dimension = dimension;
+            snapshot.Dimension = dimensions;
             snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
         
             var mainTransform = interfaceController.Main.transform;

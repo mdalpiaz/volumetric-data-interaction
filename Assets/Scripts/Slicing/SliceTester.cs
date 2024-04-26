@@ -49,14 +49,14 @@ namespace Slicing
                     continue;
                 }
 
-                var dimension = SlicePlane.GetTextureDimension(model, points);
-                if (dimension == null)
+                var dimensions = SlicePlane.GetTextureDimension(model, points);
+                if (dimensions == null)
                 {
                     yield return null;
                     continue;
                 }
 
-                var texture = SlicePlane.CreateSliceTexture(model, dimension, points);
+                var texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
                 var oldTexture = _mat.mainTexture;
                 _mat.mainTexture = texture;
                 Destroy(oldTexture);

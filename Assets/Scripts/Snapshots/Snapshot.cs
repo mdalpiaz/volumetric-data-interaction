@@ -25,7 +25,7 @@ namespace Snapshots
 
         public GameObject OriginPlane { get; set; } = null!;
 
-        public Dimension Dimension { get; set; } = null!;
+        public Dimensions Dimension { get; set; } = null!;
 
         public IntersectionPoints IntersectionPoints { get; set; } = null!;
 

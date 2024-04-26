@@ -133,7 +133,7 @@ namespace Slicing
             //return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
         }
         
-        public static Dimension? GetTextureDimension(Model.Model model, IntersectionPoints points)
+        public static Dimensions? GetTextureDimension(Model.Model model, IntersectionPoints points)
         {
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
@@ -195,12 +195,12 @@ namespace Slicing
             //    textureStepY *= -1;
             //}
 
-            return new Dimension { Width = width, Height = height };
+            return new Dimensions { Width = width, Height = height };
 
             //return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
         }
 
-        public static Texture2D CreateSliceTexture(Model.Model model, Dimension dimension, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimension, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
         {
             var resultImage = new Texture2D(dimension.Width, dimension.Height);
 
