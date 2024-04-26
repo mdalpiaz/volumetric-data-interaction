@@ -235,7 +235,7 @@ namespace Model
             if (x >= XCount || y >= YCount || z >= ZCount ||
                 x < 0 || y < 0 || z < 0)
             {
-                return Color.black;
+                return new Color(0, 0, 0, 0);
             }
             
             return interpolation switch
