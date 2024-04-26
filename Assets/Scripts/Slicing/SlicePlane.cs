@@ -50,7 +50,6 @@ namespace Slicing
             }
             
             var rotation = Quaternion.LookRotation(normal);
-            //var slicerUp = rotation * Vector3.up;
             var slicerLeft = rotation * Vector3.left;
             
             //if (points.Count != 4)
@@ -60,18 +59,10 @@ namespace Slicing
 
             // points from here are always 4
 
-            // we need to sort the points by angle, so that the mesh later on will be visible
-            // to find the right order of the points
-            // we can find the middle point and then calculate the dot product between all points
-            //var middle = GetCenterPoint(points);
-
             var heightSortedPoints = points.OrderByDescending(p => p.y);
 
             var topPoints = heightSortedPoints.Take(2).ToList();
             var bottomPoints = heightSortedPoints.Reverse().Take(2).ToList();
-
-            //Debug.DrawLine(topPoints[0], topPoints[1], Color.magenta);
-            //Debug.DrawLine(bottomPoints[0], bottomPoints[1], Color.yellow);
 
             var testPlane = new Plane(slicerLeft, 0);
             testPlane.Raycast(new Ray(topPoints[0], slicerLeft), out var distance0);
@@ -111,26 +102,6 @@ namespace Slicing
                 LowerRight = bottomRight,
                 UpperRight = topRight
             };
-
-            //var pointsInQuadrants = points
-            //    .Select(p => (p, Vector3.Normalize(p - middle)))
-            //    .Select(p => (p.p, Vector3.Dot(slicerUp, p.Item2), Vector3.Dot(slicerLeft, p.Item2)))
-            //    .ToList();
-
-            //// the quadrants go: top left, bottom left, bottom right, top right
-            //var q1 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
-            //var q2 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: >= 0 }).OrderByDescending(p => p.Item2);
-            //var q3 = pointsInQuadrants.Where(p => p is { Item2: < 0, Item3: < 0 }).OrderBy(p => p.Item2);
-            //var q4 = pointsInQuadrants.Where(p => p is { Item2: >= 0, Item3: < 0 }).OrderBy(p => p.Item2);
-
-            //var newPoints = q1
-            //    .Concat(q2)
-            //    .Concat(q3)
-            //    .Concat(q4)
-            //    .Select(p => p.p)
-            //    .ToList();
-
-            //return new IntersectionPoints(newPoints[0], newPoints[1], newPoints[2], newPoints[3]);
         }
         
         public static Dimensions? GetTextureDimension(Model.Model model, IntersectionPoints points)
@@ -258,6 +229,7 @@ namespace Slicing
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(index, interpolationType);
                     //var realX = dimension.Width > 0 ? dimension.Width - x - 1 : x;
+
                     resultImage.SetPixel(x, y, pixel);
                 }
             }
@@ -290,7 +262,7 @@ namespace Slicing
                     0, 1, 2, 0, 2, 3
                     },
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
-                uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
+                uv = new Vector2[] { Vector2.one, Vector2.right, Vector2.zero, Vector2.up }
             };
         }
         
