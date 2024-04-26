@@ -33,7 +33,19 @@ namespace Slicing
             var normalVector = model.transform.InverseTransformVector(slicerRotation * Vector3.back);
             var localPosition = model.transform.InverseTransformPoint(slicerPosition);
             var plane = new Plane(normalVector, localPosition);
-            
+
+            // we only take the plane if it faces up (normal points down), else we just flip it
+            // the rotation section is CORRECT
+            // we need to check normal vector again, because slicerRotation on it's own could point up
+            var normal = normalVector;
+            if (normal.y > 0)
+            {
+                normal *= -1;
+            }
+
+            var rotation = Quaternion.LookRotation(normal);
+            var slicerLeft = rotation * Vector3.left;
+
             var points = GetIntersectionPoints_internal(model, plane).ToList();
             if (points.Count < 3)
             {
@@ -41,21 +53,7 @@ namespace Slicing
                 return null;
             }
             
-            // we only take the plane if it faces up (normal points down), else we just flip it
-            // the rotation section is CORRECT
-            var normal = plane.normal;
-            if (normal.y > 0)
-            {
-                normal = plane.flipped.normal;
-            }
-            
-            var rotation = Quaternion.LookRotation(normal);
-            var slicerLeft = rotation * Vector3.left;
-            
-            //if (points.Count != 4)
-            //{
-                points = ConvertTo4Points(rotation, points).ToList();
-            //}
+            points = ConvertTo4Points(rotation, points).ToList();
 
             // points from here are always 4
 
@@ -123,102 +121,63 @@ namespace Slicing
             var xSteps = Mathf.RoundToInt(diffXZ.x / model.StepSize.x);
             var zSteps = Mathf.RoundToInt(diffXZ.z / model.StepSize.z);
 
+            var width = xSteps;
+            if (Math.Abs(zSteps) > Math.Abs(width))
+            {
+                width = zSteps;
+            }
+
+            var height = ySteps;
+            if (Math.Abs(forwardStepsX) > Math.Abs(height))
+            {
+                height = forwardStepsX;
+            }
+            if (Math.Abs(forwardStepsZ) > Math.Abs(height))
+            {
+                height = forwardStepsZ;
+            }
+
+            if (width == 0 || height == 0)
+            {
+                return null;
+            }
+
             return new Dimensions
             {
-                Width = Math.Max(Math.Abs(xSteps), Math.Abs(zSteps)),
-                Height = Math.Max(Math.Max(Math.Abs(ySteps), Math.Abs(forwardStepsX)), Math.Abs(forwardStepsZ))
+                Width = width,
+                Height = height
             };
-
-            //var height = Math.Max(Math.Max(Math.Abs(ySteps), Math.Abs(forwardStepsX)), Math.Abs(forwardStepsZ));
-            //var width = Math.Max(Math.Abs(xSteps), Math.Abs(zSteps));
-
-            //var height = ySteps;
-            //if (Math.Abs(forwardStepsX) > Math.Abs(height))
-            //{
-            //    height = forwardStepsX;
-            //}
-
-            //if (Math.Abs(forwardStepsZ) > Math.Abs(height))
-            //{
-            //    height = forwardStepsZ;
-            //}
-
-            //var width = xSteps;
-            //if (Math.Abs(zSteps) > Math.Abs(width))
-            //{
-            //    width = zSteps;
-            //}
-            
-            // 3) we get the step size using the edge points and width and height
-            //var textureStepX = diffXZ / width;
-            //var textureStepY = diffHeight / height;
-
-            //Debug.Log($"Width: {width}, Height: {height}");
-
-            //if (width == 0 || height == 0)
-            //{
-            //    return null;
-            //}
-
-            //if (width < 0)
-            //{
-            //    width = Math.Abs(width);
-            //    textureStepX *= -1;
-            //}
-
-            //if (height < 0)
-            //{
-            //    height = Math.Abs(height);
-            //    textureStepY *= -1;
-            //}
-
-            //return new SlicePlaneCoordinates(width, height, ll, textureStepX, textureStepY);
         }
 
-        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimension, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimensions, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            var resultImage = new Texture2D(dimension.Width, dimension.Height);
+            var resultImage = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
 
             Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
             Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
             Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
             Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
-            //Debug.Log($"{model.LocalPositionToIndex(points.LowerLeft)}");
+            var start = points.LowerRight;
+            var xStep = ((points.LowerRight - points.LowerLeft) / Math.Abs(dimensions.Width)) * -1;
+            var yStep = (points.UpperLeft - points.LowerLeft) / (Math.Abs(dimensions.Height));
 
-            for (var x = 0; x < dimension.Width; x++)
+            for (var x = 0; x < Math.Abs(dimensions.Width); x++)
             {
                 //var y = 0;
-                for (var y = 0; y < dimension.Height; y++)
+                for (var y = 0; y < Math.Abs(dimensions.Height); y++)
                 {
-                    // special case: the sides DO NOT form a trapezoid, all sides can have different sizes
-
-                    // we get the percentage of x and y positions
-                    var xPercent = x / (float)(dimension.Width - 1);
-                    var yPercent = y / (float)(dimension.Height - 1);
-
-                    // then we get BOTH points of the x and y axis (x -> left and right, y -> up and down)
-                    var bottomDistance = points.LowerRight - points.LowerLeft;
-                    var bottomX = points.LowerLeft + bottomDistance * xPercent;
-
-                    var topDistance = points.UpperRight - points.UpperLeft;
-                    var topX = points.UpperLeft + topDistance * xPercent;
-
-                    var heightDelta = topX - bottomX;
-                    var position = bottomX + heightDelta * yPercent;
-
-                    //var position = points.LowerLeft + startPoint + adjustedXStep * x + adjustedYStep * y;
-
-                    // we connect the points and the intersection is the right position
+                    var position = start + xStep * x + yStep * y;
 
                     var index = model.LocalPositionToIndex(position);
 
-                    //Debug.DrawRay(position, Vector3.forward, new Color(x / (float)Math.Abs(sliceCoords.Width), 0, 0));
+                    // this line is essential to flip the image in the right way
+                    // because flipping the UV and horizontal and vertical axis will adjust it based on the BACKSIDE of the mesh
+                    // by flipping the index we can flip it from the BACK to the FRONT of the mesh, finally matching the model
+                    index.x = model.XCount - index.x;
 
                     // get image at index and then the pixel
                     var pixel = model.GetPixel(index, interpolationType);
-                    //var realX = dimension.Width > 0 ? dimension.Width - x - 1 : x;
-
                     resultImage.SetPixel(x, y, pixel);
                 }
             }
@@ -247,8 +206,8 @@ namespace Slicing
             return new Mesh
             {
                 vertices = arr,
-                triangles = new int[] { //0, 2, 1, 0, 3, 2,   // mesh faces in both directions
-                    0, 1, 2, 0, 2, 3
+                triangles = new int[] { 0, 2, 1, 0, 3, 2,   // mesh faces in both directions
+                    //0, 1, 2, 0, 2, 3
                     },
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
                 uv = new Vector2[] { Vector2.one, Vector2.right, Vector2.zero, Vector2.up }
@@ -368,14 +327,6 @@ namespace Slicing
             var left = planeRotation * Vector3.left;
             var right = planeRotation * Vector3.right;
 
-            //for (var i = 0; i < points.Count; i++)
-            //{
-            //    Debug.DrawLine(points[i], points[(i + 1) % points.Count], Color.red);
-            //}
-
-            //Debug.DrawRay(Vector3.zero, left, Color.green);
-            //Debug.DrawRay(Vector3.zero, right, Color.yellow);
-
             var plane = new Plane(right, points[0]);
             var sortedPoints = points.Select(p =>
                 {
@@ -394,23 +345,19 @@ namespace Slicing
             var topPoint = sortedPoints.Last();
             var bottomPoint = sortedPoints.First();
 
-            var corners = new Vector3[4];
-            
             plane.SetNormalAndPosition(left, leftPoint);
             plane.Raycast(new Ray(topPoint, left), out var distance);
-            corners[0] = topPoint + distance * left;
+            yield return topPoint + distance * left;
 
             plane.Raycast(new Ray(bottomPoint, left), out distance);
-            corners[1] = bottomPoint + distance * left;
+            yield return bottomPoint + distance * left;
 
             plane.SetNormalAndPosition(right, rightPoint);
             plane.Raycast(new Ray(bottomPoint, right), out distance);
-            corners[2] = bottomPoint + distance * right;
+            yield return bottomPoint + distance * right;
 
             plane.Raycast(new Ray(topPoint, right), out distance);
-            corners[3] = topPoint + distance * right;
-
-            return corners;
+            yield return topPoint + distance * right;
         }
     }
 }
