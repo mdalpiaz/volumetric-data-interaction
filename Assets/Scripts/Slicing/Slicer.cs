@@ -92,7 +92,6 @@ namespace Slicing
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();
             transparentMaterial.name = "SliceMaterial";
             transparentMaterial.mainTexture = texture;
-            //var sliceMaterial = MaterialTools.GetMaterialOrientation(transparentMaterial, model, sliceCoords.StartPoint);
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
