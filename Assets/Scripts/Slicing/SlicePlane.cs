@@ -69,7 +69,7 @@ namespace Slicing
             testPlane.Raycast(new Ray(topPoints[1], slicerLeft), out var distance1);
             Vector3 topLeft;
             Vector3 topRight;
-            if (distance0 > distance1)
+            if (distance0 < distance1)
             {
                 topLeft = topPoints[0];
                 topRight = topPoints[1];
@@ -84,7 +84,7 @@ namespace Slicing
             testPlane.Raycast(new Ray(bottomPoints[1], slicerLeft), out distance1);
             Vector3 bottomLeft;
             Vector3 bottomRight;
-            if (distance0 > distance1)
+            if (distance0 < distance1)
             {
                 bottomLeft = bottomPoints[0];
                 bottomRight = bottomPoints[1];
@@ -184,18 +184,7 @@ namespace Slicing
             Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
             Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
-            //var adjustedXStep = (points.LowerRight - points.LowerLeft) / dimension.Width;// * (dimension.Width > 0 ? 1 : -1);
-            //var adjustedYStep = (points.UpperLeft - points.LowerLeft) / dimension.Height;// * (dimension.Height > 0 ? 1 : -1);
-
-            //var startPoint = points.LowerLeft;
-            //if (dimension.Width < 0)
-            //{
-            //    startPoint += dimension.Width * adjustedXStep;
-            //}
-            //if (dimension.Height < 0)
-            //{
-            //    startPoint += dimension.Height * adjustedYStep;
-            //}
+            //Debug.Log($"{model.LocalPositionToIndex(points.LowerLeft)}");
 
             for (var x = 0; x < dimension.Width; x++)
             {
