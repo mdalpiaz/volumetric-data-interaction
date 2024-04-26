@@ -22,5 +22,11 @@ namespace Slicing
             _meshFilter = GetComponent<MeshFilter>();
             _meshRenderer = GetComponent<MeshRenderer>();
         }
+
+        private void OnDestroy()
+        {
+            Destroy(_meshFilter.mesh);
+            Destroy(_meshRenderer.material);
+        }
     }
 }
