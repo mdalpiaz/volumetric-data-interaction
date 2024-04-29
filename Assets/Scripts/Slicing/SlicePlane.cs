@@ -26,16 +26,16 @@ namespace Slicing
 
         public static Task<IntersectionPoints?> GetIntersectionPointsAsync(Model.Model model, Vector3 localPosition, Vector3 normalVector)
         {
-            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
-            Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
-            Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
-            Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
+            //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
+            //Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
 
-            Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
-            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
+            //Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
+            //Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
 
-            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
-            Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
+            //Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
+            //Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
 
             // this is the normal of the slicer
             var plane = new Plane(normalVector, localPosition);
@@ -157,21 +157,38 @@ namespace Slicing
 
         public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimensions, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
         {
-            var resultImage = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
+            var width = Math.Abs(dimensions.Width);
+            var height = Math.Abs(dimensions.Height);
 
-            Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
-            Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
-            Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
-            Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
+            var task = CreateSliceTextureAsync(model, dimensions, points, interpolationType);
+            task.Wait();
+            var data = task.Result;
+
+            var resultImage = new Texture2D(width, height);
+            resultImage.SetPixels32(data);
+            resultImage.Apply();
+            return resultImage;
+        }
+
+        public static Task<Color32[]> CreateSliceTextureAsync(Model.Model model, Dimensions dimensions, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
+        {
+            var width = Math.Abs(dimensions.Width);
+            var height = Math.Abs(dimensions.Height);
+
+            var data = new Color32[width * height];
+
+            //Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
+            //Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
+            //Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
+            //Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
             var start = points.LowerLeft;
-            var xStep = (points.LowerRight - points.LowerLeft) / Math.Abs(dimensions.Width);
-            var yStep = (points.UpperLeft - points.LowerLeft) / Math.Abs(dimensions.Height);
+            var xStep = (points.LowerRight - points.LowerLeft) / width;
+            var yStep = (points.UpperLeft - points.LowerLeft) / height;
 
-            for (var x = 0; x < Math.Abs(dimensions.Width); x++)
+            for (var x = 0; x < width; x++)
             {
-                //var y = 0;
-                for (var y = 0; y < Math.Abs(dimensions.Height); y++)
+                for (var y = 0; y < height; y++)
                 {
                     var position = start + xStep * x + yStep * y;
 
@@ -183,13 +200,12 @@ namespace Slicing
                     index.x = model.XCount - index.x;
 
                     // get image at index and then the pixel
-                    var pixel = model.GetPixel(index, interpolationType);
-                    resultImage.SetPixel(x, y, pixel);
+                    var pixel = model.GetPixel32(index, interpolationType);
+                    data[x + y * width] = pixel;
                 }
             }
-            
-            resultImage.Apply();
-            return resultImage;
+
+            return Task.FromResult(data);
         }
         
         public static Mesh CreateMesh(Model.Model model, IntersectionPoints points)

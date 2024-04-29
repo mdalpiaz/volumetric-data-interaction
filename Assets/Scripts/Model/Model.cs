@@ -22,7 +22,7 @@ namespace Model
 
         private Mesh _originalMesh = null!;
 
-        private Texture2D[] _originalBitmap = null!;
+        private Color32[] _slices = null!;
 
         private Vector3 _originalPosition;
         private Quaternion _originalRotation;
@@ -42,7 +42,6 @@ namespace Model
 
         public Vector3 StepSize { get; private set; }
 
-        // transform.position is NOT the centerpoint of the model!
         public Vector3 BottomFrontLeftCorner { get; private set; }
 
         public Vector3 BottomFrontRightCorner { get; private set; }
@@ -67,12 +66,38 @@ namespace Model
             _renderer = GetComponent<Renderer>();
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
-            _originalBitmap = InitModel(stackPath);
 
-            // we use slices of the XY plane, why was this called XCount if its on the Z axis?
-            ZCount = _originalBitmap.Length;
-            YCount = _originalBitmap.Length > 0 ? _originalBitmap[0].height : 0;
-            XCount = _originalBitmap.Length > 0 ? _originalBitmap[0].width : 0;
+            if (!Directory.Exists(stackPath))
+            {
+                Debug.LogError($"Directory \"{stackPath}\" not found!");
+                throw new ArgumentException($"Directory \"{stackPath}\" not found!");
+            }
+            var files = Directory.GetFiles(stackPath);
+            if (files.Length == 0)
+            {
+                Debug.LogError($"No files loaded from \"{stackPath}\"!");
+                throw new ArgumentException($"No files loaded from \"{stackPath}\"!");
+            }
+
+            var imagePath = Path.Combine(stackPath, files[0]);
+            var texture = FileTools.LoadImage(imagePath);
+
+            ZCount = files.Length;
+            XCount = texture.width;
+            YCount = texture.height;
+
+            _slices = new Color32[XCount * YCount * ZCount];
+
+            texture.GetPixels32().CopyTo(_slices, 0);
+            Destroy(texture);
+
+            for (var i = 1; i < files.Length; i++)
+            {
+                imagePath = Path.Combine(stackPath, files[i]);
+                texture = FileTools.LoadImage(imagePath);
+                texture.GetPixels32().CopyTo(_slices, i * XCount * YCount);
+                Destroy(texture);
+            }
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
 
@@ -87,15 +112,15 @@ namespace Model
             // this code gets ALL corner points and sorts them locally, so we can easily determin to which corner which point belongs
             // this code has already been tested and is CORRECT
             var points = new Vector3[8];
-            var center = transform.TransformPoint(BoxCollider.center);
-            points[0] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
+            var center = transform.TransformPoint(BoxCollider.center);  // transform.position is NOT the centerpoint of the model!
+            points[0] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.back() *  worldExtents.z);
             points[1] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
-            points[2] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
-            points[3] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
-            points[4] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.back() * worldExtents.z);
-            points[5] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
-            points[6] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.back() * worldExtents.z);
-            points[7] = transform.InverseTransformPoint(center + transform.right * worldExtents.x + transform.up * worldExtents.y + transform.forward * worldExtents.z);
+            points[2] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up *     worldExtents.y + transform.back() *  worldExtents.z);
+            points[3] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up *     worldExtents.y + transform.forward * worldExtents.z);
+            points[4] = transform.InverseTransformPoint(center + transform.right *  worldExtents.x + transform.down() * worldExtents.y + transform.back() *  worldExtents.z);
+            points[5] = transform.InverseTransformPoint(center + transform.right *  worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
+            points[6] = transform.InverseTransformPoint(center + transform.right *  worldExtents.x + transform.up *     worldExtents.y + transform.back() *  worldExtents.z);
+            points[7] = transform.InverseTransformPoint(center + transform.right *  worldExtents.x + transform.up *     worldExtents.y + transform.forward * worldExtents.z);
 
             BottomBackLeftCorner =   points.OrderBy(p => p.x)          .Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
             BottomBackRightCorner =  points.OrderByDescending(p => p.x).Take(4).OrderBy(p => p.y)          .Take(2).OrderByDescending(p => p.z).First();
@@ -217,33 +242,21 @@ namespace Model
             };
         }
 
-        public Color GetPixel(Vector3Int index, InterpolationType interpolation = InterpolationType.Nearest)
-        {
-            return GetPixel(index.x, index.y, index.z, interpolation);
-        }
-
         /// <summary>
         /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
+        /// <param name="index"></param>
         /// <param name="interpolation"></param>
         /// <returns></returns>
-        public Color GetPixel(int x, int y, int z, InterpolationType interpolation = InterpolationType.Nearest)
+        public Color32 GetPixel32(Vector3Int index, InterpolationType interpolation = InterpolationType.Nearest)
         {
-            if (x >= XCount || y >= YCount || z >= ZCount ||
-                x < 0 || y < 0 || z < 0)
+            if (index.x >= XCount || index.y >= YCount || index.z >= ZCount ||
+                index.x < 0 || index.y < 0 || index.z < 0)
             {
-                return new Color(0, 0, 0, 0);
+                return new Color32(0, 0, 0, 0);
             }
-            
-            return interpolation switch
-            {
-                InterpolationType.Nearest => _originalBitmap[z].GetPixel(x, y),
-                InterpolationType.Bilinear => _originalBitmap[z].GetPixelBilinear(_originalBitmap[z].width / (float)x, _originalBitmap[z].height / (float)y),
-                _ => throw new NotImplementedException()
-            };
+
+            return _slices[ToSliceIndex(index)];
         }
         
         public void ResetState()
@@ -253,29 +266,9 @@ namespace Model
             transform.localScale = _originalScale;
         }
 
-        private static Texture2D[] InitModel(string path)
+        private int ToSliceIndex(Vector3Int i)
         {
-            if (!Directory.Exists(path))
-            {
-                Debug.LogError($"Directory \"{path}\" not found!");
-                return Array.Empty<Texture2D>();
-            }
-            var files = Directory.GetFiles(path);
-            if (files.Length == 0)
-            {
-                Debug.LogError($"No files loaded from \"{path}\"!");
-                return Array.Empty<Texture2D>();
-            }
-            
-            var model3D = new Texture2D[files.Length];
-
-            for (var i = 0; i < files.Length; i++)
-            {
-                var imagePath = Path.Combine(path, files[i]);
-                model3D[i] = FileTools.LoadImage(imagePath);
-            }
-
-            return model3D;
+            return i.x + i.y * XCount + i.z * XCount * YCount;
         }
     }
 }

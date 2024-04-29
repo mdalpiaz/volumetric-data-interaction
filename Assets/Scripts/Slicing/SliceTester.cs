@@ -1,6 +1,7 @@
 #nullable enable
 
 using PimDeWitte.UnityMainThreadDispatcher;
+using System;
 using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Slicing
 
         private IEnumerator _coroutine = null!;
 
-        private SemaphoreSlim _sem = new(0, 1);
+        private readonly SemaphoreSlim _sem = new(0, 1);
 
         private void Awake()
         {
@@ -65,9 +66,13 @@ namespace Slicing
                         return;
                     }
 
+                    var texData = await SlicePlane.CreateSliceTextureAsync(model, dimensions, points);
+
                     await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
                     {
-                        texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
+                        texture = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
+                        texture.SetPixels32(texData);
+                        texture.Apply();
                         _sem.Release();
                     });
                     await _sem.WaitAsync();

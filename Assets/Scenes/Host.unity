@@ -3352,6 +3352,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2506788419982554567, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 2618122019900176585, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_Materials.Array.data[0]

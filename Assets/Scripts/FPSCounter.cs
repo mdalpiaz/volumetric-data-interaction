@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class FPSCounter : MonoBehaviour
 {
-    public int FPS;
+    [SerializeField]
+    private TMP_Text text;
 
     void Update()
     {
-        FPS = (int)(1f / Time.deltaTime);
+        text.SetText($"FPS: {(int)(1f / Time.deltaTime)}");
     }
 }
