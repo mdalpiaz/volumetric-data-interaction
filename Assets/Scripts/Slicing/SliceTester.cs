@@ -53,20 +53,17 @@ namespace Slicing
                 Texture2D? texture = null;
                 var task = Task.Run(async () =>
                 {
-                    Debug.Log("Starting task");
                     var points = await SlicePlane.GetIntersectionPointsAsync(model, slicerPositionLocal, slicerRotationNormal);
                     if (points == null)
                     {
                         return;
                     }
-                    Debug.Log("got points");
 
                     var dimensions = SlicePlane.GetTextureDimension(model, points);
                     if (dimensions == null)
                     {
                         return;
                     }
-                    Debug.Log("got dimensions");
 
                     await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
                     {
