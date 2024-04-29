@@ -248,7 +248,7 @@ namespace Model
         /// <param name="index"></param>
         /// <param name="interpolation"></param>
         /// <returns></returns>
-        public Color32 GetPixel32(Vector3Int index, InterpolationType interpolation = InterpolationType.Nearest)
+        public Color32 GetPixel32(Vector3Int index)
         {
             if (index.x >= XCount || index.y >= YCount || index.z >= ZCount ||
                 index.x < 0 || index.y < 0 || index.z < 0)

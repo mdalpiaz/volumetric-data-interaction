@@ -155,12 +155,12 @@ namespace Slicing
             };
         }
 
-        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimensions, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimensions, IntersectionPoints points)
         {
             var width = Math.Abs(dimensions.Width);
             var height = Math.Abs(dimensions.Height);
 
-            var task = CreateSliceTextureAsync(model, dimensions, points, interpolationType);
+            var task = CreateSliceTextureAsync(model, dimensions, points);
             task.Wait();
             var data = task.Result;
 
@@ -170,7 +170,7 @@ namespace Slicing
             return resultImage;
         }
 
-        public static Task<Color32[]> CreateSliceTextureAsync(Model.Model model, Dimensions dimensions, IntersectionPoints points, InterpolationType interpolationType = InterpolationType.Nearest)
+        public static Task<Color32[]> CreateSliceTextureAsync(Model.Model model, Dimensions dimensions, IntersectionPoints points)
         {
             var width = Math.Abs(dimensions.Width);
             var height = Math.Abs(dimensions.Height);
@@ -200,7 +200,7 @@ namespace Slicing
                     index.x = model.XCount - index.x;
 
                     // get image at index and then the pixel
-                    var pixel = model.GetPixel32(index, interpolationType);
+                    var pixel = model.GetPixel32(index);
                     data[x + y * width] = pixel;
                 }
             }
