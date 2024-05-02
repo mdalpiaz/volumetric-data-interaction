@@ -228,7 +228,8 @@ namespace Slicing
             return new Mesh
             {
                 vertices = arr,
-                triangles = new int[] { 0, 2, 1, 0, 3, 2 },
+                triangles = new int[] { 0, 2, 1, 0, 3, 2,
+                    0, 1, 2, 0, 2, 3 },
                 normals = new Vector3[] { Vector3.back, Vector3.back, Vector3.back, Vector3.back },
                 uv = new Vector2[] { Vector2.up, Vector2.zero, Vector2.right, Vector2.one }
             };
