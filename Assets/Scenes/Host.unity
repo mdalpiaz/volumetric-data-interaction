@@ -3001,7 +3001,7 @@ PrefabInstance:
     - target: {fileID: 1253644937185150830, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771008, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
@@ -3012,6 +3012,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
@@ -3026,7 +3041,7 @@ PrefabInstance:
     - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
@@ -3063,6 +3078,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771009, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5182067467409771010, guid: 342293c18dcff8c40b8afc38bddac6ad,
         type: 3}
       propertyPath: stackPath
@@ -3077,6 +3097,11 @@ PrefabInstance:
         type: 3}
       propertyPath: sectionQuadMeshFilter
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 342293c18dcff8c40b8afc38bddac6ad, type: 3}
@@ -3771,7 +3796,7 @@ PrefabInstance:
     - target: {fileID: 5906740283371962224, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}

@@ -1,5 +1,6 @@
 #nullable enable
 
+using Model;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,9 +9,6 @@ namespace Slicing
 {
     public class SliceTester : MonoBehaviour
     {
-        [SerializeField]
-        private Model.Model model = null!;
-        
         [SerializeField]
         private Transform slicer = null!;
 
@@ -43,6 +41,7 @@ namespace Slicing
         {
             while (true)
             {
+                var model = ModelManager.Instance.CurrentModel;
                 slicer.GetPositionAndRotation(out var position, out var rotation);
                 var slicerPositionLocal = model.transform.InverseTransformPoint(position);
                 var slicerRotationNormal = model.transform.InverseTransformVector(rotation * Vector3.back);

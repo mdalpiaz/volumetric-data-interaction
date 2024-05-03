@@ -23,16 +23,16 @@ namespace Slicing
 
         public static IntersectionPoints? GetIntersectionPointsFromLocal(Model.Model model, Vector3 localPosition, Vector3 normalVector)
         {
-            //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
-            //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
-            //Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
-            //Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
+            Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
+            Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
+            Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
 
-            //Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
-            //Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
+            Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
+            Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
 
-            //Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
-            //Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
+            Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
+            Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
 
             // this is the normal of the slicer
             var plane = new Plane(normalVector, localPosition);
