@@ -96,6 +96,11 @@ namespace Slicing
                 bottomRight = bottomPoints[0];
             }
 
+            Debug.DrawLine(topLeft, bottomLeft, Color.blue);
+            Debug.DrawLine(bottomLeft, bottomRight, Color.green);
+            Debug.DrawLine(bottomRight, topRight, Color.yellow);
+            Debug.DrawLine(topRight, topLeft, Color.red);
+
             return new IntersectionPoints
             {
                 UpperLeft = topLeft,
@@ -158,11 +163,6 @@ namespace Slicing
             var height = Math.Abs(dimensions.Height);
 
             var data = new Color32[width * height];
-
-            //Debug.DrawLine(points.UpperLeft, points.LowerLeft, Color.blue);
-            //Debug.DrawLine(points.LowerLeft, points.LowerRight, Color.green);
-            //Debug.DrawLine(points.LowerRight, points.UpperRight, Color.yellow);
-            //Debug.DrawLine(points.UpperRight, points.UpperLeft, Color.red);
 
             var start = points.LowerLeft;
             var xStep = (points.LowerRight - points.LowerLeft) / width;
