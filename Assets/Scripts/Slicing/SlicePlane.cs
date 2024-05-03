@@ -17,14 +17,14 @@ namespace Slicing
         /// <param name="slicerPosition"></param>
         /// <param name="slicerRotation"></param>
         /// <returns></returns>
-        public static IntersectionPoints? GetIntersectionPoints(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        public static IntersectionPoints? GetIntersectionPointsFromWorld(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var task = GetIntersectionPointsAsync(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
+            var task = GetIntersectionPointsFromLocalAsync(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
             task.Wait();
             return task.Result;
         }
 
-        public static Task<IntersectionPoints?> GetIntersectionPointsAsync(Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        public static Task<IntersectionPoints?> GetIntersectionPointsFromLocalAsync(Model.Model model, Vector3 localPosition, Vector3 normalVector)
         {
             //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
             //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);

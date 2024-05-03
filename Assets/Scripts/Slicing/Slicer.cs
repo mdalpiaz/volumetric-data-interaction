@@ -73,7 +73,7 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            var points = SlicePlane.GetIntersectionPoints(model, transform.position, transform.rotation);
+            var points = SlicePlane.GetIntersectionPointsFromWorld(model, transform.position, transform.rotation);
             if (points == null)
             {
                 Debug.LogWarning("Intersection image can't be calculated!");

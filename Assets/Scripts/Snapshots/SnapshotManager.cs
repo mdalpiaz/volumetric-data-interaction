@@ -80,12 +80,9 @@ namespace Snapshots
             
             // The openIA extension requires that all Snapshots are registered at the server and the server sends out the same data with an ID (the actual Snapshot).
             // So just send position and rotation to the server and wait.
+            sectionQuad.transform.GetPositionAndRotation(out var slicerPosition, out var slicerRotation);
+            tracker.transform.GetPositionAndRotation(out var currPos, out var currRot);
 
-            var slicerPosition = sectionQuad.transform.position;
-            var slicerRotation = sectionQuad.transform.rotation;
-
-            var currPos = tracker.transform.position;
-            var currRot = tracker.transform.rotation;
             var newPosition = currPos + Quaternion.AngleAxis(angle + currRot.eulerAngles.y + CenteringRotation, Vector3.up) * Vector3.back * SnapshotDistance;
 
             if (OnlineState.Instance.IsOnline)
@@ -205,7 +202,7 @@ namespace Snapshots
         {
             var model = ModelManager.Instance.CurrentModel;
             
-            var intersectionPoints = SlicePlane.GetIntersectionPoints(model, slicerPosition, slicerRotation);
+            var intersectionPoints = SlicePlane.GetIntersectionPointsFromWorld(model, slicerPosition, slicerRotation);
             if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");

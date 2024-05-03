@@ -1,9 +1,7 @@
 #nullable enable
 
-using PimDeWitte.UnityMainThreadDispatcher;
 using System;
 using System.Collections;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -22,8 +20,6 @@ namespace Slicing
         private MeshRenderer _meshRenderer = null!;
 
         private IEnumerator _coroutine = null!;
-
-        private readonly SemaphoreSlim _sem = new(0, 1);
 
         private void Awake()
         {
@@ -51,41 +47,36 @@ namespace Slicing
                 slicer.GetPositionAndRotation(out var position, out var rotation);
                 var slicerPositionLocal = model.transform.InverseTransformPoint(position);
                 var slicerRotationNormal = model.transform.InverseTransformVector(rotation * Vector3.back);
-                Texture2D? texture = null;
+                Dimensions? dimensions = null;
+                Color32[]? texData = null;
+
                 var task = Task.Run(async () =>
                 {
-                    var points = await SlicePlane.GetIntersectionPointsAsync(model, slicerPositionLocal, slicerRotationNormal);
+                    var points = await SlicePlane.GetIntersectionPointsFromLocalAsync(model, slicerPositionLocal, slicerRotationNormal);
                     if (points == null)
                     {
                         return;
                     }
 
-                    var dimensions = SlicePlane.GetTextureDimension(model, points);
+                    dimensions = SlicePlane.GetTextureDimension(model, points);
                     if (dimensions == null)
                     {
                         return;
                     }
 
-                    var texData = await SlicePlane.CreateSliceTextureAsync(model, dimensions, points);
-
-                    await UnityMainThreadDispatcher.Instance().EnqueueAsync(() =>
-                    {
-                        texture = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
-                        texture.SetPixels32(texData);
-                        texture.Apply();
-                        _sem.Release();
-                    });
-                    await _sem.WaitAsync();
+                    texData = await SlicePlane.CreateSliceTextureAsync(model, dimensions, points);
                 });
                 
                 yield return new WaitUntil(() => task.IsCompleted);
 
-                if (texture != null)
+                if (texData != null && dimensions != null)
                 {
+                    var texture = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
+                    texture.SetPixels32(texData);
+                    texture.Apply();
                     var oldTexture = _mat.mainTexture;
                     _mat.mainTexture = texture;
                     Destroy(oldTexture);
-                    texture = null;
                 }
             }
         }
