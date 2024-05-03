@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Slicing
@@ -19,12 +18,10 @@ namespace Slicing
         /// <returns></returns>
         public static IntersectionPoints? GetIntersectionPointsFromWorld(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            var task = GetIntersectionPointsFromLocalAsync(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
-            task.Wait();
-            return task.Result;
+            return GetIntersectionPointsFromLocal(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
         }
 
-        public static Task<IntersectionPoints?> GetIntersectionPointsFromLocalAsync(Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        public static IntersectionPoints? GetIntersectionPointsFromLocal(Model.Model model, Vector3 localPosition, Vector3 normalVector)
         {
             //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
             //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
@@ -56,7 +53,7 @@ namespace Slicing
             if (points.Count < 3)
             {
                 Debug.LogError("Cannot create proper intersection with less than 3 points!");
-                return Task.FromResult<IntersectionPoints?>(null);
+                return null;
             }
             
             points = ConvertTo4Points(rotation, points).ToList();
@@ -99,13 +96,13 @@ namespace Slicing
                 bottomRight = bottomPoints[0];
             }
 
-            return Task.FromResult<IntersectionPoints?>(new IntersectionPoints
+            return new IntersectionPoints
             {
                 UpperLeft = topLeft,
                 LowerLeft = bottomLeft,
                 LowerRight = bottomRight,
                 UpperRight = topRight
-            });
+            };
         }
         
         public static Dimensions? GetTextureDimension(Model.Model model, IntersectionPoints points)
@@ -155,22 +152,7 @@ namespace Slicing
             };
         }
 
-        public static Texture2D CreateSliceTexture(Model.Model model, Dimensions dimensions, IntersectionPoints points)
-        {
-            var width = Math.Abs(dimensions.Width);
-            var height = Math.Abs(dimensions.Height);
-
-            var task = CreateSliceTextureAsync(model, dimensions, points);
-            task.Wait();
-            var data = task.Result;
-
-            var resultImage = new Texture2D(width, height);
-            resultImage.SetPixels32(data);
-            resultImage.Apply();
-            return resultImage;
-        }
-
-        public static Task<Color32[]> CreateSliceTextureAsync(Model.Model model, Dimensions dimensions, IntersectionPoints points)
+        public static Color32[] CreateSliceTextureData(Model.Model model, Dimensions dimensions, IntersectionPoints points)
         {
             var width = Math.Abs(dimensions.Width);
             var height = Math.Abs(dimensions.Height);
@@ -205,9 +187,20 @@ namespace Slicing
                 }
             }
 
-            return Task.FromResult(data);
+            return data;
         }
-        
+
+        public static Texture2D CreateSliceTexture(Dimensions dimensions, Color32[] data)
+        {
+            var width = Math.Abs(dimensions.Width);
+            var height = Math.Abs(dimensions.Height);
+
+            var resultImage = new Texture2D(width, height);
+            resultImage.SetPixels32(data);
+            resultImage.Apply();
+            return resultImage;
+        }
+
         public static Mesh CreateMesh(Model.Model model, IntersectionPoints points)
         {
             // convert to world coordinates

@@ -86,7 +86,8 @@ namespace Slicing
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return;
             }
-            var texture = SlicePlane.CreateSliceTexture(model, dimensions, points);
+            var texData = SlicePlane.CreateSliceTextureData(model, dimensions, points);
+            var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
             var mesh = SlicePlane.CreateMesh(model, points);
             
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();

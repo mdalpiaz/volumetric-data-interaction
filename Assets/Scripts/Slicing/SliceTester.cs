@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -50,9 +49,9 @@ namespace Slicing
                 Dimensions? dimensions = null;
                 Color32[]? texData = null;
 
-                var task = Task.Run(async () =>
+                var task = Task.Run(() =>
                 {
-                    var points = await SlicePlane.GetIntersectionPointsFromLocalAsync(model, slicerPositionLocal, slicerRotationNormal);
+                    var points = SlicePlane.GetIntersectionPointsFromLocal(model, slicerPositionLocal, slicerRotationNormal);
                     if (points == null)
                     {
                         return;
@@ -64,16 +63,14 @@ namespace Slicing
                         return;
                     }
 
-                    texData = await SlicePlane.CreateSliceTextureAsync(model, dimensions, points);
+                    texData = SlicePlane.CreateSliceTextureData(model, dimensions, points);
                 });
                 
                 yield return new WaitUntil(() => task.IsCompleted);
 
                 if (texData != null && dimensions != null)
                 {
-                    var texture = new Texture2D(Math.Abs(dimensions.Width), Math.Abs(dimensions.Height));
-                    texture.SetPixels32(texData);
-                    texture.Apply();
+                    var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
                     var oldTexture = _mat.mainTexture;
                     _mat.mainTexture = texture;
                     Destroy(oldTexture);

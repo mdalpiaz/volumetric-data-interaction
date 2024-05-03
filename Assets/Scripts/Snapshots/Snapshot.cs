@@ -150,8 +150,9 @@ namespace Snapshots
                 y = IntersectionPoints.UpperRight.y,
                 z = IntersectionPoints.UpperRight.z
             };
-            
-            var texture = SlicePlane.CreateSliceTexture(model, Dimension, IntersectionPoints);
+
+            var texData = SlicePlane.CreateSliceTextureData(model, Dimension, IntersectionPoints);
+            var texture = SlicePlane.CreateSliceTexture(Dimension, texData);
             
             SetIntersectionChild(texture, IntersectionPoints.LowerLeft, model);
 

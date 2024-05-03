@@ -215,8 +215,9 @@ namespace Snapshots
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return null;
             }
-            
-            var texture = SlicePlane.CreateSliceTexture(model, dimensions, intersectionPoints);
+
+            var texData = SlicePlane.CreateSliceTextureData(model, dimensions, intersectionPoints);
+            var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
             
             AudioManager.Instance.PlayCameraSound();
             
