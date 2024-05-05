@@ -14,8 +14,6 @@ namespace Networking.Screens
     {
         public static ScreenServer Instance { get; private set; } = null!;
         
-        private const float ConeAngleDegree = 30.0f;
-        
         [SerializeField]
         private int port = Ports.ScreenPort;
 
