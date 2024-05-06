@@ -14,7 +14,6 @@ using UnityEngine;
 
 namespace Snapshots
 {
-    [RequireComponent(typeof(Timer))]
     public class SnapshotManager : MonoBehaviour
     {
         private const int SnapshotDistance = 2;
@@ -44,7 +43,7 @@ namespace Snapshots
         [SerializeField]
         private GameObject sectionQuad = null!;
 
-        private Timer _snapshotTimer = null!;
+        private Timer _snapshotTimer = new();
 
         public InterfaceController InterfaceController => interfaceController;
 
@@ -56,7 +55,6 @@ namespace Snapshots
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                _snapshotTimer = GetComponent<Timer>();
             }
             else
             {
