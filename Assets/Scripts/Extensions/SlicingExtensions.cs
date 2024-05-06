@@ -40,7 +40,7 @@ namespace Extensions
 
             // we only take the plane if it faces up (normal points down), else we just flip it
             // the rotation section is CORRECT
-            // we need to check normal vector again, because slicerRotation on it's own could point up
+            // we need to check normal vector again, because slicerRotation on its own could point up
             var normal = normalVector;
             if (normal.y > 0)
             {
