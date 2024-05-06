@@ -249,14 +249,14 @@ namespace Networking.Tablet
 
             if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
-                await SnapshotManager.Instance.DeleteSnapshot(snapshot);
+                SnapshotManager.Instance.DeleteSnapshot(snapshot);
             }
             else
             {
-                var result = await SnapshotManager.Instance.DeleteAllSnapshots();
+                var result = SnapshotManager.Instance.DeleteAllSnapshots();
                 if (!result)
                 {
-                    await ModelManager.Instance.ResetState();
+                    ModelManager.Instance.CurrentModel.ResetState();
                 }
             }
 

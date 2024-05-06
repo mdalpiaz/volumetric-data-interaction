@@ -158,7 +158,7 @@ namespace Snapshots
         /// Delete all Snapshots.
         /// </summary>
         /// <returns>Returns true if any snapshots have been deleted, false if nothing happened.</returns>
-        public async Task<bool> DeleteAllSnapshots()
+        public bool DeleteAllSnapshots()
         {
             if (Snapshots.Count == 0)
             {
@@ -171,20 +171,12 @@ namespace Snapshots
                 Destroy(s.gameObject);
             }
 
-            if (OnlineState.Instance.IsOnline)
-            {
-                foreach (var s in Snapshots)
-                {
-                    await OpenIaWebSocketClient.Instance.Send(new RemoveSnapshot(s.ID));
-                }
-            }
-
             Snapshots.Clear();
 
             return true;
         }
 
-        public async Task<bool> DeleteSnapshot(Snapshot s)
+        public bool DeleteSnapshot(Snapshot s)
         {
             var result = Snapshots.Remove(s);
             if (!result)
@@ -194,14 +186,10 @@ namespace Snapshots
             }
             s.Selectable.IsSelected = false;
             Destroy(s.gameObject);
-            if (OnlineState.Instance.IsOnline)
-            {
-                await OpenIaWebSocketClient.Instance.Send(new RemoveSnapshot(s.ID));
-            }
             return true;
         }
 
-        public async Task<bool> DeleteSnapshot(ulong id)
+        public bool DeleteSnapshot(ulong id)
         {
             var snapshot = Snapshots.FirstOrDefault(s => s.ID == id);
             // ReSharper disable once InvertIf
@@ -210,7 +198,7 @@ namespace Snapshots
                 Debug.LogWarning($"Tried deleting non-existent Snapshot with ID {id}.");
                 return false;
             }
-            return await DeleteSnapshot(snapshot);
+            return DeleteSnapshot(snapshot);
         }
 
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)

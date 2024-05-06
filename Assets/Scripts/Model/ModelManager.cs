@@ -62,15 +62,6 @@ namespace Model
             }
         }
 
-        public async Task ResetState()
-        {
-            if (OnlineState.Instance.IsOnline)
-            {
-                await OpenIaWebSocketClient.Instance.Send(new Reset());
-            }
-            CurrentModel.ResetState();
-        }
-
         private Model? GetActiveModel()
         {
             for (var i = 0; i < transform.childCount; i++)
