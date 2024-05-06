@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using Extensions;
 using Model;
 using Selection;
 using Slicing;
@@ -151,8 +152,8 @@ namespace Snapshots
                 z = IntersectionPoints.UpperRight.z
             };
 
-            var texData = SlicePlane.CreateSliceTextureData(model, Dimension, IntersectionPoints);
-            var texture = SlicePlane.CreateSliceTexture(Dimension, texData);
+            var texData = model.CreateSliceTextureData(Dimension, IntersectionPoints);
+            var texture = SlicingExtensions.CreateSliceTexture(Dimension, texData);
             
             SetIntersectionChild(texture, IntersectionPoints.LowerLeft, model);
 

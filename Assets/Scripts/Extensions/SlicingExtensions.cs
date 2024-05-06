@@ -1,13 +1,14 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Slicing;
 using UnityEngine;
 
-namespace Slicing
+namespace Extensions
 {
-    public static class SlicePlane
+    public static class SlicingExtensions
     {
         /// <summary>
         /// Get all intersection points of the slicer. The points are sorted by starting at the top and moving counter-clockwise around the center.
@@ -16,12 +17,12 @@ namespace Slicing
         /// <param name="slicerPosition"></param>
         /// <param name="slicerRotation"></param>
         /// <returns></returns>
-        public static IntersectionPoints? GetIntersectionPointsFromWorld(Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
+        public static IntersectionPoints? GetIntersectionPointsFromWorld(this Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             return GetIntersectionPointsFromLocal(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
         }
 
-        public static IntersectionPoints? GetIntersectionPointsFromLocal(Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        public static IntersectionPoints? GetIntersectionPointsFromLocal(this Model.Model model, Vector3 localPosition, Vector3 normalVector)
         {
             //Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
             //Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
@@ -110,7 +111,7 @@ namespace Slicing
             };
         }
         
-        public static Dimensions? GetTextureDimension(Model.Model model, IntersectionPoints points)
+        public static Dimensions? GetTextureDimension(this Model.Model model, IntersectionPoints points)
         {
             var ul = points.UpperLeft;
             var ll = points.LowerLeft;
@@ -157,7 +158,7 @@ namespace Slicing
             };
         }
 
-        public static Color32[] CreateSliceTextureData(Model.Model model, Dimensions dimensions, IntersectionPoints points)
+        public static Color32[] CreateSliceTextureData(this Model.Model model, Dimensions dimensions, IntersectionPoints points)
         {
             var width = Math.Abs(dimensions.Width);
             var height = Math.Abs(dimensions.Height);
@@ -201,7 +202,7 @@ namespace Slicing
             return resultImage;
         }
 
-        public static Mesh CreateMesh(Model.Model model, IntersectionPoints points)
+        public static Mesh CreateMesh(this Model.Model model, IntersectionPoints points)
         {
             // convert to world coordinates
             var worldPoints = new IntersectionPoints

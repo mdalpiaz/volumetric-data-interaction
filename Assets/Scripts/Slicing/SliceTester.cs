@@ -3,6 +3,7 @@
 using Model;
 using System.Collections;
 using System.Threading.Tasks;
+using Extensions;
 using UnityEngine;
 
 namespace Slicing
@@ -50,26 +51,26 @@ namespace Slicing
 
                 var task = Task.Run(() =>
                 {
-                    var points = SlicePlane.GetIntersectionPointsFromLocal(model, slicerPositionLocal, slicerRotationNormal);
+                    var points = model.GetIntersectionPointsFromLocal(slicerPositionLocal, slicerRotationNormal);
                     if (points == null)
                     {
                         return;
                     }
 
-                    dimensions = SlicePlane.GetTextureDimension(model, points);
+                    dimensions = model.GetTextureDimension(points);
                     if (dimensions == null)
                     {
                         return;
                     }
 
-                    texData = SlicePlane.CreateSliceTextureData(model, dimensions, points);
+                    texData = model.CreateSliceTextureData(dimensions, points);
                 });
                 
                 yield return new WaitUntil(() => task.IsCompleted);
 
                 if (texData != null && dimensions != null)
                 {
-                    var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
+                    var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
                     var oldTexture = _mat.mainTexture;
                     _mat.mainTexture = texture;
                     Destroy(oldTexture);

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Constants;
+using Extensions;
 using EzySlice;
 using Model;
 using UnityEngine;
@@ -73,22 +74,22 @@ namespace Slicing
             }
             AudioManager.Instance.PlayCameraSound();
 
-            var points = SlicePlane.GetIntersectionPointsFromWorld(model, transform.position, transform.rotation);
+            var points = model.GetIntersectionPointsFromWorld(transform.position, transform.rotation);
             if (points == null)
             {
                 Debug.LogWarning("Intersection image can't be calculated!");
                 return;
             }
             
-            var dimensions = SlicePlane.GetTextureDimension(model, points);
+            var dimensions = model.GetTextureDimension(points);
             if (dimensions == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return;
             }
-            var texData = SlicePlane.CreateSliceTextureData(model, dimensions, points);
-            var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
-            var mesh = SlicePlane.CreateMesh(model, points);
+            var texData = model.CreateSliceTextureData(dimensions, points);
+            var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
+            var mesh = model.CreateMesh(points);
             
             var transparentMaterial = MaterialTools.CreateTransparentMaterial();
             transparentMaterial.name = "SliceMaterial";

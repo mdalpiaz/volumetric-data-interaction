@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Constants;
+using Extensions;
 using Model;
 using Networking;
 using Networking.openIA;
 using Networking.openIA.Commands;
-using Slicing;
 using UnityEngine;
 
 namespace Snapshots
@@ -202,22 +202,22 @@ namespace Snapshots
         {
             var model = ModelManager.Instance.CurrentModel;
             
-            var intersectionPoints = SlicePlane.GetIntersectionPointsFromWorld(model, slicerPosition, slicerRotation);
+            var intersectionPoints = model.GetIntersectionPointsFromWorld(slicerPosition, slicerRotation);
             if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
             
-            var dimensions = SlicePlane.GetTextureDimension(model, intersectionPoints);
+            var dimensions = model.GetTextureDimension(intersectionPoints);
             if (dimensions == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return null;
             }
 
-            var texData = SlicePlane.CreateSliceTextureData(model, dimensions, intersectionPoints);
-            var texture = SlicePlane.CreateSliceTexture(dimensions, texData);
+            var texData = model.CreateSliceTextureData(dimensions, intersectionPoints);
+            var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
             
             AudioManager.Instance.PlayCameraSound();
             

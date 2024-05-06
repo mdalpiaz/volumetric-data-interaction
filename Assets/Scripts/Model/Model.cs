@@ -246,7 +246,6 @@ namespace Model
         /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="interpolation"></param>
         /// <returns></returns>
         public Color32 GetPixel32(Vector3Int index)
         {
