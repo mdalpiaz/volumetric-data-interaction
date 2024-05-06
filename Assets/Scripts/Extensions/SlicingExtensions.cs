@@ -61,10 +61,10 @@ namespace Extensions
 
             // points from here are always 4
 
-            var heightSortedPoints = points.OrderByDescending(p => p.y);
+            var heightSortedPoints = points.OrderByDescending(p => p.y).ToList();
 
             var topPoints = heightSortedPoints.Take(2).ToList();
-            var bottomPoints = heightSortedPoints.Reverse().Take(2).ToList();
+            var bottomPoints = heightSortedPoints.Reverse<Vector3>().Take(2).ToList();
 
             var testPlane = new Plane(slicerLeft, 0);
             testPlane.Raycast(new Ray(topPoints[0], slicerLeft), out var distance0);
