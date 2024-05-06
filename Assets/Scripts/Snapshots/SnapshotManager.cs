@@ -49,10 +49,6 @@ namespace Snapshots
         public InterfaceController InterfaceController => interfaceController;
 
         private List<Snapshot> Snapshots { get; } = new();
-
-        private ulong _offlineSnapshotID;
-
-        private Snapshot? _preCreatedSnapshot;
         
         private void Awake()
         {
@@ -87,19 +83,11 @@ namespace Snapshots
 
             if (OnlineState.Instance.IsOnline)
             {
-                var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
-                if (snapshot == null)
-                {
-                    return;
-                }
-                snapshot.transform.position = newPosition;
-                _preCreatedSnapshot = snapshot;
-                
                 await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(slicerPosition, slicerRotation));
             }
             else
             {
-                var snapshot = CreateSnapshot(_offlineSnapshotID++, slicerPosition, slicerRotation);
+                var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
                 if (snapshot == null)
                 {
                     return;
@@ -110,22 +98,46 @@ namespace Snapshots
         
         public Snapshot? CreateSnapshot(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
-            if (OnlineState.Instance.IsOnline && _preCreatedSnapshot != null)
+            var model = ModelManager.Instance.CurrentModel;
+
+            var intersectionPoints = model.GetIntersectionPointsFromWorld(slicerPosition, slicerRotation);
+            if (intersectionPoints == null)
             {
-                // If we are online, this method is called as some sort of callback where the snapshot is
-                // already created and we only need to synchronize its ID.
-                // Thank god for references or else we would have a problem.
-                
-                // There is still a race condition here:
-                // When the server sends a snapshot from another client and this client simultaneously tries
-                // to create a snapshot, the wrong ID might be set.
-                var snapshotReference = _preCreatedSnapshot;
-                _preCreatedSnapshot = null;
-                snapshotReference.ID = id;
-                return snapshotReference;
+                Debug.LogWarning("SlicePlane couldn't be created!");
+                return null;
             }
 
-            return CreateSnapshot_internal(id, slicerPosition, slicerRotation);
+            var dimensions = model.GetTextureDimension(intersectionPoints);
+            if (dimensions == null)
+            {
+                Debug.LogWarning("SliceCoords can't be calculated!");
+                return null;
+            }
+
+            var texData = model.CreateSliceTextureData(dimensions, intersectionPoints);
+            var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
+
+            AudioManager.Instance.PlayCameraSound();
+
+            var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
+            snapshot.ID = id;
+            snapshot.tag = Tags.Snapshot;
+            snapshot.IntersectionPoints = intersectionPoints;
+            snapshot.Dimension = dimensions;
+            snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
+
+            var mainTransform = interfaceController.Main.transform;
+            var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);
+            originPlane.transform.SetParent(model.transform);
+            originPlane.SetActive(false);
+
+            snapshot.Viewer = trackedCamera;
+            snapshot.OriginPlane = originPlane;
+            snapshot.Selectable.IsSelected = false;
+
+            Snapshots.Add(snapshot);
+
+            return snapshot;
         }
         
         public void ToggleSnapshotsAttached()
@@ -199,50 +211,6 @@ namespace Snapshots
                 return false;
             }
             return DeleteSnapshot(snapshot);
-        }
-
-        private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
-        {
-            var model = ModelManager.Instance.CurrentModel;
-            
-            var intersectionPoints = model.GetIntersectionPointsFromWorld(slicerPosition, slicerRotation);
-            if (intersectionPoints == null)
-            {
-                Debug.LogWarning("SlicePlane couldn't be created!");
-                return null;
-            }
-            
-            var dimensions = model.GetTextureDimension(intersectionPoints);
-            if (dimensions == null)
-            {
-                Debug.LogWarning("SliceCoords can't be calculated!");
-                return null;
-            }
-
-            var texData = model.CreateSliceTextureData(dimensions, intersectionPoints);
-            var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
-            
-            AudioManager.Instance.PlayCameraSound();
-            
-            var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
-            snapshot.ID = id;
-            snapshot.tag = Tags.Snapshot;
-            snapshot.IntersectionPoints = intersectionPoints;
-            snapshot.Dimension = dimensions;
-            snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
-        
-            var mainTransform = interfaceController.Main.transform;
-            var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);
-            originPlane.transform.SetParent(model.transform);
-            originPlane.SetActive(false);
-        
-            snapshot.Viewer = trackedCamera;
-            snapshot.OriginPlane = originPlane;
-            snapshot.Selectable.IsSelected = false;
-            
-            Snapshots.Add(snapshot);
-            
-            return snapshot;
         }
         
         /// <summary>
