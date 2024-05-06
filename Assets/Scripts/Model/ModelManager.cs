@@ -1,6 +1,10 @@
 #nullable enable
 
+using Networking;
+using Networking.openIA;
+using Networking.openIA.Commands;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Model
@@ -46,7 +50,7 @@ namespace Model
         public void ChangeModel(string nameToCheck)
         {
             // reset the model beforehand, so manipulations are not replicated when switching back to the model
-            ResetState();
+            CurrentModel.ResetState();
 
             for (var i = 0; i < transform.childCount; i++)
             {
@@ -57,9 +61,13 @@ namespace Model
                 }
             }
         }
-        
-        public void ResetState()
+
+        public async Task ResetState()
         {
+            if (OnlineState.Instance.IsOnline)
+            {
+                await OpenIaWebSocketClient.Instance.Send(new Reset());
+            }
             CurrentModel.ResetState();
         }
 

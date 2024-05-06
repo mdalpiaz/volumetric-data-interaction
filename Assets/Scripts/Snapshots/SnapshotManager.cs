@@ -158,22 +158,33 @@ namespace Snapshots
         /// Delete all Snapshots.
         /// </summary>
         /// <returns>Returns true if any snapshots have been deleted, false if nothing happened.</returns>
-        public bool DeleteAllSnapshots()
+        public async Task<bool> DeleteAllSnapshots()
         {
             if (Snapshots.Count == 0)
             {
                 return false;
             }
-            
-            while (Snapshots.Count > 0)
+
+            foreach (var s in Snapshots)
             {
-                DeleteSnapshot(Snapshots.First());
+                s.Selectable.IsSelected = false;
+                Destroy(s.gameObject);
             }
+
+            if (OnlineState.Instance.IsOnline)
+            {
+                foreach (var s in Snapshots)
+                {
+                    await OpenIaWebSocketClient.Instance.Send(new RemoveSnapshot(s.ID));
+                }
+            }
+
+            Snapshots.Clear();
 
             return true;
         }
 
-        public bool DeleteSnapshot(Snapshot s)
+        public async Task<bool> DeleteSnapshot(Snapshot s)
         {
             var result = Snapshots.Remove(s);
             if (!result)
@@ -183,10 +194,14 @@ namespace Snapshots
             }
             s.Selectable.IsSelected = false;
             Destroy(s.gameObject);
+            if (OnlineState.Instance.IsOnline)
+            {
+                await OpenIaWebSocketClient.Instance.Send(new RemoveSnapshot(s.ID));
+            }
             return true;
         }
 
-        public bool DeleteSnapshot(ulong id)
+        public async Task<bool> DeleteSnapshot(ulong id)
         {
             var snapshot = Snapshots.FirstOrDefault(s => s.ID == id);
             // ReSharper disable once InvertIf
@@ -195,7 +210,7 @@ namespace Snapshots
                 Debug.LogWarning($"Tried deleting non-existent Snapshot with ID {id}.");
                 return false;
             }
-            return DeleteSnapshot(snapshot);   
+            return await DeleteSnapshot(snapshot);
         }
 
         private Snapshot? CreateSnapshot_internal(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
