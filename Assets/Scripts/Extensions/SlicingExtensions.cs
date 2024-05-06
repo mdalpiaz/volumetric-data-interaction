@@ -10,19 +10,7 @@ namespace Extensions
 {
     public static class SlicingExtensions
     {
-        /// <summary>
-        /// Get all intersection points of the slicer. The points are sorted by starting at the top and moving counter-clockwise around the center.
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="slicerPosition"></param>
-        /// <param name="slicerRotation"></param>
-        /// <returns></returns>
-        public static IntersectionPoints? GetIntersectionPointsFromWorld(this Model.Model model, Vector3 slicerPosition, Quaternion slicerRotation)
-        {
-            return GetIntersectionPointsFromLocal(model, model.transform.InverseTransformPoint(slicerPosition), model.transform.InverseTransformVector(slicerRotation * Vector3.back));
-        }
-
-        public static IntersectionPoints? GetIntersectionPointsFromLocal(this Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        public static IntersectionPoints? GetIntersectionPointsFromLocal(this Model.Model model, Vector3 localPosition, Quaternion localRotation)
         {
             Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
             Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
@@ -36,6 +24,8 @@ namespace Extensions
             Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
 
             // this is the normal of the slicer
+            var normalVector = localRotation * Vector3.back;
+
             var plane = new Plane(normalVector, localPosition);
 
             // we only take the plane if it faces up (normal points down), else we just flip it

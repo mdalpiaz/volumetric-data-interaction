@@ -10,6 +10,8 @@ using Slicing;
 using Selection;
 using Snapshots;
 using UnityEngine;
+using Networking.openIA;
+using Networking.openIA.Commands;
 
 namespace Networking.Tablet
 {
@@ -31,6 +33,9 @@ namespace Networking.Tablet
 
         [SerializeField]
         private GameObject tablet = null!;
+
+        [SerializeField]
+        private GameObject sectionQuad = null!;
 
         [SerializeField]
         private MappingAnchor mappingAnchor = null!;
@@ -338,7 +343,15 @@ namespace Networking.Tablet
             }
             else if (_menuMode == MenuMode.Analysis)
             {
-                await SnapshotManager.Instance.CreateSnapshot(angle);
+                if (OnlineState.Instance.IsOnline)
+                {
+                    sectionQuad.transform.GetLocalPositionAndRotation(out var position, out var rotation);
+                    await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(position, rotation));
+                }
+                else
+                {
+                    SnapshotManager.Instance.CreateSnapshot(angle);
+                }
             }
         }
 

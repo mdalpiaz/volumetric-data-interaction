@@ -43,15 +43,13 @@ namespace Slicing
             while (true)
             {
                 var model = ModelManager.Instance.CurrentModel;
-                slicer.GetPositionAndRotation(out var position, out var rotation);
-                var slicerPositionLocal = model.transform.InverseTransformPoint(position);
-                var slicerRotationNormal = model.transform.InverseTransformVector(rotation * Vector3.back);
+                slicer.GetLocalPositionAndRotation(out var position, out var rotation);
                 Dimensions? dimensions = null;
                 Color32[]? texData = null;
 
                 var task = Task.Run(() =>
                 {
-                    var points = model.GetIntersectionPointsFromLocal(slicerPositionLocal, slicerRotationNormal);
+                    var points = model.GetIntersectionPointsFromLocal(position, rotation);
                     if (points == null)
                     {
                         return;

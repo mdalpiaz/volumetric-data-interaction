@@ -4114,6 +4114,11 @@ PrefabInstance:
       objectReference: {fileID: 1076793652}
     - target: {fileID: 7366660722126321413, guid: ff5d2d89acc84344cbec83eb2f76eb8e,
         type: 3}
+      propertyPath: sectionQuad
+      value: 
+      objectReference: {fileID: 500436827}
+    - target: {fileID: 7366660722126321413, guid: ff5d2d89acc84344cbec83eb2f76eb8e,
+        type: 3}
       propertyPath: screenServer
       value: 
       objectReference: {fileID: 957433211}

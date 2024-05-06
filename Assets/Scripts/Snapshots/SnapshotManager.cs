@@ -64,7 +64,7 @@ namespace Snapshots
 
         public Snapshot? GetSnapshot(ulong id) => Snapshots.FirstOrDefault(s => s.ID == id);
         
-        public async Task CreateSnapshot(float angle)
+        public void CreateSnapshot(float angle)
         {
             if (!_snapshotTimer.IsTimerElapsed)
             {
@@ -74,31 +74,24 @@ namespace Snapshots
             
             // The openIA extension requires that all Snapshots are registered at the server and the server sends out the same data with an ID (the actual Snapshot).
             // So just send position and rotation to the server and wait.
-            sectionQuad.transform.GetPositionAndRotation(out var slicerPosition, out var slicerRotation);
+            sectionQuad.transform.GetLocalPositionAndRotation(out var slicerPosition, out var slicerRotation);
             tracker.transform.GetPositionAndRotation(out var currPos, out var currRot);
 
             var newPosition = currPos + Quaternion.AngleAxis(angle + currRot.eulerAngles.y + CenteringRotation, Vector3.up) * Vector3.back * SnapshotDistance;
 
-            if (OnlineState.Instance.IsOnline)
+            var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
+            if (snapshot == null)
             {
-                await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(slicerPosition, slicerRotation));
+                return;
             }
-            else
-            {
-                var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
-                if (snapshot == null)
-                {
-                    return;
-                }
-                snapshot.transform.position = newPosition;
-            }
+            snapshot.transform.position = newPosition;
         }
         
         public Snapshot? CreateSnapshot(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
         {
             var model = ModelManager.Instance.CurrentModel;
 
-            var intersectionPoints = model.GetIntersectionPointsFromWorld(slicerPosition, slicerRotation);
+            var intersectionPoints = model.GetIntersectionPointsFromLocal(slicerPosition, slicerRotation);
             if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
