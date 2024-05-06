@@ -54,6 +54,19 @@ namespace Networking.openIA.Commands
         }
     }
 
+    public record Reset() : ICommand
+    {
+        public byte[] ToByteArray()
+        {
+            var request = new byte[Size];
+            request[0] = Categories.Datasets.Value;
+            request[1] = Categories.Datasets.Reset;
+            return request;
+        }
+
+        public static int Size = 1 + 1;
+    }
+
     public record LoadDataset(string Name) : ICommand
     {
         public byte[] ToByteArray()

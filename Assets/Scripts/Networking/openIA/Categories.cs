@@ -28,8 +28,8 @@ namespace Networking.openIA
         public static class Datasets
         {
             public const byte Value = 0x4;
-            public const byte Reset = 0x1;
-            public const byte LoadDataset = 0x2;
+            public const byte Reset = 0x0;
+            public const byte LoadDataset = 0x1;
         }
 
         public static class Objects
