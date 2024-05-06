@@ -32,7 +32,7 @@ namespace Networking.openIA.States
             {
                 case Categories.Datasets.Reset:
                 {
-                    ModelManager.Instance.ResetState();
+                    await ModelManager.Instance.ResetState();
                     SnapshotManager.Instance.DeleteAllSnapshots();
                     return this;
                 }
@@ -95,7 +95,7 @@ namespace Networking.openIA.States
             return Task.FromResult<IInterpreterState>(this);
         }
 
-        public Task<IInterpreterState> Snapshots(byte[] data)
+        public async Task<IInterpreterState> Snapshots(byte[] data)
         {
             switch (data[1])
             {
@@ -108,12 +108,12 @@ namespace Networking.openIA.States
                 case Categories.Snapshots.Remove:
                 {
                     var removeCommand = RemoveSnapshot.FromByteArray(data);
-                    SnapshotManager.Instance.DeleteSnapshot(removeCommand.ID);
+                    await SnapshotManager.Instance.DeleteSnapshot(removeCommand.ID);
                     break;
                 }
                 case Categories.Snapshots.Clear:
                 {
-                    SnapshotManager.Instance.DeleteAllSnapshots();
+                    await SnapshotManager.Instance.DeleteAllSnapshots();
                     break;
                 }
                 case Categories.Snapshots.SlicePosition:

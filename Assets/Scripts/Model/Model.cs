@@ -216,13 +216,13 @@ namespace Model
 
         public void SetCuttingPlane(GameObject plane) => _onePlaneCuttingController.plane = plane;
         
-        public void ResetMesh()
+        public void ResetState()
         {
-            _meshFilter.mesh = Instantiate(_originalMesh);
-        }
+            transform.SetPositionAndRotation(_originalPosition, _originalRotation);
+            transform.localScale = _originalScale;
 
-        public void RemoveCuts()
-        {
+            _meshFilter.mesh = Instantiate(_originalMesh);
+
             // destroy top to bottom to stop index out of bounds
             for (var i = transform.childCount - 1; i >= 0; i--)
             {
@@ -256,13 +256,6 @@ namespace Model
             }
 
             return _slices[ToSliceIndex(index)];
-        }
-        
-        public void ResetState()
-        {
-            transform.position = _originalPosition;
-            transform.rotation = _originalRotation;
-            transform.localScale = _originalScale;
         }
 
         private int ToSliceIndex(Vector3Int i)

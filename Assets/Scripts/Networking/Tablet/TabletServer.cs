@@ -125,7 +125,7 @@ namespace Networking.Tablet
                                 buffer[0] = commandIdentifier[0];
                                 await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = SwipeCommand.FromByteArray(buffer);
-                                HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
+                                await HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
                                 break;
                             }
                         case Categories.Scale:
@@ -161,7 +161,7 @@ namespace Networking.Tablet
                                 buffer[0] = commandIdentifier[0];
                                 await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = ShakeCommand.FromByteArray(buffer);
-                                HandleShakes(cmd.Count);
+                                await HandleShakes(cmd.Count);
                                 break;
                             }
                         case Categories.Tap:
@@ -170,7 +170,7 @@ namespace Networking.Tablet
                                 buffer[0] = commandIdentifier[0];
                                 await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = TapCommand.FromByteArray(buffer);
-                                HandleTap(cmd.Type, cmd.X, cmd.Y);
+                                await HandleTap(cmd.Type, cmd.X, cmd.Y);
                                 break;
                             }
                     }
@@ -240,7 +240,7 @@ namespace Networking.Tablet
             _menuMode = mode;
         }
         
-        private async void HandleShakes(int shakeCount)
+        private async Task HandleShakes(int shakeCount)
         {
             if (shakeCount <= 1) // one shake can happen unintentionally
             {
@@ -249,15 +249,14 @@ namespace Networking.Tablet
 
             if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
-                SnapshotManager.Instance.DeleteSnapshot(snapshot);
+                await SnapshotManager.Instance.DeleteSnapshot(snapshot);
             }
             else
             {
-                var result = SnapshotManager.Instance.DeleteAllSnapshots();
+                var result = await SnapshotManager.Instance.DeleteAllSnapshots();
                 if (!result)
                 {
-                    ModelManager.Instance.CurrentModel.ResetMesh();
-                    ModelManager.Instance.CurrentModel.RemoveCuts();
+                    await ModelManager.Instance.ResetState();
                 }
             }
 
@@ -279,7 +278,7 @@ namespace Networking.Tablet
             }
         }
 
-        private async void HandleTap(TapType type, float x, float y)
+        private async Task HandleTap(TapType type, float x, float y)
         {
             switch(type)
             {
@@ -323,7 +322,7 @@ namespace Networking.Tablet
             }
         }
 
-        private async void HandleSwipe(bool isSwipeInward, float endX, float endY, float angle)
+        private async Task HandleSwipe(bool isSwipeInward, float endX, float endY, float angle)
         {
             // ignore inward swiped, outward swipes are used to create snapshots
             if (isSwipeInward)
