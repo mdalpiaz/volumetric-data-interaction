@@ -66,9 +66,9 @@ namespace Extensions
             var topPoints = heightSortedPoints.Take(2).ToList();
             var bottomPoints = heightSortedPoints.Reverse<Vector3>().Take(2).ToList();
 
-            var testPlane = new Plane(slicerLeft, 0);
-            testPlane.Raycast(new Ray(topPoints[0], slicerLeft), out var distance0);
-            testPlane.Raycast(new Ray(topPoints[1], slicerLeft), out var distance1);
+            plane = new Plane(slicerLeft, 0);
+            plane.Raycast(new Ray(topPoints[0], slicerLeft), out var distance0);
+            plane.Raycast(new Ray(topPoints[1], slicerLeft), out var distance1);
             Vector3 topLeft;
             Vector3 topRight;
             if (distance0 < distance1)
@@ -82,8 +82,8 @@ namespace Extensions
                 topRight = topPoints[0];
             }
 
-            testPlane.Raycast(new Ray(bottomPoints[0], slicerLeft), out distance0);
-            testPlane.Raycast(new Ray(bottomPoints[1], slicerLeft), out distance1);
+            plane.Raycast(new Ray(bottomPoints[0], slicerLeft), out distance0);
+            plane.Raycast(new Ray(bottomPoints[1], slicerLeft), out distance1);
             Vector3 bottomLeft;
             Vector3 bottomRight;
             if (distance0 < distance1)
