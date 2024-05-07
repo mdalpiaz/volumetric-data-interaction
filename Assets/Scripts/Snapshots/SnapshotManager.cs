@@ -144,11 +144,11 @@ namespace Snapshots
             }
         }
 
-        public void Move(Snapshot snapshot, NeighbourDirection direction)
-        {
-            snapshot.MoveSliceZ(NeighbourDistance * (int)direction);
-            SnapshotMoved?.Invoke(snapshot);
-        }
+        // public void Move(Snapshot snapshot, NeighbourDirection direction)
+        // {
+        //     snapshot.MoveSliceZ(NeighbourDistance * (int)direction);
+        //     SnapshotMoved?.Invoke(snapshot);
+        // }
 
         public void DeactivateAllSnapshots() => Snapshots.ForEach(s => s.Selectable.IsSelected = false);
 
