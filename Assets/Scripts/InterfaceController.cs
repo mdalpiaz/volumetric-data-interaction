@@ -1,8 +1,6 @@
 ﻿#nullable enable
 
 using System.Collections.Generic;
-using Constants;
-using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +12,9 @@ using UnityEngine.UI;
 public class InterfaceController : MonoBehaviour
 {
     public const int AdditionCount = 5;
+    private const string MainModeInfo = "Main Menu";
+    private const string SelectionModeInfo = "Selection Mode";
+    private const string ExplorationModeInfo = "Exploration Mode";
     
     [SerializeField]
     private TextMeshProUGUI hud = null!;
@@ -70,18 +71,18 @@ public class InterfaceController : MonoBehaviour
         {
             case MenuMode.None:
                 SetMaterial(uiMain);
-                SetHUD(StringConstants.MainModeInfo);
-                SetCenterText(StringConstants.MainModeInfo);
+                SetHUD(MainModeInfo);
+                SetCenterText(MainModeInfo);
                 break;
             case MenuMode.Analysis:
                 SetMaterial(uiExploration);
-                SetHUD(StringConstants.ExplorationModeInfo);
-                SetCenterText(StringConstants.ExplorationModeInfo);
+                SetHUD(ExplorationModeInfo);
+                SetCenterText(ExplorationModeInfo);
                 break;
             case MenuMode.Selection:
                 SetMaterial(uiSelection);
-                SetHUD(StringConstants.SelectionModeInfo);
-                SetCenterText(StringConstants.SelectionModeInfo);
+                SetHUD(SelectionModeInfo);
+                SetCenterText(SelectionModeInfo);
                 break;
             case MenuMode.Selected:
                 if (!isSnapshotSelected)
