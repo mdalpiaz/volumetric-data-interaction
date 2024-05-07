@@ -271,16 +271,16 @@ namespace Networking.Tablet
 
         private void HandleTilt(bool isLeft)
         {
-            if (_menuMode != MenuMode.Selected)
-            {
-                return;
-            }
-            
-            if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
-            {
-                var direction = isLeft ? NeighbourDirection.Left : NeighbourDirection.Right;
-                SnapshotManager.Instance.Move(snapshot, direction);
-            }
+            // if (_menuMode != MenuMode.Selected)
+            // {
+            //     return;
+            // }
+            //
+            // if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
+            // {
+            //     var direction = isLeft ? NeighbourDirection.Left : NeighbourDirection.Right;
+            //     SnapshotManager.Instance.Move(snapshot, direction);
+            // }
         }
 
         private async Task HandleTap(TapType type, float x, float y)
