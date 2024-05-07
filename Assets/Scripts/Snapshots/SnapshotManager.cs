@@ -3,13 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Constants;
 using Extensions;
 using Model;
-using Networking;
-using Networking.openIA;
-using Networking.openIA.Commands;
 using UnityEngine;
 
 namespace Snapshots

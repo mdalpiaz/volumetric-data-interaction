@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Constants;
 using Extensions;
 using Selection;
 using UnityEngine;
@@ -14,7 +13,7 @@ namespace Model
     public class Model : MonoBehaviour
     {
         [SerializeField]
-        private string stackPath = StringConstants.XStackPath;
+        private string? stackPath;
 
         private MeshFilter _meshFilter = null!;
         private Renderer _renderer = null!;
@@ -66,7 +65,11 @@ namespace Model
             _renderer = GetComponent<Renderer>();
             _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
-
+            if (stackPath == null)
+            {
+                throw new ArgumentNullException(nameof(stackPath), "The stack path mustn't be empty!");
+            }
+            
             if (!Directory.Exists(stackPath))
             {
                 Debug.LogError($"Directory \"{stackPath}\" not found!");

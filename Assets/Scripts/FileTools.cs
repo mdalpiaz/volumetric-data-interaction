@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using Constants;
-using Newtonsoft.Json;
 using UnityEngine;
 
 public static class FileTools
 {
+    private const string DefaultImageExportPath = @"C:\temp\TempImages";
+    
     public static string SaveBitmapPng(Texture2D image)
     {
         var fileLocation = GetDatedFilePath();
@@ -17,7 +14,7 @@ public static class FileTools
         return fileLocation;
     }
 
-    private static string GetDatedFilePath(string name = "plane", string path = StringConstants.ImagesFolderPath)
+    private static string GetDatedFilePath(string name = "plane", string path = DefaultImageExportPath)
     {
         var fileName = DateTime.Now.ToString("yy-MM-dd hh.mm.ss " + name);
         EnsurePathExists(path);
