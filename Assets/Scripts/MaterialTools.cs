@@ -1,9 +1,13 @@
-﻿using Constants;
+﻿#nullable enable
+
 using UnityEngine;
 
 public static class MaterialTools
 {
-    private static readonly Shader StandardShader = Shader.Find(StringConstants.ShaderStandard);
+    // private const string ShaderOnePlane = "CrossSection/OnePlaneBSP";
+    private const string ShaderStandard = "Standard";
+    
+    private static readonly Shader StandardShader = Shader.Find(ShaderStandard);
         
     public static Material GetMaterialOrientation(Material material, Model.Model modelScript, Vector3 startPoint)
     {
