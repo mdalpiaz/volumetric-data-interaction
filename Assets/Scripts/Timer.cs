@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading.Tasks;
-using UnityEngine;
 
 public class Timer
 {
@@ -15,9 +14,7 @@ public class Timer
         IsTimerElapsed = false;
         Task.Run(async () =>
         {
-            Debug.Log($"Started waiting for {seconds} Second(s).");
             await Task.Delay(TimeSpan.FromSeconds(seconds));
-            Debug.Log("Waiting over.");
             IsTimerElapsed = true;
             TimerElapsed?.Invoke();
         });
