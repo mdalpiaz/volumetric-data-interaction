@@ -1,9 +1,7 @@
 ﻿#nullable enable
 
 using System;
-using Model;
 using Selection;
-using Slicing;
 using UnityEngine;
 
 namespace Snapshots
@@ -25,15 +23,17 @@ namespace Snapshots
 
         public GameObject OriginPlane { get; set; } = null!;
 
-        public Dimensions Dimension { get; set; } = null!;
+        // public Dimensions Dimension { get; set; } = null!;
 
-        public IntersectionPoints IntersectionPoints { get; set; } = null!;
+        // public IntersectionPoints IntersectionPoints { get; set; } = null!;
 
-        public Texture2D SnapshotTexture
-        {
-            get => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
-            set => _textureQuadRenderer.material.mainTexture = value;
-        }
+        public Texture2D SnapshotTexture => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
+        
+        // public Texture2D SnapshotTexture
+        // {
+        //     get => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
+        //     set => _textureQuadRenderer.material.mainTexture = value;
+        // }
 
         public bool IsAttached { get; private set; }
 
