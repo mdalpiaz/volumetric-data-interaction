@@ -48,7 +48,6 @@ namespace Networking.openIA
             public const byte Create = 0x0;
             public const byte Remove = 0x2;
             public const byte Clear = 0x3;
-            public const byte SlicePosition = 0x4;
         }
     }
 }

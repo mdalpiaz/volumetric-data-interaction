@@ -288,28 +288,4 @@ namespace Networking.openIA.Commands
             return new RemoveSnapshot(BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(2, sizeof(ulong))));
         }
     }
-
-    public record SetSlicePosition(ulong ID, Axis Axis, float Value) : ICommand
-    {
-        public byte[] ToByteArray()
-        {
-            var request = new byte[Size];
-            request[0] = Categories.Snapshots.Value;
-            request[1] = Categories.Snapshots.SlicePosition;
-            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
-            request[10] = (byte)Axis;
-            Buffer.BlockCopy(BitConverter.GetBytes(Value), 0, request, 11, sizeof(float));
-            return request;
-        }
-
-        public static int Size => 1 + 1 + sizeof(ulong) + sizeof(Axis) + sizeof(float);
-
-        public static SetSlicePosition FromByteArray(byte[] buffer)
-        {
-            var id = BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(2, sizeof(ulong)));
-            var axis = (Axis)buffer[11];
-            var value = BitConverter.ToSingle(buffer.AsSpan(12, sizeof(float)));
-            return new SetSlicePosition(id, axis, value);
-        }
-    }
 }

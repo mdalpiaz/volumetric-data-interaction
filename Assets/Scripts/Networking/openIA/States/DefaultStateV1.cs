@@ -116,33 +116,6 @@ namespace Networking.openIA.States
                     SnapshotManager.Instance.DeleteAllSnapshots();
                     break;
                 }
-                case Categories.Snapshots.SlicePosition:
-                {
-                    var slicerEditCommand = SetSlicePosition.FromByteArray(data);
-                    var snapshot = SnapshotManager.Instance.GetSnapshot(slicerEditCommand.ID);
-                    if (snapshot == null)
-                    {
-                        Debug.LogWarning($"Snapshot with ID {slicerEditCommand.ID} not found.");
-                        break;
-                    }
-                    
-                    switch (slicerEditCommand.Axis)
-                    {
-                        case Axis.X:
-                            snapshot.MoveSliceX(slicerEditCommand.Value);
-                            break;
-                        case Axis.Y:
-                            snapshot.MoveSliceY(slicerEditCommand.Value);
-                            break;
-                        case Axis.Z:
-                            snapshot.MoveSliceZ(slicerEditCommand.Value);
-                            break;
-                        default:
-                            Debug.LogError($"Axis {slicerEditCommand.Axis} not specified in protocol!");
-                            break;
-                    }
-                    break;
-                }
             }
 
             return Task.FromResult<IInterpreterState>(this);
