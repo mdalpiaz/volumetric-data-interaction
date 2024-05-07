@@ -3,8 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions;
 using Model;
+using Slicing;
 using UnityEngine;
 
 namespace Snapshots
@@ -86,22 +86,22 @@ namespace Snapshots
         {
             var model = ModelManager.Instance.CurrentModel;
 
-            var intersectionPoints = model.GetIntersectionPointsFromWorld(slicerPosition, slicerRotation);
+            var intersectionPoints = Slicer.GetIntersectionPointsFromWorld(model, slicerPosition, slicerRotation);
             if (intersectionPoints == null)
             {
                 Debug.LogWarning("SlicePlane couldn't be created!");
                 return null;
             }
 
-            var dimensions = model.GetTextureDimension(intersectionPoints);
+            var dimensions = Slicer.GetTextureDimension(model, intersectionPoints);
             if (dimensions == null)
             {
                 Debug.LogWarning("SliceCoords can't be calculated!");
                 return null;
             }
 
-            var texData = model.CreateSliceTextureData(dimensions, intersectionPoints);
-            var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
+            var texData = Slicer.CreateSliceTextureData(model, dimensions, intersectionPoints);
+            var texture = Slicer.CreateSliceTexture(dimensions, texData);
 
             AudioManager.Instance.PlayCameraSound();
 

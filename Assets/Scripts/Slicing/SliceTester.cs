@@ -51,26 +51,26 @@ namespace Slicing
 
                 var task = Task.Run(() =>
                 {
-                    var points = model.GetIntersectionPointsFromLocal(localPosition, localRotation);
+                    var points = Slicer.GetIntersectionPointsFromLocal(model, localPosition, localRotation);
                     if (points == null)
                     {
                         return;
                     }
 
-                    dimensions = model.GetTextureDimension(points);
+                    dimensions = Slicer.GetTextureDimension(model, points);
                     if (dimensions == null)
                     {
                         return;
                     }
 
-                    texData = model.CreateSliceTextureData(dimensions, points);
+                    texData = Slicer.CreateSliceTextureData(model, dimensions, points);
                 });
                 
                 yield return new WaitUntil(() => task.IsCompleted);
 
                 if (texData != null && dimensions != null)
                 {
-                    var texture = SlicingExtensions.CreateSliceTexture(dimensions, texData);
+                    var texture = Slicer.CreateSliceTexture(dimensions, texData);
                     var oldTexture = _mat.mainTexture;
                     _mat.mainTexture = texture;
                     Destroy(oldTexture);
