@@ -10,22 +10,32 @@ namespace Extensions
 {
     public static class SlicingExtensions
     {
-        public static IntersectionPoints? GetIntersectionPointsFromLocal(this Model.Model model, Vector3 localPosition, Quaternion localRotation)
+        public static IntersectionPoints? GetIntersectionPointsFromWorld(this Model.Model model, Vector3 position, Quaternion rotation)
         {
+            return GetIntersectionPointsFromLocal(model, model.transform.InverseTransformPoint(position), model.transform.InverseTransformVector(rotation * Vector3.back));
+        }
+        
+        public static IntersectionPoints? GetIntersectionPointsFromLocal(this Model.Model model, Vector3 localPosition, Vector3 normalVector)
+        {
+            // connecting edges
             Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomBackLeftCorner, Color.black);
             Debug.DrawLine(model.BottomFrontRightCorner, model.BottomBackRightCorner, Color.black);
             Debug.DrawLine(model.TopFrontLeftCorner, model.TopBackLeftCorner, Color.black);
             Debug.DrawLine(model.TopFrontRightCorner, model.TopBackRightCorner, Color.black);
 
+            // backside edges
             Debug.DrawLine(model.BottomBackLeftCorner, model.TopBackLeftCorner, Color.black);
             Debug.DrawLine(model.BottomBackRightCorner, model.TopBackRightCorner, Color.black);
-
             Debug.DrawLine(model.BottomBackLeftCorner, model.BottomBackRightCorner, Color.black);
             Debug.DrawLine(model.TopBackLeftCorner, model.TopBackRightCorner, Color.black);
 
+            // frontside edges
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.TopFrontLeftCorner, Color.black);
+            Debug.DrawLine(model.BottomFrontRightCorner, model.TopFrontRightCorner, Color.black);
+            Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontRightCorner, Color.black);
+            Debug.DrawLine(model.TopFrontLeftCorner, model.TopFrontRightCorner, Color.black);
+            
             // this is the normal of the slicer
-            var normalVector = localRotation * Vector3.back;
-
             var plane = new Plane(normalVector, localPosition);
 
             // we only take the plane if it faces up (normal points down), else we just flip it
@@ -45,6 +55,21 @@ namespace Extensions
             {
                 Debug.LogError("Cannot create proper intersection with less than 3 points!");
                 return null;
+            }
+
+            var colorArray = new[]
+            {
+                Color.red,
+                Color.yellow,
+                Color.green,
+                Color.blue,
+                Color.cyan,
+                Color.magenta
+            };
+            
+            for (var i = 0; i < points.Count; i++)
+            {
+                Debug.DrawLine(points[i], points[(i + 1) % points.Count], colorArray[i]);
             }
             
             points = ConvertTo4Points(rotation, points).ToList();
@@ -87,10 +112,10 @@ namespace Extensions
                 bottomRight = bottomPoints[0];
             }
 
-            //Debug.DrawLine(topLeft, bottomLeft, Color.blue);
-            //Debug.DrawLine(bottomLeft, bottomRight, Color.green);
-            //Debug.DrawLine(bottomRight, topRight, Color.yellow);
-            //Debug.DrawLine(topRight, topLeft, Color.red);
+            // Debug.DrawLine(topLeft, bottomLeft, Color.blue);
+            // Debug.DrawLine(bottomLeft, bottomRight, Color.green);
+            // Debug.DrawLine(bottomRight, topRight, Color.yellow);
+            // Debug.DrawLine(topRight, topLeft, Color.red);
 
             return new IntersectionPoints
             {
