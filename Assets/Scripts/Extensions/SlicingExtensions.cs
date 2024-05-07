@@ -112,10 +112,10 @@ namespace Extensions
                 bottomRight = bottomPoints[0];
             }
 
-            // Debug.DrawLine(topLeft, bottomLeft, Color.blue);
-            // Debug.DrawLine(bottomLeft, bottomRight, Color.green);
-            // Debug.DrawLine(bottomRight, topRight, Color.yellow);
-            // Debug.DrawLine(topRight, topLeft, Color.red);
+            Debug.DrawLine(topLeft, bottomLeft, Color.blue);
+            Debug.DrawLine(bottomLeft, bottomRight, Color.green);
+            Debug.DrawLine(bottomRight, topRight, Color.yellow);
+            Debug.DrawLine(topRight, topLeft, Color.red);
 
             return new IntersectionPoints
             {
