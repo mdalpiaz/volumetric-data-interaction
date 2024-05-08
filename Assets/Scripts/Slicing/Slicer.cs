@@ -10,9 +10,6 @@ using Plane = UnityEngine.Plane;
 
 namespace Slicing
 {
-    /// <summary>
-    /// https://github.com/LandVr/SliceMeshes
-    /// </summary>
     public class Slicer : MonoBehaviour
     {
         [SerializeField]
