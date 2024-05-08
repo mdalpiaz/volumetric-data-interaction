@@ -11,7 +11,6 @@ using Selection;
 using Snapshots;
 using UnityEngine;
 using Networking.openIA;
-using Networking.openIA.Commands;
 
 namespace Networking.Tablet
 {

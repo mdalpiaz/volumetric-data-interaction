@@ -2,7 +2,6 @@
 
 using System.Threading.Tasks;
 using UnityEngine;
-using Networking.openIA.Commands;
 
 namespace Networking.openIA.States
 {

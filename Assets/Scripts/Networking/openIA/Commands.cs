@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using System.Text;
 
-namespace Networking.openIA.Commands
+namespace Networking.openIA
 {
     public record ACK() : ICommand
     {

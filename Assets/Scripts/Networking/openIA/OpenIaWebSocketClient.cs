@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Networking.openIA.Commands;
 using UnityEngine;
 
 namespace Networking.openIA

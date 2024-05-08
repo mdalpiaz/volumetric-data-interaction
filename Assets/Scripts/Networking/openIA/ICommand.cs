@@ -1,4 +1,4 @@
-namespace Networking.openIA.Commands
+namespace Networking.openIA
 {
     public interface ICommand
     {
