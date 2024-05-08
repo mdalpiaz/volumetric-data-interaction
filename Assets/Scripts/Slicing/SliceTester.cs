@@ -3,7 +3,6 @@
 using Model;
 using System.Collections;
 using System.Threading.Tasks;
-using Extensions;
 using UnityEngine;
 
 namespace Slicing
