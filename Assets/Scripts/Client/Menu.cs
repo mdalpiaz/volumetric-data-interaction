@@ -65,15 +65,18 @@ namespace Client
         
         public async void OnAnalysisClick() => await StartAnalysis();
         
-        private async void HandleMenuModeChanged(MenuMode mode)
+        private void HandleMenuModeChanged(MenuMode mode)
         {
             switch (mode)
             {
-                case MenuMode.Selected:
-                    await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
-                    break;
                 case MenuMode.None:
-                    await Cancel();
+                    SwitchToMainMenu();
+                    break;
+                case MenuMode.Selected:
+                // don't send menu mode change back to server (AGAIN)
+                //await tabletClient.SendMenuChangedMessage(MenuMode.Selected);
+                case MenuMode.Analysis:
+                case MenuMode.Selection:
                     break;
                 default:
                     Debug.Log($"{nameof(HandleMenuModeChanged)} received unknown menu mode: {mode}");
@@ -91,20 +94,20 @@ namespace Client
         private async Task StartSelection()
         {
             Debug.Log("Selection");
-            await tabletClient.SendMenuChangedMessage(MenuMode.Selection);
             SwitchToInteractionMenu("Selection Mode");
+            await tabletClient.SendMenuChangedMessage(MenuMode.Selection);
         }
 
         private async Task StartAnalysis()
         {
-            await tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
             SwitchToInteractionMenu("Analysis Mode");
+            await tabletClient.SendMenuChangedMessage(MenuMode.Analysis);
         }
         
         private async Task Cancel()
         {
-            await tabletClient.SendMenuChangedMessage(MenuMode.None);
             SwitchToMainMenu();
+            await tabletClient.SendMenuChangedMessage(MenuMode.None);
         }
 
         private void SwitchToInteractionMenu(string header)
