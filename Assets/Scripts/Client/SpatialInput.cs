@@ -45,7 +45,7 @@ namespace Client
             {
                 HandleShakeInput();
                 _shakeCounter = 0;
-            }        
+            }
 
             CheckShakeInput();
             CheckTiltInput();
