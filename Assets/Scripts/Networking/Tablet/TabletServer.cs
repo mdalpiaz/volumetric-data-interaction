@@ -373,29 +373,29 @@ namespace Networking.Tablet
 
         private void HandleRotation(float rotationRadDelta)
         {
-            if (Selected == null)
-            {
-                return;
-            }
+            //if (Selected == null)
+            //{
+            //    return;
+            //}
 
-            var trackerTransform = tracker.transform;
-            const float threshold = 20.0f;
-            const float downAngle = 90.0f;
+            //var trackerTransform = tracker.transform;
+            //const float threshold = 20.0f;
+            //const float downAngle = 90.0f;
 
-            if (trackerTransform.eulerAngles.x is >= downAngle - threshold and <= downAngle + threshold)
-            {
-                Selected.transform.Rotate(0.0f, rotationRadDelta * Mathf.Rad2Deg, 0.0f);
-                return;
-            }
+            //if (trackerTransform.eulerAngles.x is >= downAngle - threshold and <= downAngle + threshold)
+            //{
+            //    Selected.transform.Rotate(0.0f, rotationRadDelta * Mathf.Rad2Deg, 0.0f);
+            //    return;
+            //}
 
-            if (trackerTransform.rotation.x is >= 0f and <= 30f or >= 140f and <= 160f)
-            {
-                Selected.transform.Rotate(Vector3.up, -rotationRadDelta * Mathf.Rad2Deg);
-            }
-            else
-            {
-                Selected.transform.Rotate(Vector3.forward, rotationRadDelta * Mathf.Rad2Deg);
-            }
+            //if (trackerTransform.rotation.x is >= 0f and <= 30f or >= 140f and <= 160f)
+            //{
+            //    Selected.transform.Rotate(Vector3.up, -rotationRadDelta * Mathf.Rad2Deg);
+            //}
+            //else
+            //{
+            //    Selected.transform.Rotate(Vector3.forward, rotationRadDelta * Mathf.Rad2Deg);
+            //}
         }
         
         private void Unselect()
