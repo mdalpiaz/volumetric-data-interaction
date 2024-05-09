@@ -307,7 +307,7 @@ namespace Networking.Tablet
                         slicer.Slice();
                     }
                     break;
-                case TapType.HoldStart:
+                case TapType.HoldBegin:
                     Debug.Log($"Tap Hold Start received at: ({x},{y})");
                     if (_menuMode == MenuMode.Selected &&
                         Selected != null &&

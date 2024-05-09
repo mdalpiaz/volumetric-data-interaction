@@ -59,7 +59,7 @@ namespace Networking.Tablet.Editor
             if (GUILayout.Button("Hold Start"))
             {
                 var host = (TabletServer)serializedObject.targetObject;
-                _tapMethod.Invoke(host, new object[] { TapType.HoldStart, 250, 250 });
+                _tapMethod.Invoke(host, new object[] { TapType.HoldBegin, 250, 250 });
             }
             
             if (GUILayout.Button("Hold End"))

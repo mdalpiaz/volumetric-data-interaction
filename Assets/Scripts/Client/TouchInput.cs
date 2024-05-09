@@ -135,7 +135,7 @@ namespace Client
             switch (gesture.State)
             {
                 case GestureRecognizerState.Began:
-                    Tapped?.Invoke(TapType.HoldStart, xUV, yUV);
+                    Tapped?.Invoke(TapType.HoldBegin, xUV, yUV);
                     break;
                 case GestureRecognizerState.Ended:
                     Tapped?.Invoke(TapType.HoldEnd, xUV, yUV);

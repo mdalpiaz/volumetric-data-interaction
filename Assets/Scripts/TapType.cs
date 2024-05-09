@@ -2,6 +2,6 @@
 {
     Single,
     Double,
-    HoldStart,
+    HoldBegin,
     HoldEnd
 }
