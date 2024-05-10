@@ -141,24 +141,24 @@ namespace Networking.Tablet
                                 HandleScaling(cmd.Scale);
                                 break;
                             }
-                        case Categories.Rotate:
-                            {
-                                var buffer = new byte[RotateCommand.Size];
-                                buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
-                                var cmd = RotateCommand.FromByteArray(buffer);
-                                HandleRotation(cmd.Rotation);
-                                break;
-                            }
-                        case Categories.Tilt:
-                            {
-                                var buffer = new byte[TiltCommand.Size];
-                                buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
-                                var cmd = TiltCommand.FromByteArray(buffer);
-                                HandleTilt(cmd.IsLeft);
-                                break;
-                            }
+                        //case Categories.Rotate:
+                        //    {
+                        //        var buffer = new byte[RotateCommand.Size];
+                        //        buffer[0] = commandIdentifier[0];
+                        //        await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                        //        var cmd = RotateCommand.FromByteArray(buffer);
+                        //        HandleRotation(cmd.Rotation);
+                        //        break;
+                        //    }
+                        //case Categories.Tilt:
+                        //    {
+                        //        var buffer = new byte[TiltCommand.Size];
+                        //        buffer[0] = commandIdentifier[0];
+                        //        await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                        //        var cmd = TiltCommand.FromByteArray(buffer);
+                        //        HandleTilt(cmd.IsLeft);
+                        //        break;
+                        //    }
                         case Categories.Shake:
                             {
                                 var buffer = new byte[ShakeCommand.Size];
@@ -175,6 +175,16 @@ namespace Networking.Tablet
                                 await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = TapCommand.FromByteArray(buffer);
                                 await HandleTap(cmd.Type, cmd.X, cmd.Y);
+                                break;
+                            }
+                        case Categories.Rotate:
+                            {
+                                Debug.Log("Rotate command is ignored");
+                                break;
+                            }
+                        case Categories.Tilt:
+                            {
+                                Debug.Log("Tilt command is ignored");
                                 break;
                             }
                     }
