@@ -155,12 +155,13 @@ namespace Model
 
         public bool IsYEdgeVector(Vector3 point) => point.y == 0 || (point.y + 1) >= YCount;
         
-        public void UpdateModel(Mesh newMesh, GameObject cuttingPlane)
+        public void UpdateModel(GameObject newModel, GameObject cuttingPlane)
         {
             Debug.Log("Replacing model");
             // TODO
             _onePlaneCuttingController.plane = cuttingPlane;
-            _meshFilter.mesh = newMesh;
+            _meshFilter.mesh = newModel.GetComponent<MeshFilter>().mesh;
+            _renderer.materials = newModel.GetComponent<MeshRenderer>().materials;
             Selectable.Freeze();
             //CurrentModel.OnePlaneCuttingController.plane = cuttingPlane;
             /*

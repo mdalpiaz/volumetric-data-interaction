@@ -97,7 +97,7 @@ namespace Slicing
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
             var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
-            model.UpdateModel(lowerHull.GetComponent<MeshFilter>().mesh, gameObject);
+            model.UpdateModel(lowerHull, gameObject);
             Destroy(lowerHull);
             SetCuttingActive(true);
 
