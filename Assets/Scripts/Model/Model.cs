@@ -20,6 +20,7 @@ namespace Model
         private OnePlaneCuttingController _onePlaneCuttingController = null!;
 
         private Mesh _originalMesh = null!;
+        private Material _originalMaterial = null!;
 
         private Color32[] _slices = null!;
 
@@ -103,6 +104,7 @@ namespace Model
             }
 
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
+            _originalMaterial = GetComponent<Renderer>().material;
 
             _originalPosition = transform.position;
             _originalRotation = transform.rotation;
@@ -226,6 +228,7 @@ namespace Model
             transform.localScale = _originalScale;
 
             _meshFilter.mesh = Instantiate(_originalMesh);
+            _renderer.material = _originalMaterial;
 
             // destroy top to bottom to stop index out of bounds
             for (var i = transform.childCount - 1; i >= 0; i--)
