@@ -160,7 +160,6 @@ namespace Model
         public void UpdateModel(GameObject newModel, GameObject cuttingPlane)
         {
             Debug.Log("Replacing model");
-            // TODO
             _onePlaneCuttingController.plane = cuttingPlane;
             _meshFilter.mesh = newModel.GetComponent<MeshFilter>().mesh;
             _renderer.materials = newModel.GetComponent<MeshRenderer>().materials;
