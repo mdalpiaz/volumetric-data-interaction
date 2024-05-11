@@ -22,8 +22,7 @@ public class MappingAnchor : MonoBehaviour
         }
 
         var mappingTransform = transform;
-        mappingTransform.position = tracker.position + _positionOffset;
-        mappingTransform.rotation = tracker.rotation;
+        mappingTransform.SetPositionAndRotation(tracker.position + _positionOffset, tracker.rotation);
 
         var mappingPosition = mappingTransform.position;
         Debug.DrawRay(mappingPosition, mappingTransform.up, Color.green);
@@ -41,8 +40,7 @@ public class MappingAnchor : MonoBehaviour
         _positionOffset = modelPosition - tracker.position;
 
         var mappingTransform = transform;
-        mappingTransform.position = modelPosition;
-        mappingTransform.rotation = tracker.rotation;
+        mappingTransform.SetPositionAndRotation(modelPosition, tracker.rotation);
         model.SetParent(mappingTransform);
     }
 
