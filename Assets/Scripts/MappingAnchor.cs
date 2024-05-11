@@ -32,6 +32,12 @@ public class MappingAnchor : MonoBehaviour
     
     public void StartMapping(Transform model)
     {
+        if (_model != null)
+        {
+            Debug.Log("Mapping was not stopped before. Stopping now.");
+            StopMapping();
+        }
+
         Debug.Log("Started Mapping");
         _model = model;
         _parent = model.parent;
