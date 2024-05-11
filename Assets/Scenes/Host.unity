@@ -3226,6 +3226,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2469736293291541880, guid: cb41c662eae259440806b7edc6d25fbe,
         type: 3}
+      propertyPath: cuttingPlane
+      value: 
+      objectReference: {fileID: 1528763165}
+    - target: {fileID: 2469736293291541880, guid: cb41c662eae259440806b7edc6d25fbe,
+        type: 3}
       propertyPath: mappingAnchor
       value: 
       objectReference: {fileID: 453520626}

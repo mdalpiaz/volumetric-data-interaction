@@ -16,9 +16,6 @@ namespace Slicing
         private CutQuad cutQuadPrefab = null!;
         
         [SerializeField]
-        private GameObject cuttingPlane = null!;
-        
-        [SerializeField]
         private Material materialTemporarySlice = null!;
         
         [SerializeField]
@@ -109,13 +106,7 @@ namespace Slicing
         
         public void SetCuttingActive(bool active)
         {
-            cuttingPlane.SetActive(active);
             var model = ModelManager.Instance.CurrentModel;
-
-            if (active)
-            {
-                model.SetCuttingPlane(cuttingPlane);
-            }
 
             model.SetCuttingPlaneActive(active);
 

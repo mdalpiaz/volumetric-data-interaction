@@ -151,6 +151,11 @@ namespace Model
             };
         }
 
+        private void Start()
+        {
+            _onePlaneCuttingController.plane = ModelManager.Instance.CuttingPlane;
+        }
+
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
 
         public bool IsZEdgeVector(Vector3 point) => point.z == 0 || (point.z + 1) >= ZCount;
@@ -216,11 +221,13 @@ namespace Model
             _renderer.material = material;
             _renderer.material.shader = shader;
         }
-        
-        public void SetCuttingPlaneActive(bool active) => _onePlaneCuttingController.enabled = active;
 
-        public void SetCuttingPlane(GameObject plane) => _onePlaneCuttingController.plane = plane;
-        
+        public void SetCuttingPlaneActive(bool active)
+        {
+            _onePlaneCuttingController.plane.SetActive(active);
+            _onePlaneCuttingController.enabled = active;
+        }
+
         public void ResetState()
         {
             transform.SetPositionAndRotation(_originalPosition, _originalRotation);

@@ -9,7 +9,12 @@ namespace Model
     {
         public static ModelManager Instance { get; private set; } = null!;
 
+        [SerializeField]
+        private GameObject cuttingPlane = null!;
+
         public Model CurrentModel { get; private set; } = null!;
+
+        public GameObject CuttingPlane => cuttingPlane;
 
         private void Awake()
         {
