@@ -55,10 +55,13 @@ namespace Model
 
             for (var i = 0; i < transform.childCount; i++)
             {
-                gameObject.SetActive(false);
                 if (transform.GetChild(i).name == nameToCheck)
                 {
                     gameObject.SetActive(true);
+                }
+                else
+                {
+                    gameObject.SetActive(false);
                 }
             }
         }
