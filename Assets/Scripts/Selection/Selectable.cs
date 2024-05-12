@@ -7,11 +7,8 @@ namespace Selection
     /// <summary>
     /// Halo hack: https://answers.unity.com/questions/10534/changing-color-of-halo.html
     /// </summary>
-    [RequireComponent(typeof(Rigidbody))]
     public class Selectable : MonoBehaviour
     {
-        private Rigidbody _rigidbody;
-
         private bool _isHighlighted;
         private bool _isSelected;
 
@@ -51,11 +48,6 @@ namespace Selection
                 _isSelected = value;
                 SelectChanged?.Invoke(_isSelected);
             }
-        }
-
-        private void Awake()
-        {
-            _rigidbody = GetComponent<Rigidbody>();
         }
 
         /// <summary>
