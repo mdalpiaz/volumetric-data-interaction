@@ -352,7 +352,7 @@ namespace Networking.Tablet
             }
             else if (_menuMode == MenuMode.Analysis)
             {
-                if (OnlineState.Instance.IsOnline)
+                if (OnlineState.IsOnline)
                 {
                     sectionQuad.transform.GetLocalPositionAndRotation(out var position, out var rotation);
                     await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(position, rotation));

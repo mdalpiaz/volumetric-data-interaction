@@ -6,12 +6,12 @@ namespace Networking
 {
     public class OnlineState : MonoBehaviour
     {
-        public static OnlineState Instance { get; private set; } = null!;
-        
+        public static bool IsOnline => Instance.isOnline;
+
+        private static OnlineState Instance { get; set; } = null!;
+
         [SerializeField]
         private bool isOnline;
-
-        public bool IsOnline => isOnline;
 
         private void Awake()
         {
