@@ -1,4 +1,3 @@
-// ReSharper disable InconsistentNaming
 namespace Networking
 {
     public static class Ports
