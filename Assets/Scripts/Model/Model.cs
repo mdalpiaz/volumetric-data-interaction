@@ -168,7 +168,6 @@ namespace Model
             _onePlaneCuttingController.plane = cuttingPlane;
             _meshFilter.mesh = newModel.GetComponent<MeshFilter>().mesh;
             _renderer.materials = newModel.GetComponent<MeshRenderer>().materials;
-            Selectable.Freeze();
             //CurrentModel.OnePlaneCuttingController.plane = cuttingPlane;
             /*
             //objBase.AddComponent<MeshCollider>().convex = true;

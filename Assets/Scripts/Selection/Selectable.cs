@@ -41,7 +41,6 @@ namespace Selection
                 if (!value && IsHighlighted)
                 {
                     IsHighlighted = false;
-                    Freeze();
                 }
                 
                 if (_isSelected == value)
@@ -85,9 +84,5 @@ namespace Selection
             TabletServer.Instance.Highlighted = null;
             IsHighlighted = false;
         }
-
-        public void Freeze() => _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-
-        public void UnFreeze() => _rigidbody.constraints = RigidbodyConstraints.None;
     }
 }
