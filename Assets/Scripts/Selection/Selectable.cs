@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using Networking.Tablet;
 using UnityEngine;
 
@@ -12,8 +14,8 @@ namespace Selection
         private bool _isHighlighted;
         private bool _isSelected;
 
-        public event Action<bool> HighlightChanged;
-        public event Action<bool> SelectChanged;
+        public event Action<bool>? HighlightChanged;
+        public event Action<bool>? SelectChanged;
 
         private bool IsHighlighted
         {
