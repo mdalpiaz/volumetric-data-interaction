@@ -27,8 +27,8 @@ namespace Networking.Tablet
         [SerializeField]
         private Slicer slicer = null!;
         
-        [SerializeField]
-        private GameObject tracker = null!;
+        //[SerializeField]
+        //private GameObject tracker = null!;
 
         [SerializeField]
         private GameObject tablet = null!;
