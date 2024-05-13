@@ -141,24 +141,6 @@ namespace Networking.Tablet
                                 HandleScaling(cmd.Scale);
                                 break;
                             }
-                        //case Categories.Rotate:
-                        //    {
-                        //        var buffer = new byte[RotateCommand.Size];
-                        //        buffer[0] = commandIdentifier[0];
-                        //        await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
-                        //        var cmd = RotateCommand.FromByteArray(buffer);
-                        //        HandleRotation(cmd.Rotation);
-                        //        break;
-                        //    }
-                        //case Categories.Tilt:
-                        //    {
-                        //        var buffer = new byte[TiltCommand.Size];
-                        //        buffer[0] = commandIdentifier[0];
-                        //        await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
-                        //        var cmd = TiltCommand.FromByteArray(buffer);
-                        //        HandleTilt(cmd.IsLeft);
-                        //        break;
-                        //    }
                         case Categories.Shake:
                             {
                                 var buffer = new byte[ShakeCommand.Size];
@@ -278,20 +260,6 @@ namespace Networking.Tablet
             await SendMenuModeToClient(MenuMode.None);
         }
 
-        private void HandleTilt(bool isLeft)
-        {
-            // if (_menuMode != MenuMode.Selected)
-            // {
-            //     return;
-            // }
-            //
-            // if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
-            // {
-            //     var direction = isLeft ? NeighbourDirection.Left : NeighbourDirection.Right;
-            //     SnapshotManager.Instance.Move(snapshot, direction);
-            // }
-        }
-
         private async Task HandleTap(TapType type, float x, float y)
         {
             switch(type)
@@ -379,33 +347,6 @@ namespace Networking.Tablet
                 // TODO check scaleMultiplier to identify attach and detach commands
                 SnapshotManager.Instance.ToggleSnapshotsAttached();
             }
-        }
-
-        private void HandleRotation(float rotationRadDelta)
-        {
-            //if (Selected == null)
-            //{
-            //    return;
-            //}
-
-            //var trackerTransform = tracker.transform;
-            //const float threshold = 20.0f;
-            //const float downAngle = 90.0f;
-
-            //if (trackerTransform.eulerAngles.x is >= downAngle - threshold and <= downAngle + threshold)
-            //{
-            //    Selected.transform.Rotate(0.0f, rotationRadDelta * Mathf.Rad2Deg, 0.0f);
-            //    return;
-            //}
-
-            //if (trackerTransform.rotation.x is >= 0f and <= 30f or >= 140f and <= 160f)
-            //{
-            //    Selected.transform.Rotate(Vector3.up, -rotationRadDelta * Mathf.Rad2Deg);
-            //}
-            //else
-            //{
-            //    Selected.transform.Rotate(Vector3.forward, rotationRadDelta * Mathf.Rad2Deg);
-            //}
         }
         
         private void Unselect()

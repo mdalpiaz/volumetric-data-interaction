@@ -76,18 +76,6 @@ namespace Networking.Tablet
             await _stream.WriteAsync(new ScaleCommand(scale).ToByteArray());
         }
 
-        public async Task SendRotateMessage(float rotation)
-        {
-            Debug.Log($"Sending rotation: {rotation}");
-            await _stream.WriteAsync(new RotateCommand(rotation).ToByteArray());
-        }
-
-        public async Task SendTiltMessage(bool isLeft)
-        {
-            Debug.Log($"Sending tilt {(isLeft ? "left" : "right")}");
-            await _stream.WriteAsync(new TiltCommand(isLeft).ToByteArray());
-        }
-
         public async Task SendShakeMessage(int count)
         {
             Debug.Log($"Sending shake: {count}");

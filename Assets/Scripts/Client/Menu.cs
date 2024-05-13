@@ -44,10 +44,8 @@ namespace Client
             tabletClient.MenuModeChanged += HandleMenuModeChanged;
             touchInput.Swiped += OnSwipe;
             touchInput.Scaled += OnScale;
-            touchInput.Rotated += OnRotate;
             touchInput.Tapped += OnTap;
             spatialInput.Shook += OnShake;
-            spatialInput.Tilted += OnTilt;
         }
 
         private void OnDisable()
@@ -55,10 +53,8 @@ namespace Client
             tabletClient.MenuModeChanged -= HandleMenuModeChanged;
             touchInput.Swiped -= OnSwipe;
             touchInput.Scaled -= OnScale;
-            touchInput.Rotated -= OnRotate;
             touchInput.Tapped -= OnTap;
             spatialInput.Shook -= OnShake;
-            spatialInput.Tilted -= OnTilt;
         }
 
         public async void OnSelectionClick() => await StartSelection();
@@ -127,12 +123,8 @@ namespace Client
 
         private async void OnScale(float scale) => await tabletClient.SendScaleMessage(scale);
 
-        private async void OnRotate(float angle) => await tabletClient.SendRotateMessage(angle);
-
         private async void OnTap(TapType type, float x, float y) => await tabletClient.SendTapMessage(type, x, y);
 
         private async void OnShake(int shakeCount) => await tabletClient.SendShakeMessage(shakeCount);
-
-        private async void OnTilt(bool isLeft) => await tabletClient.SendTiltMessage(isLeft);
     }
 }
