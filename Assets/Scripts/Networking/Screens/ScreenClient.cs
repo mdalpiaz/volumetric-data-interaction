@@ -89,7 +89,7 @@ namespace Networking.Screens
         private Vector2 ExpandToRectSize(int width, int height)
         {
             // currently only supports images that are taller than wider
-            var aspect = (float)width / (float)height;
+            var aspect = width / (float)height;
             var newWidth = aspect * _rectSize.y;
             return new Vector2(newWidth, _rectSize.y);
         }
