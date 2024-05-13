@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -49,9 +50,9 @@ namespace Networking.Screens
                 {
                     var client = await _server.AcceptTcpClientAsync();
                     var stream = client.GetStream();
-                    var buffer = new byte[4];
-                    await stream.ReadAllAsync(buffer, 0, 4);
-                    var id = BitConverter.ToInt32(buffer);
+                    var buffer = new byte[sizeof(int)];
+                    await stream.ReadAllAsync(buffer, 0, sizeof(int));
+                    var id = BinaryPrimitives.ReadInt32LittleEndian(buffer);
                     _clients.Add(id, (client, stream));
                     Debug.Log($"Client {id} connected");
                 }
@@ -82,8 +83,8 @@ namespace Networking.Screens
             
             var colors = data.GetPixels32();
             var dimBuffer = new byte[8];
-            Buffer.BlockCopy(BitConverter.GetBytes(data.width), 0, dimBuffer, 0, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(data.height), 0, dimBuffer, 4, 4);
+            BinaryPrimitives.WriteInt32LittleEndian(dimBuffer.AsSpan(), data.width);
+            BinaryPrimitives.WriteInt32LittleEndian(dimBuffer.AsSpan(sizeof(int)), data.height);
             
             var bytes = new byte[colors.Length * 4];
 
