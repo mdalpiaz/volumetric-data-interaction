@@ -14,14 +14,12 @@ namespace Client
     {
         public event Action<bool, float, float, float>? Swiped;
         public event Action<float>? Scaled;
-        public event Action<float>? Rotated;
         public event Action<TapType, float, float>? Tapped;
 
         private TapGestureRecognizer _tapGesture = null!;
         private TapGestureRecognizer _doubleTapGesture = null!;
         private SwipeGestureRecognizer _swipeGesture = null!;
         private ScaleGestureRecognizer _scaleGesture = null!;
-        private RotateGestureRecognizer _rotateGesture = null!;
         private LongPressGestureRecognizer _longPressGesture = null!;
 
         // private const float OutterAreaSize = 0.2f;
@@ -50,12 +48,8 @@ namespace Client
             };
             _swipeGesture.StateUpdated += SwipeGestureCallback;
             
-            _rotateGesture = new RotateGestureRecognizer();
-            _rotateGesture.StateUpdated += RotateGestureCallback;
-            
             _scaleGesture = new ScaleGestureRecognizer();
             _scaleGesture.StateUpdated += ScaleGestureCallback;
-            _scaleGesture.AllowSimultaneousExecution(_rotateGesture);
             
             _longPressGesture = new LongPressGestureRecognizer();
             _longPressGesture.MaximumNumberOfTouchesToTrack = 1;
@@ -68,7 +62,6 @@ namespace Client
             FingersScript.Instance.AddGesture(_tapGesture);
             FingersScript.Instance.AddGesture(_swipeGesture);
             FingersScript.Instance.AddGesture(_scaleGesture);
-            FingersScript.Instance.AddGesture(_rotateGesture);
             FingersScript.Instance.AddGesture(_longPressGesture);
         }
 
@@ -113,14 +106,6 @@ namespace Client
             if (gesture.State == GestureRecognizerState.Executing)
             {
                 Scaled?.Invoke(_scaleGesture.ScaleMultiplier);
-            }
-        }
-
-        private void RotateGestureCallback(GestureRecognizer gesture)
-        {
-            if (gesture.State == GestureRecognizerState.Executing)
-            {
-                Rotated?.Invoke(_rotateGesture.RotationRadiansDelta * -1);
             }
         }
 
