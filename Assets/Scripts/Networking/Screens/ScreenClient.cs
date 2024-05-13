@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using Extensions;
@@ -57,8 +58,8 @@ namespace Networking.Screens
                     break;
                 }
 
-                var width = BitConverter.ToInt32(dimBuffer, 0);
-                var height = BitConverter.ToInt32(dimBuffer, 4);
+                var width = BinaryPrimitives.ReadInt32LittleEndian(dimBuffer.AsSpan());
+                var height = BinaryPrimitives.ReadInt32LittleEndian(dimBuffer.AsSpan(sizeof(int)));
                 Debug.Log($"Received dimensions: {width}, {height}");
 
                 var buffer = new byte[width * height * 4];
