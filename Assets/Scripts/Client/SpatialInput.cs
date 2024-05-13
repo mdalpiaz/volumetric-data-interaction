@@ -33,15 +33,11 @@ namespace Client
         {
             if (_shakeCounter > 0 && Time.unscaledTime > _shakeTimeSinceFirst + MinInputInterval * 5)
             {
-                HandleShakeInput();
+                _shakeTimeSinceLast = Time.unscaledTime;
+                Shook?.Invoke(_shakeCounter);
                 _shakeCounter = 0;
             }
 
-            CheckShakeInput();
-        }
-
-        private void CheckShakeInput()
-        {
             if (Input.acceleration.sqrMagnitude >= _shakeThreshold
                 && Time.unscaledTime >= _shakeTimeSinceLast + MinInputInterval)
             {
@@ -54,12 +50,6 @@ namespace Client
 
                 _shakeCounter++;
             }
-        }
-
-        private void HandleShakeInput()
-        {
-            _shakeTimeSinceLast = Time.unscaledTime;
-            Shook?.Invoke(_shakeCounter);
         }
     }
 }
