@@ -27,7 +27,7 @@ namespace Slicing
         [SerializeField]
         private Shader materialShader = null!;
         
-        private bool _isTouched;
+        private bool isTouched;
 
         private void OnTriggerEnter(Collider other)
         {
@@ -36,7 +36,7 @@ namespace Slicing
                 return;
             }
 
-            _isTouched = true;
+            isTouched = true;
         }
 
         private void OnTriggerExit(Collider other)
@@ -46,12 +46,12 @@ namespace Slicing
                 return;
             }
 
-            _isTouched = false;
+            isTouched = false;
         }
 
         public void Slice()
         {
-            if (!_isTouched)
+            if (!isTouched)
             {
                 return;
             }
