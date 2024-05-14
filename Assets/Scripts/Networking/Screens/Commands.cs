@@ -48,14 +48,13 @@ namespace Networking.Screens
     {
         public byte[] ToByteArray()
         {
-            var request = new byte[Data.Length * 4];
+            var request = new byte[Data.Length * 3];
 
             for (var i = 0; i < Data.Length; i++)
             {
-                request[i * 4] = Data[i].r;
-                request[i * 4 + 1] = Data[i].g;
-                request[i * 4 + 2] = Data[i].b;
-                request[i * 4 + 3] = Data[i].a;
+                request[i * 3] = Data[i].r;
+                request[i * 3 + 1] = Data[i].g;
+                request[i * 3 + 2] = Data[i].b;
             }
             
             return request;
@@ -63,20 +62,20 @@ namespace Networking.Screens
 
         public static int GetBufferSize(Dimensions dims)
         {
-            return dims.Width * dims.Height * 4;
+            return dims.Width * dims.Height * 3;
         }
 
         public static ImageData FromByteArray(byte[] buffer)
         {
-            var data = new Color32[buffer.Length / 4];
+            var data = new Color32[buffer.Length / 3];
 
             for (var i = 0; i < data.Length; i++)
             {
                 data[i] = new Color32(
-                    buffer[i * 4],
-                    buffer[i * 4 + 1],
-                    buffer[i * 4 + 2],
-                    buffer[i * 4 + 3]);
+                    buffer[i * 3],
+                    buffer[i * 3 + 1],
+                    buffer[i * 3 + 2],
+                    255);
             }
             
             return new ImageData(data);
