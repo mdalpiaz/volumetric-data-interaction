@@ -1,8 +1,5 @@
 #nullable enable
 
-using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using Extensions;
 using UnityEngine;
@@ -42,29 +39,26 @@ namespace Networking.Screens
             await _client.ConnectAsync(ip, port);
             await using var stream = _client.GetStream();
 
-            var idBuffer = new byte[sizeof(int)];
-            BinaryPrimitives.WriteInt32LittleEndian(idBuffer.AsSpan(), id);
-            await stream.WriteAsync(idBuffer);
+            await stream.WriteAsync(new IDAdvertisement(id).ToByteArray());
             Debug.Log($"ID sent {id}");
 
-            var dimBuffer = new byte[8];
+            var dimBuffer = new byte[Dimensions.Size];
             
             while (true)
             {
                 try
                 {
-                    await stream.ReadAllAsync(dimBuffer, 0, 8);
+                    await stream.ReadAllAsync(dimBuffer, 0, Dimensions.Size);
                 }
                 catch
                 {
                     break;
                 }
 
-                var width = BinaryPrimitives.ReadInt32LittleEndian(dimBuffer.AsSpan());
-                var height = BinaryPrimitives.ReadInt32LittleEndian(dimBuffer.AsSpan(sizeof(int)));
-                Debug.Log($"Received dimensions: {width}, {height}");
+                var dims = Dimensions.FromByteArray(dimBuffer);
+                Debug.Log($"Received dimensions: {dims.Width}, {dims.Height}");
 
-                var buffer = new byte[width * height * 4];
+                var buffer = new byte[ImageData.GetBufferSize(dims)];
                 try
                 {
                     await stream.ReadAllAsync(buffer, 0, buffer.Length);
@@ -74,11 +68,12 @@ namespace Networking.Screens
                     break;
                 }
                 Debug.Log("Image read");
+                var imageData = ImageData.FromByteArray(buffer);
 
                 // we are done with a packet
                 // the texture is correct! it exports to the correct image
-                image.texture = DataToTexture(width, height, buffer);
-                _rect.sizeDelta = ExpandToRectSize(width, height);
+                image.texture = DataToTexture(dims, imageData);
+                _rect.sizeDelta = ExpandToRectSize(dims.Width, dims.Height);
             }
             
             Debug.LogWarning("Client loop has stopped!");
@@ -97,20 +92,11 @@ namespace Networking.Screens
             return new Vector2(newWidth, _rectSize.y);
         }
 
-        private static Texture2D DataToTexture(int width, int height, IReadOnlyList<byte> data)
+        private static Texture2D DataToTexture(Dimensions dims, ImageData data)
         {
-            var tex = new Texture2D(width, height);
-            var colors = new Color32[data.Count / 4];
-            for (var i = 0; i < colors.Length; i++)
-            {
-                colors[i].r = data[i * 4];
-                colors[i].g = data[i * 4 + 1];
-                colors[i].b = data[i * 4 + 2];
-                colors[i].a = data[i * 4 + 3];
-            }
-            tex.SetPixels32(colors);
+            var tex = new Texture2D(dims.Width, dims.Height);
+            tex.SetPixels32(data.Data);
             tex.Apply();
-
             return tex;
         }
     }

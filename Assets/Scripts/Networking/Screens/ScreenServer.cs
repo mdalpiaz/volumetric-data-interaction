@@ -1,7 +1,5 @@
 #nullable enable
 
-using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -50,11 +48,11 @@ namespace Networking.Screens
                 {
                     var client = await _server.AcceptTcpClientAsync();
                     var stream = client.GetStream();
-                    var buffer = new byte[sizeof(int)];
-                    await stream.ReadAllAsync(buffer, 0, sizeof(int));
-                    var id = BinaryPrimitives.ReadInt32LittleEndian(buffer);
-                    _clients.Add(id, (client, stream));
-                    Debug.Log($"Client {id} connected");
+                    var buffer = new byte[IDAdvertisement.Size];
+                    await stream.ReadAllAsync(buffer, 0, buffer.Length);
+                    var idAd = IDAdvertisement.FromByteArray(buffer);
+                    _clients.Add(idAd.ID, (client, stream));
+                    Debug.Log($"Client {idAd.ID} connected");
                 }
                 catch
                 {
@@ -80,25 +78,12 @@ namespace Networking.Screens
             }
             
             Debug.Log($"Sending to screen {screen}");
-            
-            var colors = data.GetPixels32();
-            var dimBuffer = new byte[8];
-            BinaryPrimitives.WriteInt32LittleEndian(dimBuffer.AsSpan(), data.width);
-            BinaryPrimitives.WriteInt32LittleEndian(dimBuffer.AsSpan(sizeof(int)), data.height);
-            
-            var bytes = new byte[colors.Length * 4];
 
-            for (var i = 0; i < colors.Length; i++)
-            {
-                bytes[i * 4] = colors[i].r;
-                bytes[i * 4 + 1] = colors[i].g;
-                bytes[i * 4 + 2] = colors[i].b;
-                bytes[i * 4 + 3] = colors[i].a;
-            }
-
+            var imageData = new ImageData(data.GetPixels32());
+            var dims = new Dimensions(data.width, data.height);
             var (_, stream) = _clients[screen];
-            await stream.WriteAsync(dimBuffer);
-            await stream.WriteAsync(bytes);
+            await stream.WriteAsync(dims.ToByteArray());
+            await stream.WriteAsync(imageData.ToByteArray());
         }
 
         private bool FindScreen(out int id, Vector3 trackerPosition, Vector3 trackerPointDirection)
