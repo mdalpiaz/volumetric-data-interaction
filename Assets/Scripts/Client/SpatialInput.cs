@@ -14,54 +14,42 @@ namespace Client
         public event Action<int>? Shook;
         
         private const float MinInputInterval = 0.2f; // 0.2sec - to avoid detecting multiple shakes per shake
+
         private int _shakeCounter;
 
-        private InputTracker _shakeTracker = null!;
+        private const float _shakeThreshold = 5.0f;
+        private float _shakeTimeSinceFirst;
+        private float _shakeTimeSinceLast;
 
         private Gyroscope _deviceGyroscope = null!;
 
         private void Start()
         {
-            _shakeTracker = new InputTracker
-            {
-                Threshold = 5f
-            };
-            
             _deviceGyroscope = Input.gyro;
             _deviceGyroscope.enabled = true;
         }
 
         private void Update()
         {
-            if (_shakeCounter > 0 && Time.unscaledTime > _shakeTracker.TimeSinceFirst + MinInputInterval * 5)
+            if (_shakeCounter > 0 && Time.unscaledTime > _shakeTimeSinceFirst + MinInputInterval * 5)
             {
-                HandleShakeInput();
+                _shakeTimeSinceLast = Time.unscaledTime;
+                Shook?.Invoke(_shakeCounter);
                 _shakeCounter = 0;
             }
 
-            CheckShakeInput();
-        }
-
-        private void CheckShakeInput()
-        {
-            if (Input.acceleration.sqrMagnitude >= _shakeTracker.Threshold
-                && Time.unscaledTime >= _shakeTracker.TimeSinceLast + MinInputInterval)
+            if (Input.acceleration.sqrMagnitude >= _shakeThreshold
+                && Time.unscaledTime >= _shakeTimeSinceLast + MinInputInterval)
             {
-                _shakeTracker.TimeSinceLast = Time.unscaledTime;
+                _shakeTimeSinceLast = Time.unscaledTime;
 
                 if (_shakeCounter == 0)
                 {
-                    _shakeTracker.TimeSinceFirst = _shakeTracker.TimeSinceLast;
+                    _shakeTimeSinceFirst = _shakeTimeSinceLast;
                 }
 
                 _shakeCounter++;
             }
-        }
-
-        private void HandleShakeInput()
-        {
-            _shakeTracker.TimeSinceLast = Time.unscaledTime;
-            Shook?.Invoke(_shakeCounter);
         }
     }
 }
