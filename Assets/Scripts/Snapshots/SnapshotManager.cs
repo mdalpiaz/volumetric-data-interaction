@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Model;
@@ -35,6 +36,11 @@ namespace Snapshots
         private GameObject sectionQuad = null!;
 
         private readonly Timer _snapshotTimer = new();
+
+        /// <summary>
+        /// Snapshot is created by the user.
+        /// </summary>
+        public event Action<Snapshot>? SnapshotCreatedOffline;
 
         public InterfaceController InterfaceController => interfaceController;
 
@@ -76,6 +82,7 @@ namespace Snapshots
                 return;
             }
             snapshot.transform.position = newPosition;
+            SnapshotCreatedOffline?.Invoke(snapshot);
         }
         
         public Snapshot? CreateSnapshot(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)

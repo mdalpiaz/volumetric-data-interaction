@@ -24,7 +24,7 @@ namespace Snapshots
         public GameObject OriginPlane { get; set; } = null!;
 
         public Texture2D SnapshotTexture => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
-        
+
         public bool IsAttached { get; private set; }
 
         public Selectable Selectable { get; private set; } = null!;

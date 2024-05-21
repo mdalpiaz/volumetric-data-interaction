@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using Networking.Tablet;
+using Snapshots;
 using UnityEngine;
 
 namespace Networking.openIA
@@ -54,6 +55,7 @@ namespace Networking.openIA
 
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.MappingStopped += MappingStopped;
+            SnapshotManager.Instance.SnapshotCreatedOffline += SnapshotCreated;
         }
 
         private async void Start()
@@ -89,6 +91,8 @@ namespace Networking.openIA
         {
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.MappingStopped -= MappingStopped;
+            SnapshotManager.Instance.SnapshotCreatedOffline -= SnapshotCreated;
+
         }
 
         private void OnDestroy()
@@ -126,6 +130,12 @@ namespace Networking.openIA
             model.transform.GetPositionAndRotation(out var position, out var rotation);
             await Send(new SetObjectTranslation(model.ID, position));
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
+        }
+
+        private async void SnapshotCreated(Snapshot s)
+        {
+            s.OriginPlane.transform.GetPositionAndRotation(out var position, out var rotation);
+            await Send(new CreateSnapshotClient(position, rotation));
         }
     }
 }
