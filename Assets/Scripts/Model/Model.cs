@@ -254,7 +254,7 @@ namespace Model
         }
 
         /// <summary>
-        /// Returns the pixel color at the specific location. Out of bounds locations are returned as black.
+        /// Returns the pixel color at the specific location. Out of bounds locations are returned as transparent.
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -266,10 +266,10 @@ namespace Model
                 return new Color32(0, 0, 0, 0);
             }
 
-            return slices[ToSliceIndex(index)];
+            return slices[ToPixelIndex(index)];
         }
 
-        private int ToSliceIndex(Vector3Int i)
+        private int ToPixelIndex(Vector3Int i)
         {
             return i.x + i.y * XCount + i.z * XCount * YCount;
         }
