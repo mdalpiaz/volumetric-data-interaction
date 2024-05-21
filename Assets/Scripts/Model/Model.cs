@@ -15,14 +15,14 @@ namespace Model
         [SerializeField]
         private string? stackPath;
 
-        private MeshFilter _meshFilter = null!;
-        private Renderer _renderer = null!;
-        private OnePlaneCuttingController _onePlaneCuttingController = null!;
+        private MeshFilter meshFilter = null!;
+        private Renderer modelRenderer = null!;
+        private OnePlaneCuttingController onePlaneCuttingController = null!;
 
-        private Mesh _originalMesh = null!;
-        private Material _originalMaterial = null!;
+        private Mesh originalMesh = null!;
+        private Material originalMaterial = null!;
 
-        private Color32[] _slices = null!;
+        private Color32[] slices = null!;
 
         public ulong ID { get; set; } = 0;
 
@@ -64,11 +64,11 @@ namespace Model
 
         private void Awake()
         {
-            _meshFilter = GetComponent<MeshFilter>();
+            meshFilter = GetComponent<MeshFilter>();
             Selectable = GetComponent<Selectable>();
             BoxCollider = GetComponent<BoxCollider>();
-            _renderer = GetComponent<Renderer>();
-            _onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
+            modelRenderer = GetComponent<Renderer>();
+            onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
             if (stackPath == null)
             {
@@ -94,21 +94,21 @@ namespace Model
             XCount = texture.width;
             YCount = texture.height;
 
-            _slices = new Color32[XCount * YCount * ZCount];
+            slices = new Color32[XCount * YCount * ZCount];
 
-            texture.GetPixels32().CopyTo(_slices, 0);
+            texture.GetPixels32().CopyTo(slices, 0);
             Destroy(texture);
 
             for (var i = 1; i < files.Length; i++)
             {
                 imagePath = Path.Combine(stackPath, files[i]);
                 texture = FileTools.LoadImage(imagePath);
-                texture.GetPixels32().CopyTo(_slices, i * XCount * YCount);
+                texture.GetPixels32().CopyTo(slices, i * XCount * YCount);
                 Destroy(texture);
             }
 
-            _originalMesh = Instantiate(_meshFilter.sharedMesh);
-            _originalMaterial = GetComponent<Renderer>().material;
+            originalMesh = Instantiate(meshFilter.sharedMesh);
+            originalMaterial = GetComponent<Renderer>().material;
 
             OriginalPosition = transform.position;
             OriginalRotation = transform.rotation;
@@ -157,7 +157,7 @@ namespace Model
 
         private void Start()
         {
-            _onePlaneCuttingController.plane = ModelManager.Instance.CuttingPlane;
+            onePlaneCuttingController.plane = ModelManager.Instance.CuttingPlane;
         }
 
         public bool IsXEdgeVector(Vector3 point) => point.x == 0 || (point.x + 1) >= XCount;
@@ -169,9 +169,9 @@ namespace Model
         public void UpdateModel(GameObject newModel, GameObject cuttingPlane)
         {
             Debug.Log("Replacing model");
-            _onePlaneCuttingController.plane = cuttingPlane;
-            _meshFilter.mesh = newModel.GetComponent<MeshFilter>().mesh;
-            _renderer.materials = newModel.GetComponent<MeshRenderer>().materials;
+            onePlaneCuttingController.plane = cuttingPlane;
+            meshFilter.mesh = newModel.GetComponent<MeshFilter>().mesh;
+            modelRenderer.materials = newModel.GetComponent<MeshRenderer>().materials;
             //CurrentModel.OnePlaneCuttingController.plane = cuttingPlane;
             /*
             //objBase.AddComponent<MeshCollider>().convex = true;
@@ -216,19 +216,19 @@ namespace Model
         
         public void SetModelMaterial(Material material)
         {
-            _renderer.material = material;
+            modelRenderer.material = material;
         }
 
         public void SetModelMaterial(Material material, Shader shader)
         {
-            _renderer.material = material;
-            _renderer.material.shader = shader;
+            modelRenderer.material = material;
+            modelRenderer.material.shader = shader;
         }
 
         public void SetCuttingPlaneActive(bool active)
         {
-            _onePlaneCuttingController.plane.SetActive(active);
-            _onePlaneCuttingController.enabled = active;
+            onePlaneCuttingController.plane.SetActive(active);
+            onePlaneCuttingController.enabled = active;
         }
 
         public void ResetState()
@@ -236,8 +236,8 @@ namespace Model
             transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
             transform.localScale = OriginalScale;
 
-            _meshFilter.mesh = Instantiate(_originalMesh);
-            _renderer.material = _originalMaterial;
+            meshFilter.mesh = Instantiate(originalMesh);
+            modelRenderer.material = originalMaterial;
 
             // destroy top to bottom to stop index out of bounds
             for (var i = transform.childCount - 1; i >= 0; i--)
@@ -271,7 +271,7 @@ namespace Model
                 return new Color32(0, 0, 0, 0);
             }
 
-            return _slices[ToSliceIndex(index)];
+            return slices[ToSliceIndex(index)];
         }
 
         private int ToSliceIndex(Vector3Int i)
