@@ -41,6 +41,15 @@ namespace Networking.openIA
             }
         }
 
+        private void OnEnable()
+        {
+            if (!OnlineState.IsOnline)
+            {
+                return;
+            }
+            
+        }
+
         private async void Start()
         {
             if (!OnlineState.IsOnline)
@@ -68,6 +77,11 @@ namespace Networking.openIA
             await interpreter.Start();
             await runTask;
             Debug.Log("WebSocket client stopped");
+        }
+
+        private void OnDisable()
+        {
+            
         }
 
         private void OnDestroy()

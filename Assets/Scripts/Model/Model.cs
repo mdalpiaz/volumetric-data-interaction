@@ -24,9 +24,13 @@ namespace Model
 
         private Color32[] _slices = null!;
 
-        private Vector3 _originalPosition;
-        private Quaternion _originalRotation;
-        private Vector3 _originalScale;
+        public ulong ID { get; set; } = 0;
+
+        public Vector3 OriginalPosition { get; private set; }
+
+        public Quaternion OriginalRotation { get; private set; }
+
+        public Vector3 OriginalScale { get; private set; }
 
         public Selectable Selectable { get; private set; } = null!;
 
@@ -106,9 +110,9 @@ namespace Model
             _originalMesh = Instantiate(_meshFilter.sharedMesh);
             _originalMaterial = GetComponent<Renderer>().material;
 
-            _originalPosition = transform.position;
-            _originalRotation = transform.rotation;
-            _originalScale = transform.localScale;
+            OriginalPosition = transform.position;
+            OriginalRotation = transform.rotation;
+            OriginalScale = transform.localScale;
 
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
             var worldSize = transform.TransformVector(BoxCollider.size);
@@ -229,8 +233,8 @@ namespace Model
 
         public void ResetState()
         {
-            transform.SetPositionAndRotation(_originalPosition, _originalRotation);
-            transform.localScale = _originalScale;
+            transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+            transform.localScale = OriginalScale;
 
             _meshFilter.mesh = Instantiate(_originalMesh);
             _renderer.material = _originalMaterial;

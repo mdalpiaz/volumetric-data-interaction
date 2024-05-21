@@ -283,6 +283,11 @@ namespace Networking.Tablet
                     else if (_menuMode == MenuMode.Analysis)
                     {
                         slicer.Slice();
+                        if (OnlineState.IsOnline)
+                        {
+                            await OpenIaWebSocketClient.Instance.Send(
+                                new CreateSnapshotClient(slicer.transform.position, slicer.transform.rotation));
+                        }
                     }
                     break;
                 case TapType.HoldBegin:
@@ -296,7 +301,16 @@ namespace Networking.Tablet
                     break;
                 case TapType.HoldEnd:
                     Debug.Log($"Tap Hold End received at: ({x},{y})");
-                    mappingAnchor.StopMapping();
+                    if (mappingAnchor.StopMapping())
+                    {
+                        // mapping was successfully stopped
+                        if (OnlineState.IsOnline)
+                        {
+                            var model = ModelManager.Instance.CurrentModel;
+                            await OpenIaWebSocketClient.Instance.Send(new SetObjectTranslation(model.ID, model.transform.position));
+                            await OpenIaWebSocketClient.Instance.Send(new SetObjectRotationQuaternion(model.ID, model.transform.rotation));
+                        }
+                    }
                     break;
                 default:
                     Debug.Log($"{nameof(HandleTap)}() received unhandled tap type: {type}");

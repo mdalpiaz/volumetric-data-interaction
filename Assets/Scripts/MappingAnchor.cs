@@ -50,16 +50,17 @@ public class MappingAnchor : MonoBehaviour
         model.SetParent(mappingTransform);
     }
 
-    public void StopMapping()
+    public bool StopMapping()
     {
         if (_model == null)
         {
-            return;
+            return false;
         }
         
         Debug.Log("Stopped Mapping");
         _model.SetParent(_parent);
         _model = null;
         _parent = null;
+        return true;
     }
 }
