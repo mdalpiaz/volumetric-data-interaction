@@ -9,7 +9,7 @@ namespace Networking.openIA
 {
     public class OpenIaWebSocketClient : MonoBehaviour
     {
-        public static OpenIaWebSocketClient Instance { get; private set; } = null!;
+        private static OpenIaWebSocketClient Instance { get; set; } = null!;
 
         [SerializeField]
         private bool isOnline = true;
@@ -32,8 +32,6 @@ namespace Networking.openIA
 
         private ICommandSender _sender = null!;
 
-        public bool IsOnline => isOnline;
-
         private void Awake()
         {
             if (Instance == null)
@@ -49,7 +47,7 @@ namespace Networking.openIA
 
         private void OnEnable()
         {
-            if (!IsOnline)
+            if (!isOnline)
             {
                 return;
             }
@@ -60,7 +58,7 @@ namespace Networking.openIA
 
         private async void Start()
         {
-            if (!IsOnline)
+            if (!isOnline)
             {
                 return;
             }
@@ -95,7 +93,7 @@ namespace Networking.openIA
 
         private void OnDestroy()
         {
-            if (!IsOnline)
+            if (!isOnline)
             {
                 return;
             }
