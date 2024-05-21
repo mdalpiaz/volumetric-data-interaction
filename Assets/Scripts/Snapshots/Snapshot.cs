@@ -23,18 +23,8 @@ namespace Snapshots
 
         public GameObject OriginPlane { get; set; } = null!;
 
-        // public Dimensions Dimension { get; set; } = null!;
-
-        // public IntersectionPoints IntersectionPoints { get; set; } = null!;
-
         public Texture2D SnapshotTexture => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
         
-        // public Texture2D SnapshotTexture
-        // {
-        //     get => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
-        //     set => _textureQuadRenderer.material.mainTexture = value;
-        // }
-
         public bool IsAttached { get; private set; }
 
         public Selectable Selectable { get; private set; } = null!;
@@ -111,60 +101,6 @@ namespace Snapshots
             _textureQuad.SetActive(true);
         }
 
-        // public void MoveSliceX(float amount)
-        // {
-        //     // TODO this function is pretty much equivalent with creating neighbours and deleting the original
-        // }
-        //
-        // public void MoveSliceY(float amount)
-        // {
-        //     // TODO
-        // }
-        //
-        // public void MoveSliceZ(float value)
-        // {
-        //     var model = ModelManager.Instance.CurrentModel;
-        //
-        //     // value is pixels
-        //     IntersectionPoints.UpperLeft = new Vector3()
-        //     {
-        //         x = IntersectionPoints.UpperLeft.x + value,
-        //         y = IntersectionPoints.UpperLeft.y,
-        //         z = IntersectionPoints.UpperLeft.z
-        //     };
-        //     IntersectionPoints.LowerLeft = new Vector3()
-        //     {
-        //         x = IntersectionPoints.LowerLeft.x + value,
-        //         y = IntersectionPoints.LowerLeft.y,
-        //         z = IntersectionPoints.LowerLeft.z
-        //     };
-        //     IntersectionPoints.LowerRight = new Vector3()
-        //     {
-        //         x = IntersectionPoints.LowerRight.x + value,
-        //         y = IntersectionPoints.LowerRight.y,
-        //         z = IntersectionPoints.LowerRight.z
-        //     };
-        //     IntersectionPoints.UpperRight = new Vector3()
-        //     {
-        //         x = IntersectionPoints.UpperRight.x + value,
-        //         y = IntersectionPoints.UpperRight.y,
-        //         z = IntersectionPoints.UpperRight.z
-        //     };
-        //
-        //     var texData = Slicer.CreateSliceTextureData(model, Dimension, IntersectionPoints);
-        //     var texture = Slicer.CreateSliceTexture(Dimension, texData);
-        //     
-        //     SetIntersectionChild(texture, IntersectionPoints.LowerLeft, model);
-        //
-        //     // value is unity coordinates
-        //     var boxColliderSize = model.BoxCollider.size;
-        //     var gameDimensionKey = boxColliderSize.z / model.XCount;
-        //     var scaledValue = model.transform.localScale.x * value * gameDimensionKey;
-        //     var originPosition = OriginPlane.transform.position;
-        //     originPosition.z += scaledValue;
-        //     OriginPlane.transform.position = originPosition;
-        // }
-        
         private void SetOverlayTexture(bool isSelected)
         {
             if (isSelected)

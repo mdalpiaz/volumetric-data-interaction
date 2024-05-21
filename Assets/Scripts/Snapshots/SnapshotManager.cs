@@ -11,14 +11,11 @@ namespace Snapshots
     public class SnapshotManager : MonoBehaviour
     {
         private const int SnapshotDistance = 2;
-        // private const int NeighbourDistance = 5; // pixel, except for if it is along x-axis, then it is slices
         private const float SnapshotTimeThreshold = 1.0f;
         private const float CenteringRotation = -90.0f;
 
         public static SnapshotManager Instance { get; private set; } = null!;
 
-        // public event Action<Snapshot>? SnapshotMoved;
-        
         [SerializeField]
         private InterfaceController interfaceController = null!;
         
@@ -107,8 +104,6 @@ namespace Snapshots
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.tag = Tags.Snapshot;
-            // snapshot.IntersectionPoints = intersectionPoints;
-            // snapshot.Dimension = dimensions;
             snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
 
             var mainTransform = interfaceController.Main.transform;
@@ -142,12 +137,6 @@ namespace Snapshots
                 AttachSnapshots();
             }
         }
-
-        // public void Move(Snapshot snapshot, NeighbourDirection direction)
-        // {
-        //     snapshot.MoveSliceZ(NeighbourDistance * (int)direction);
-        //     SnapshotMoved?.Invoke(snapshot);
-        // }
 
         public void DeactivateAllSnapshots() => Snapshots.ForEach(s => s.Selectable.IsSelected = false);
 
