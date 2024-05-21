@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -74,6 +75,8 @@ namespace Networking.Tablet
                 _highlighted = value;
             }
         }
+
+        public event Action<Model.Model>? MappingStopped;
 
         private void Awake()
         {
@@ -303,6 +306,7 @@ namespace Networking.Tablet
                     Debug.Log($"Tap Hold End received at: ({x},{y})");
                     if (mappingAnchor.StopMapping())
                     {
+                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
                         // mapping was successfully stopped
                         if (OnlineState.IsOnline)
                         {
