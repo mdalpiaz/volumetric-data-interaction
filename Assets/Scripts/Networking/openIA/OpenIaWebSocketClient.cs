@@ -26,11 +26,11 @@ namespace Networking.openIA
         [SerializeField]
         private string path = "/";
 
-        private WebSocketClient _ws = null!;
+        private WebSocketClient ws = null!;
 
-        private ICommandInterpreter _interpreter = null!;
+        private ICommandInterpreter interpreter = null!;
 
-        private ICommandSender _sender = null!;
+        private ICommandSender sender = null!;
 
         private void Awake()
         {
@@ -62,16 +62,16 @@ namespace Networking.openIA
             {
                 return;
             }
-            _ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}", HandleBinaryData, HandleText);
+            ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}", HandleBinaryData, HandleText);
 
-            var interpreter = new InterpreterV1(_ws);
-            _interpreter = interpreter;
-            _sender = interpreter;
+            var newInterpreter = new InterpreterV1(ws);
+            interpreter = newInterpreter;
+            sender = newInterpreter;
             
             Debug.Log("Starting WebSocket client");
             try
             {
-                await _ws.ConnectAsync();
+                await ws.ConnectAsync();
             }
             catch
             {
@@ -79,8 +79,8 @@ namespace Networking.openIA
                 return;
             }
             Debug.Log("Connected WebSocket client");
-            var runTask = _ws.Run();
-            await interpreter.Start();
+            var runTask = ws.Run();
+            await newInterpreter.Start();
             await runTask;
             Debug.Log("WebSocket client stopped");
         }
@@ -98,10 +98,10 @@ namespace Networking.openIA
                 return;
             }
             
-            _ws.Dispose();
+            ws.Dispose();
         }
 
-        private async Task Send(ICommand cmd) => await _sender.Send(cmd);
+        private async Task Send(ICommand cmd) => await sender.Send(cmd);
         
         private Task HandleText(string text)
         {
@@ -112,7 +112,7 @@ namespace Networking.openIA
         private async Task HandleBinaryData(byte[] data)
         {
             Debug.Log($"WS bytes received: {BitConverter.ToString(data)}");
-            await _interpreter.Interpret(data);
+            await interpreter.Interpret(data);
         }
 
         private async void Sliced(Transform slicerTransform)
@@ -123,8 +123,9 @@ namespace Networking.openIA
         
         private async void MappingStopped(Model.Model model)
         {
-            await Send(new SetObjectTranslation(model.ID, model.transform.position));
-            await Send(new SetObjectRotationQuaternion(model.ID, model.transform.rotation));
+            model.transform.GetPositionAndRotation(out var position, out var rotation);
+            await Send(new SetObjectTranslation(model.ID, position));
+            await Send(new SetObjectRotationQuaternion(model.ID, rotation));
         }
     }
 }
