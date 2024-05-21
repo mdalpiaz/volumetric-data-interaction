@@ -21,20 +21,15 @@ namespace Model
 
         private Mesh originalMesh = null!;
         private Material originalMaterial = null!;
+        private Vector3 originalPosition;
+        private Quaternion originalRotation;
+        private Vector3 originalScale;
 
         private Color32[] slices = null!;
 
         public ulong ID { get; set; } = 0;
 
-        public Vector3 OriginalPosition { get; private set; }
-
-        public Quaternion OriginalRotation { get; private set; }
-
-        public Vector3 OriginalScale { get; private set; }
-
         public Selectable Selectable { get; private set; } = null!;
-
-        public BoxCollider BoxCollider { get; private set; } = null!;
         
         public int XCount { get; private set; }
 
@@ -64,9 +59,9 @@ namespace Model
 
         private void Awake()
         {
+            var boxCollider = GetComponent<BoxCollider>();
             meshFilter = GetComponent<MeshFilter>();
             Selectable = GetComponent<Selectable>();
-            BoxCollider = GetComponent<BoxCollider>();
             modelRenderer = GetComponent<Renderer>();
             onePlaneCuttingController = GetComponent<OnePlaneCuttingController>();
 
@@ -110,18 +105,18 @@ namespace Model
             originalMesh = Instantiate(meshFilter.sharedMesh);
             originalMaterial = GetComponent<Renderer>().material;
 
-            OriginalPosition = transform.position;
-            OriginalRotation = transform.rotation;
-            OriginalScale = transform.localScale;
+            originalPosition = transform.position;
+            originalRotation = transform.rotation;
+            originalScale = transform.localScale;
 
             // this only works if the model is perfectly aligned with the world! (rotation 0,0,0 or 90 degree rotations)
-            var worldSize = transform.TransformVector(BoxCollider.size);
+            var worldSize = transform.TransformVector(boxCollider.size);
             var worldExtents = worldSize / 2.0f;
 
             // this code gets ALL corner points and sorts them locally, so we can easily determin to which corner which point belongs
             // this code has already been tested and is CORRECT
             var points = new Vector3[8];
-            var center = transform.TransformPoint(BoxCollider.center);  // transform.position is NOT the centerpoint of the model!
+            var center = transform.TransformPoint(boxCollider.center);  // transform.position is NOT the centerpoint of the model!
             points[0] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.back() *  worldExtents.z);
             points[1] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.down() * worldExtents.y + transform.forward * worldExtents.z);
             points[2] = transform.InverseTransformPoint(center + transform.left() * worldExtents.x + transform.up *     worldExtents.y + transform.back() *  worldExtents.z);
@@ -233,8 +228,8 @@ namespace Model
 
         public void ResetState()
         {
-            transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
-            transform.localScale = OriginalScale;
+            transform.SetPositionAndRotation(originalPosition, originalRotation);
+            transform.localScale = originalScale;
 
             meshFilter.mesh = Instantiate(originalMesh);
             modelRenderer.material = originalMaterial;
