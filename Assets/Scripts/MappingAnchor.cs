@@ -7,22 +7,22 @@ public class MappingAnchor : MonoBehaviour
     [SerializeField]
     private Transform tracker = null!;
 
-    private Transform? _model;
+    private Transform? model;
     
-    private Transform? _parent;
+    private Transform? parent;
     
-    private Vector3 _positionOffset;
+    private Vector3 positionOffset;
     
     private void Update()
     {
         // tracker is null if not mapping
-        if (_model == null)
+        if (model == null)
         {
             return;
         }
 
         var mappingTransform = transform;
-        mappingTransform.SetPositionAndRotation(tracker.position + _positionOffset, tracker.rotation);
+        mappingTransform.SetPositionAndRotation(tracker.position + positionOffset, tracker.rotation);
 
         var mappingPosition = mappingTransform.position;
         Debug.DrawRay(mappingPosition, mappingTransform.up, Color.green);
@@ -30,37 +30,37 @@ public class MappingAnchor : MonoBehaviour
         Debug.DrawRay(mappingPosition, mappingTransform.right, Color.red);
     }
     
-    public void StartMapping(Transform model)
+    public void StartMapping(Transform newModel)
     {
-        if (_model != null)
+        if (model != null)
         {
             Debug.Log("Mapping was not stopped before. Stopping now.");
             StopMapping();
         }
 
         Debug.Log("Started Mapping");
-        _model = model;
-        _parent = model.parent;
+        model = newModel;
+        parent = newModel.parent;
         
-        var modelPosition = model.position;
-        _positionOffset = modelPosition - tracker.position;
+        var modelPosition = newModel.position;
+        positionOffset = modelPosition - tracker.position;
 
         var mappingTransform = transform;
         mappingTransform.SetPositionAndRotation(modelPosition, tracker.rotation);
-        model.SetParent(mappingTransform);
+        newModel.SetParent(mappingTransform);
     }
 
     public bool StopMapping()
     {
-        if (_model == null)
+        if (model == null)
         {
             return false;
         }
         
         Debug.Log("Stopped Mapping");
-        _model.SetParent(_parent);
-        _model = null;
-        _parent = null;
+        model.SetParent(parent);
+        model = null;
+        parent = null;
         return true;
     }
 }
