@@ -9,6 +9,9 @@ namespace Networking.openIA
     public class OpenIaWebSocketClient : MonoBehaviour
     {
         public static OpenIaWebSocketClient Instance { get; private set; } = null!;
+
+        [SerializeField]
+        private bool isOnline = true;
         
         [SerializeField]
         private bool https;
@@ -28,6 +31,8 @@ namespace Networking.openIA
 
         private ICommandSender _sender = null!;
 
+        public bool IsOnline => isOnline;
+
         private void Awake()
         {
             if (Instance == null)
@@ -43,7 +48,7 @@ namespace Networking.openIA
 
         private void OnEnable()
         {
-            if (!OnlineState.IsOnline)
+            if (!IsOnline)
             {
                 return;
             }
@@ -52,7 +57,7 @@ namespace Networking.openIA
 
         private async void Start()
         {
-            if (!OnlineState.IsOnline)
+            if (!IsOnline)
             {
                 return;
             }
@@ -86,7 +91,7 @@ namespace Networking.openIA
 
         private void OnDestroy()
         {
-            if (!OnlineState.IsOnline)
+            if (!IsOnline)
             {
                 return;
             }

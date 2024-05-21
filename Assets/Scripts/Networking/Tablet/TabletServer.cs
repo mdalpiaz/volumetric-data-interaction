@@ -286,7 +286,7 @@ namespace Networking.Tablet
                     else if (_menuMode == MenuMode.Analysis)
                     {
                         slicer.Slice();
-                        if (OnlineState.IsOnline)
+                        if (OpenIaWebSocketClient.Instance.IsOnline)
                         {
                             await OpenIaWebSocketClient.Instance.Send(
                                 new CreateSnapshotClient(slicer.transform.position, slicer.transform.rotation));
@@ -308,7 +308,7 @@ namespace Networking.Tablet
                     {
                         MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
                         // mapping was successfully stopped
-                        if (OnlineState.IsOnline)
+                        if (OpenIaWebSocketClient.Instance.IsOnline)
                         {
                             var model = ModelManager.Instance.CurrentModel;
                             await OpenIaWebSocketClient.Instance.Send(new SetObjectTranslation(model.ID, model.transform.position));
@@ -338,7 +338,7 @@ namespace Networking.Tablet
             }
             else if (_menuMode == MenuMode.Analysis)
             {
-                if (OnlineState.IsOnline)
+                if (OpenIaWebSocketClient.Instance.IsOnline)
                 {
                     sectionQuad.transform.GetLocalPositionAndRotation(out var position, out var rotation);
                     await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(position, rotation));
