@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Networking.Tablet;
 using UnityEngine;
 
 namespace Networking.openIA
@@ -52,7 +53,9 @@ namespace Networking.openIA
             {
                 return;
             }
-            
+
+            TabletServer.Instance.Sliced += Sliced;
+            TabletServer.Instance.MappingStopped += MappingStopped;
         }
 
         private async void Start()
@@ -86,7 +89,8 @@ namespace Networking.openIA
 
         private void OnDisable()
         {
-            
+            TabletServer.Instance.Sliced -= Sliced;
+            TabletServer.Instance.MappingStopped -= MappingStopped;
         }
 
         private void OnDestroy()
@@ -99,7 +103,7 @@ namespace Networking.openIA
             _ws.Dispose();
         }
 
-        public async Task Send(ICommand cmd) => await _sender.Send(cmd);
+        private async Task Send(ICommand cmd) => await _sender.Send(cmd);
         
         private Task HandleText(string text)
         {
@@ -111,6 +115,18 @@ namespace Networking.openIA
         {
             Debug.Log($"WS bytes received: {BitConverter.ToString(data)}");
             await _interpreter.Interpret(data);
+        }
+
+        private async void Sliced(Transform slicerTransform)
+        {
+            slicerTransform.GetPositionAndRotation(out var position, out var rotation);
+            await Send(new CreateSnapshotClient(position, rotation));
+        }
+        
+        private async void MappingStopped(Model.Model model)
+        {
+            await Send(new SetObjectTranslation(model.ID, model.transform.position));
+            await Send(new SetObjectRotationQuaternion(model.ID, model.transform.rotation));
         }
     }
 }

@@ -11,7 +11,6 @@ using Slicing;
 using Selection;
 using Snapshots;
 using UnityEngine;
-using Networking.openIA;
 
 namespace Networking.Tablet
 {
@@ -27,15 +26,9 @@ namespace Networking.Tablet
         
         [SerializeField]
         private Slicer slicer = null!;
-        
-        //[SerializeField]
-        //private GameObject tracker = null!;
 
         [SerializeField]
         private GameObject tablet = null!;
-
-        [SerializeField]
-        private GameObject sectionQuad = null!;
 
         [SerializeField]
         private MappingAnchor mappingAnchor = null!;
@@ -76,6 +69,8 @@ namespace Networking.Tablet
             }
         }
 
+        public event Action<Transform>? Sliced;
+        
         public event Action<Model.Model>? MappingStopped;
 
         private void Awake()
@@ -286,11 +281,7 @@ namespace Networking.Tablet
                     else if (_menuMode == MenuMode.Analysis)
                     {
                         slicer.Slice();
-                        if (OpenIaWebSocketClient.Instance.IsOnline)
-                        {
-                            await OpenIaWebSocketClient.Instance.Send(
-                                new CreateSnapshotClient(slicer.transform.position, slicer.transform.rotation));
-                        }
+                        Sliced?.Invoke(slicer.transform);
                     }
                     break;
                 case TapType.HoldBegin:
@@ -307,13 +298,6 @@ namespace Networking.Tablet
                     if (mappingAnchor.StopMapping())
                     {
                         MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
-                        // mapping was successfully stopped
-                        if (OpenIaWebSocketClient.Instance.IsOnline)
-                        {
-                            var model = ModelManager.Instance.CurrentModel;
-                            await OpenIaWebSocketClient.Instance.Send(new SetObjectTranslation(model.ID, model.transform.position));
-                            await OpenIaWebSocketClient.Instance.Send(new SetObjectRotationQuaternion(model.ID, model.transform.rotation));
-                        }
                     }
                     break;
                 default:
@@ -338,15 +322,8 @@ namespace Networking.Tablet
             }
             else if (_menuMode == MenuMode.Analysis)
             {
-                if (OpenIaWebSocketClient.Instance.IsOnline)
-                {
-                    sectionQuad.transform.GetLocalPositionAndRotation(out var position, out var rotation);
-                    await OpenIaWebSocketClient.Instance.Send(new CreateSnapshotClient(position, rotation));
-                }
-                else
-                {
-                    SnapshotManager.Instance.CreateSnapshot(angle);
-                }
+                SnapshotManager.Instance.CreateSnapshot(angle);
+                Sliced?.Invoke(slicer.transform);
             }
         }
 
