@@ -37,9 +37,9 @@ namespace Model
 
         public int ZCount { get; private set; }
         
-        public Vector3 Size { get; private set; }
+        public Vector3 Size { get; private set; } = Vector3.zero;
 
-        public Vector3 StepSize { get; private set; }
+        public Vector3 StepSize { get; private set; } = Vector3.zero;
 
         public Vector3 BottomFrontLeftCorner { get; private set; }
 

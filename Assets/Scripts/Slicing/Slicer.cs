@@ -145,6 +145,12 @@ namespace Slicing
             Debug.DrawLine(model.BottomFrontLeftCorner, model.BottomFrontRightCorner, Color.black);
             Debug.DrawLine(model.TopFrontLeftCorner, model.TopFrontRightCorner, Color.black);
             
+            if (model.Size == Vector3.zero)
+            {
+                Debug.LogError("Check if the current model is properly initialized! Is the image path set?");
+                return null;
+            }
+
             // this is the normal of the slicer
             var plane = new Plane(normalVector, localPosition);
 
