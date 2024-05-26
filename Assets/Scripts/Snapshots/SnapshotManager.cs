@@ -37,11 +37,6 @@ namespace Snapshots
 
         private readonly Timer _snapshotTimer = new();
 
-        /// <summary>
-        /// Snapshot is created by the user.
-        /// </summary>
-        public event Action<Snapshot>? SnapshotCreatedOffline;
-
         public InterfaceController InterfaceController => interfaceController;
 
         private List<Snapshot> Snapshots { get; } = new();
@@ -82,7 +77,6 @@ namespace Snapshots
                 return;
             }
             snapshot.transform.position = newPosition;
-            SnapshotCreatedOffline?.Invoke(snapshot);
         }
         
         public Snapshot? CreateSnapshot(ulong id, Vector3 slicerPosition, Quaternion slicerRotation)
@@ -145,7 +139,7 @@ namespace Snapshots
             }
         }
 
-        public void DeactivateAllSnapshots() => Snapshots.ForEach(s => s.Selectable.IsSelected = false);
+        public void UnselectAllSnapshots() => Snapshots.ForEach(s => s.Selectable.IsSelected = false);
 
         /// <summary>
         /// Delete all Snapshots.

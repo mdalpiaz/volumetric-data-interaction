@@ -69,9 +69,17 @@ namespace Networking.Tablet
             }
         }
 
-        public event Action<Transform>? Sliced;
-        
+        public event Action<Model.Model>? MappingStarted;
+
         public event Action<Model.Model>? MappingStopped;
+
+        public event Action<Transform>? Sliced;
+
+        public event Action<Snapshot>? SnapshotRemoved;
+
+        public event Action? SnapshotsCleared;
+
+        public event Action? ResettedState;
 
         private void Awake()
         {
@@ -210,19 +218,28 @@ namespace Networking.Tablet
                         ray.SetActive(false);
                         Unselect();
                     }
-                    mappingAnchor.StopMapping();
-                    SnapshotManager.Instance.DeactivateAllSnapshots();
+                    if (mappingAnchor.StopMapping())
+                    {
+                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                    }
+                    SnapshotManager.Instance.UnselectAllSnapshots();
                     break;
                 case MenuMode.Selection:
                     ray.SetActive(true);
-                    mappingAnchor.StopMapping();
+                    if (mappingAnchor.StopMapping())
+                    {
+                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                    }
                     break;
                 case MenuMode.Selected:
                     isSnapshotSelected = Selected != null && Selected.gameObject.IsSnapshot();
                     break;
                 case MenuMode.Analysis:
                     slicer.SetCuttingActive(true);
-                    mappingAnchor.StopMapping();
+                    if (mappingAnchor.StopMapping())
+                    {
+                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                    }
                     break;
                 default:
                     Debug.Log($"{nameof(HandleModeChange)}() received unhandled mode: {mode}");
@@ -244,13 +261,19 @@ namespace Networking.Tablet
             if (Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
                 SnapshotManager.Instance.DeleteSnapshot(snapshot);
+                SnapshotRemoved?.Invoke(snapshot);
             }
             else
             {
                 var result = SnapshotManager.Instance.DeleteAllSnapshots();
-                if (!result)
+                if (result)
+                {
+                    SnapshotsCleared?.Invoke();
+                }
+                else
                 {
                     ModelManager.Instance.CurrentModel.ResetState();
+                    ResettedState?.Invoke();
                 }
             }
 
@@ -291,6 +314,7 @@ namespace Networking.Tablet
                         ModelManager.Instance.CurrentModel.gameObject == Selected.gameObject)
                     {
                         mappingAnchor.StartMapping(Selected.transform);
+                        MappingStarted?.Invoke(ModelManager.Instance.CurrentModel);
                     }
                     break;
                 case TapType.HoldEnd:

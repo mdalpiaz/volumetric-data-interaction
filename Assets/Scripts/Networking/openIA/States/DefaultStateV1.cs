@@ -144,7 +144,7 @@ namespace Networking.openIA.States
                 Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
                 return;
             }
-            
+
             translation = CoordinateConverter.OpenIAToUnity(translation);
             ModelManager.Instance.CurrentModel.transform.position += translation;
         }

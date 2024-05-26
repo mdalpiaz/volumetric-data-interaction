@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Model;
 using Networking.Tablet;
 using Snapshots;
 using UnityEngine;
@@ -55,7 +56,6 @@ namespace Networking.openIA
 
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.MappingStopped += MappingStopped;
-            SnapshotManager.Instance.SnapshotCreatedOffline += SnapshotCreated;
         }
 
         private async void Start()
@@ -91,7 +91,6 @@ namespace Networking.openIA
         {
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.MappingStopped -= MappingStopped;
-            SnapshotManager.Instance.SnapshotCreatedOffline -= SnapshotCreated;
 
         }
 
