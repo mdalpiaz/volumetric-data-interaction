@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model;
 using Networking.Tablet;
@@ -54,8 +55,11 @@ namespace Networking.openIA
                 return;
             }
 
-            TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.MappingStopped += MappingStopped;
+            TabletServer.Instance.Sliced += Sliced;
+            TabletServer.Instance.SnapshotRemoved += SnapshotRemoved;
+            TabletServer.Instance.SnapshotsCleared += SnapshotsCleared;
+            TabletServer.Instance.ResettedState += ResettedState;
         }
 
         private async void Start()
@@ -89,9 +93,16 @@ namespace Networking.openIA
 
         private void OnDisable()
         {
-            TabletServer.Instance.Sliced -= Sliced;
-            TabletServer.Instance.MappingStopped -= MappingStopped;
+            if (!isOnline)
+            {
+                return;
+            }
 
+            TabletServer.Instance.MappingStopped -= MappingStopped;
+            TabletServer.Instance.Sliced -= Sliced;
+            TabletServer.Instance.SnapshotRemoved -= SnapshotRemoved;
+            TabletServer.Instance.SnapshotsCleared -= SnapshotsCleared;
+            TabletServer.Instance.ResettedState -= ResettedState;
         }
 
         private void OnDestroy()
@@ -117,14 +128,6 @@ namespace Networking.openIA
             Debug.Log($"WS bytes received: {BitConverter.ToString(data)}");
             await interpreter.Interpret(data);
         }
-
-        private async void Sliced(Transform slicerTransform)
-        {
-            slicerTransform.GetPositionAndRotation(out var position, out var rotation);
-            var localPosition = ModelManager.Instance.CurrentModel.transform.InverseTransformPoint(position);
-            var openIAPosition = CoordinateConverter.UnityToOpenIA(localPosition);
-            await Send(new CreateSnapshotClient(openIAPosition, rotation));
-        }
         
         private async void MappingStopped(Model.Model model)
         {
@@ -133,10 +136,39 @@ namespace Networking.openIA
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
         }
 
-        private async void SnapshotCreated(Snapshot s)
+        private async void Sliced(Transform slicerTransform)
         {
-            s.OriginPlane.transform.GetPositionAndRotation(out var position, out var rotation);
-            await Send(new CreateSnapshotClient(position, rotation));
+            slicerTransform.GetPositionAndRotation(out var position, out var rotation);
+            var localPosition = ModelManager.Instance.CurrentModel.transform.InverseTransformPoint(position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(localPosition);
+            await Send(new CreateSnapshotClient(openIAPosition, rotation));
+        }
+
+        //private async void SnapshotCreated(Snapshot s)
+        //{
+        //    s.OriginPlane.transform.GetPositionAndRotation(out var position, out var rotation);
+        //    await Send(new CreateSnapshotClient(position, rotation));
+        //}
+
+        private async void SnapshotRemoved(Snapshot s)
+        {
+            await Send(new RemoveSnapshot(s.ID));
+        }
+
+        private async void SnapshotsCleared(List<ulong> snapshotIDs)
+        {
+            var tasks = new List<Task>();
+            foreach (var id in snapshotIDs)
+            {
+                tasks.Add(Send(new RemoveSnapshot(id)));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        private async void ResettedState()
+        {
+            await Send(new Reset());
         }
     }
 }

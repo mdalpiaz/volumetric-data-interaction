@@ -11,6 +11,8 @@ using Slicing;
 using Selection;
 using Snapshots;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Networking.Tablet
 {
@@ -77,7 +79,7 @@ namespace Networking.Tablet
 
         public event Action<Snapshot>? SnapshotRemoved;
 
-        public event Action? SnapshotsCleared;
+        public event Action<List<ulong>>? SnapshotsCleared;
 
         public event Action? ResettedState;
 
@@ -265,10 +267,11 @@ namespace Networking.Tablet
             }
             else
             {
-                var result = SnapshotManager.Instance.DeleteAllSnapshots();
+                List<ulong> snapshotIDs = null!;
+                var result = SnapshotManager.Instance.DeleteAllSnapshots(snapshots => snapshotIDs = snapshots.Select(s => s.ID).ToList());
                 if (result)
                 {
-                    SnapshotsCleared?.Invoke();
+                    SnapshotsCleared?.Invoke(snapshotIDs);
                 }
                 else
                 {
@@ -347,7 +350,7 @@ namespace Networking.Tablet
             else if (_menuMode == MenuMode.Analysis)
             {
                 SnapshotManager.Instance.CreateSnapshot(angle);
-                Sliced?.Invoke(slicer.transform);
+                //Sliced?.Invoke(slicer.transform);
             }
         }
 

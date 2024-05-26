@@ -163,6 +163,12 @@ namespace Snapshots
             return true;
         }
 
+        public bool DeleteAllSnapshots(Action<IEnumerable<Snapshot>> preDeleteAction)
+        {
+            preDeleteAction(Snapshots);
+            return DeleteAllSnapshots();
+        }
+
         public bool DeleteSnapshot(Snapshot s)
         {
             var result = Snapshots.Remove(s);
