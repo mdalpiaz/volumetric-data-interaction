@@ -145,6 +145,7 @@ namespace Networking.openIA.States
                 return;
             }
             
+            translation = CoordinateConverter.OpenIAToUnity(translation);
             ModelManager.Instance.CurrentModel.transform.position += translation;
         }
 
