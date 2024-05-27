@@ -15,6 +15,9 @@ namespace Model
         [SerializeField]
         private string? stackPath;
 
+        [SerializeField]
+        private LoadingDirection loadingDirection = LoadingDirection.Front2Back;
+
         private MeshFilter meshFilter = null!;
         private Renderer modelRenderer = null!;
         private OnePlaneCuttingController onePlaneCuttingController = null!;
