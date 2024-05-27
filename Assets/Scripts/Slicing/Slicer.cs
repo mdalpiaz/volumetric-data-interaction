@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Extensions;
 using EzySlice;
 using Model;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace Slicing
         private Material materialWhite = null!;
         
         [SerializeField]
-        private Material materialBlack = null!;
+        private Material slicedObjectSecondaryMaterial = null!;
         
         [SerializeField]
         private Shader materialShader = null!;
@@ -93,12 +94,16 @@ namespace Slicing
             transparentMaterial.mainTexture = texture;
 
             Debug.Log($"Sliced gameobject \"{model.name}\"");
-            var lowerHull = slicedObject.CreateUpperHull(modelGo, materialBlack);
+            var lowerHull = slicedObject.CreateUpperHull(modelGo, slicedObjectSecondaryMaterial);
             model.UpdateModel(lowerHull, gameObject);
             Destroy(lowerHull);
             SetCuttingActive(true);
 
             var quad = Instantiate(cutQuadPrefab, model.transform, true);
+            // stop Z-fighting by moving slightly up
+            var pos = quad.transform.position;
+            pos += transform.back().normalized * 0.0001f;
+            quad.transform.position = pos;
             quad.name = "cut";
             quad.Mesh = mesh;
             quad.Material = transparentMaterial;
