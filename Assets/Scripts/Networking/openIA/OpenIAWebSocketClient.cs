@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace Networking.openIA
 {
-    public class OpenIaWebSocketClient : MonoBehaviour
+    public class OpenIAWebSocketClient : MonoBehaviour
     {
-        public static OpenIaWebSocketClient Instance { get; private set; } = null!;
+        public static OpenIAWebSocketClient Instance { get; private set; } = null!;
 
         [SerializeField]
         private bool isOnline = true;
