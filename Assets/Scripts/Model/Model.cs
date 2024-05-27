@@ -88,21 +88,64 @@ namespace Model
             var imagePath = Path.Combine(stackPath, files[0]);
             var texture = FileTools.LoadImage(imagePath);
 
-            ZCount = files.Length;
-            XCount = texture.width;
-            YCount = texture.height;
-
-            slices = new Color32[XCount * YCount * ZCount];
-
-            texture.GetPixels32().CopyTo(slices, 0);
-            Destroy(texture);
-
-            for (var i = 1; i < files.Length; i++)
+            switch (loadingDirection)
             {
-                imagePath = Path.Combine(stackPath, files[i]);
-                texture = FileTools.LoadImage(imagePath);
-                texture.GetPixels32().CopyTo(slices, i * XCount * YCount);
-                Destroy(texture);
+                case LoadingDirection.Front2Back:
+                {
+                    ZCount = files.Length;
+                    XCount = texture.width;
+                    YCount = texture.height;
+                    
+                    slices = new Color32[XCount * YCount * ZCount];
+
+                    texture.GetPixels32().CopyTo(slices, 0);
+                    Destroy(texture);
+
+                    for (var i = 1; i < files.Length; i++)
+                    {
+                        imagePath = Path.Combine(stackPath, files[i]);
+                        texture = FileTools.LoadImage(imagePath);
+                        texture.GetPixels32().CopyTo(slices, i * XCount * YCount);
+                        Destroy(texture);
+                    }
+                    break;
+                }
+                case LoadingDirection.Bottom2Top:
+                {
+                    YCount = files.Length;
+                    XCount = texture.width;
+                    ZCount = texture.height;
+                    
+                    slices = new Color32[XCount * YCount * ZCount];
+
+                    var data = texture.GetPixels32();
+                    for (var y = 0; y < texture.height; y++)
+                    {
+                        for (var x = 0; x < texture.width; x++)
+                        {
+                            slices[(ZCount - y - 1) * XCount * YCount + x] = data[y * texture.width + x];
+                        }
+                    }
+                    Destroy(texture);
+                    
+                    for (var i = 1; i < files.Length; i++)
+                    {
+                        imagePath = Path.Combine(stackPath, files[i]);
+                        texture = FileTools.LoadImage(imagePath);
+                        data = texture.GetPixels32();
+                        for (var y = 0; y < texture.height; y++)
+                        {
+                            for (var x = 0; x < texture.width; x++)
+                            {
+                                slices[(ZCount - y - 1) * XCount * YCount + x + i * XCount] = data[y * texture.width + x];
+                            }
+                        }
+                        Destroy(texture);
+                    }
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException($"LoadingDirection {loadingDirection} is not handled!");
             }
 
             originalMesh = Instantiate(meshFilter.sharedMesh);

@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8543886286831324657}
   - component: {fileID: 9189122256921030284}
   - component: {fileID: 5213814242413030034}
+  - component: {fileID: 8668312301381497740}
   m_Layer: 0
   m_Name: RGB
   m_TagString: Untagged
@@ -125,3 +126,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stackPath: C:\Users\p42652\Desktop\open_iA-TestDatasets-2020.09\General\rgb_stack
   loadingDirection: 1
+--- !u!114 &8668312301381497740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3853433644230905135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c677c933585d0ee4dbfe7483ac9f8c84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  plane: {fileID: 0}
+  normal: {x: 0, y: 0, z: 0}
+  position: {x: 0, y: 0, z: 0}
+  rend: {fileID: 0}
