@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stackPath: C:\Users\p42652\Desktop\Wels fiber slices\StackYZ
-  sectionQuad: {fileID: 0}
+  loadingDirection: 1
 --- !u!114 &5182067467409771014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 360d3e20528c4210b21f84d95396cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greenMaterial: {fileID: 2100000, guid: 5b2a21d0f3326184f928f34b5ffd3249, type: 2}
+  selectedMaterial: {fileID: 2100000, guid: 5b2a21d0f3326184f928f34b5ffd3249, type: 2}
   highlightedMaterial: {fileID: 2100000, guid: ef5ca9acfdda25946b85657bcfc815cf, type: 2}
 --- !u!114 &5182067467409771008
 MonoBehaviour:
