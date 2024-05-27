@@ -12,7 +12,7 @@ namespace Networking.openIA
 {
     public class OpenIaWebSocketClient : MonoBehaviour
     {
-        private static OpenIaWebSocketClient Instance { get; set; } = null!;
+        public static OpenIaWebSocketClient Instance { get; private set; } = null!;
 
         [SerializeField]
         private bool isOnline = true;
@@ -34,6 +34,8 @@ namespace Networking.openIA
         private ICommandInterpreter interpreter = null!;
 
         private ICommandSender sender = null!;
+
+        public ulong? ClientID { get; set; }
 
         private void Awake()
         {

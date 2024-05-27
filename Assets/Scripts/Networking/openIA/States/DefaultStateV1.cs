@@ -21,7 +21,7 @@ namespace Networking.openIA.States
         {
             var client = ClientLoginResponse.FromByteArray(data);
             Debug.Log($"Received client id: {client.ID}");
-            // INFO id is entirely unused on the client
+            OpenIaWebSocketClient.Instance.ClientID = client.ID;
             return Task.FromResult<IInterpreterState>(this);
         }
 
