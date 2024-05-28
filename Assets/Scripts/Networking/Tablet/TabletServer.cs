@@ -42,7 +42,7 @@ namespace Networking.Tablet
         private TcpClient? _tabletClient;
         private NetworkStream? _tabletStream;
 
-        private MenuMode _menuMode;
+        private MenuMode _menuMode = MenuMode.None;
         
         private Selectable? _selected;
         private Selectable? _highlighted;
@@ -335,13 +335,14 @@ namespace Networking.Tablet
 
         private async Task HandleSwipe(bool isSwipeInward, float endX, float endY, float angle)
         {
-            // ignore inward swiped, outward swipes are used to create snapshots
+            // outward swipes are used to create snapshots
+            // inward swipes to navigate back
             if (isSwipeInward)
             {
-                return;
+                HandleModeChange(MenuMode.None);
+                await SendMenuModeToClient(MenuMode.None);
             }
-
-            if (_menuMode == MenuMode.Selected
+            else if (_menuMode == MenuMode.Selected
                 && Direction.Up == DirectionMethods.GetDirectionDegree(angle)
                 && Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
