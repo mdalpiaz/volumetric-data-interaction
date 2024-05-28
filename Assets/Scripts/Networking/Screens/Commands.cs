@@ -6,6 +6,11 @@ using UnityEngine;
 
 namespace Networking.Screens
 {
+    public interface ICommand
+    {
+        byte[] ToByteArray();
+    }
+
     public record IDAdvertisement(int ID) : ICommand
     {
         public byte[] ToByteArray()
