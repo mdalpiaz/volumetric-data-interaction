@@ -38,36 +38,36 @@ namespace Networking.Tablet
         [SerializeField]
         private int port = Ports.TabletPort;
         
-        private TcpListener _server = null!;
-        private TcpClient? _tabletClient;
-        private NetworkStream? _tabletStream;
+        private TcpListener server = null!;
+        private TcpClient? tabletClient;
+        private NetworkStream? tabletStream;
 
-        private MenuMode _menuMode = MenuMode.None;
+        private MenuMode menuMode = MenuMode.None;
         
-        private Selectable? _selected;
-        private Selectable? _highlighted;
+        private Selectable? selected;
+        private Selectable? highlighted;
 
         private Selectable? Selected
         {
-            get => _selected;
+            get => selected;
             set
             {
                 Unselect();
-                _selected = value;
+                selected = value;
             }
         }
 
         public Selectable? Highlighted
         {
-            get => _highlighted;
+            get => highlighted;
             set
             {
-                if (_highlighted != null)
+                if (highlighted != null)
                 {
-                    _highlighted.IsSelected = false;
+                    highlighted.IsSelected = false;
                 }
 
-                _highlighted = value;
+                highlighted = value;
             }
         }
 
@@ -89,7 +89,7 @@ namespace Networking.Tablet
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                _server = new TcpListener(IPAddress.Loopback, port);
+                server = new TcpListener(IPAddress.Loopback, port);
             }
             else
             {
@@ -100,10 +100,10 @@ namespace Networking.Tablet
         private async void OnEnable()
         {
             Debug.Log($"TabletServer started on port {port}");
-            _server.Start();
+            server.Start();
             try
             {
-                _tabletClient = await _server.AcceptTcpClientAsync();
+                tabletClient = await server.AcceptTcpClientAsync();
             }
             catch
             {
@@ -111,14 +111,14 @@ namespace Networking.Tablet
                 return;
             }
             Debug.Log("Client connected");
-            _tabletStream = _tabletClient.GetStream();
+            tabletStream = tabletClient.GetStream();
 
             var commandIdentifier = new byte[1];
             while (true)
             {
                 try
                 {
-                    await _tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
+                    await tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
                     Debug.Log($"Received command {commandIdentifier[0]}");
                     switch (commandIdentifier[0])
                     {
@@ -126,7 +126,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[MenuModeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = MenuModeCommand.FromByteArray(buffer);
                                 HandleModeChange(cmd.Mode);
                                 break;
@@ -135,7 +135,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[SwipeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = SwipeCommand.FromByteArray(buffer);
                                 await HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
                                 break;
@@ -144,7 +144,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[ScaleCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = ScaleCommand.FromByteArray(buffer);
                                 HandleScaling(cmd.Scale);
                                 break;
@@ -153,7 +153,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[ShakeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = ShakeCommand.FromByteArray(buffer);
                                 await HandleShakes(cmd.Count);
                                 break;
@@ -162,7 +162,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[TapCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                await _tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = TapCommand.FromByteArray(buffer);
                                 await HandleTap(cmd.Type, cmd.X, cmd.Y);
                                 break;
@@ -194,14 +194,14 @@ namespace Networking.Tablet
 
         private void OnDisable()
         {
-            _tabletClient?.Close();
-            _server.Stop();
+            tabletClient?.Close();
+            server.Stop();
         }
         
         private void HandleModeChange(MenuMode mode)
         {
             Debug.Log($"Menu Mode change requested: \"{mode}\"");
-            if (_menuMode == mode)
+            if (menuMode == mode)
             {
                 return;
             }
@@ -211,7 +211,7 @@ namespace Networking.Tablet
             switch (mode)
             {
                 case MenuMode.None:
-                    if (_menuMode == MenuMode.Analysis)
+                    if (menuMode == MenuMode.Analysis)
                     {
                         slicer.SetCuttingActive(false);
                     }
@@ -250,7 +250,7 @@ namespace Networking.Tablet
 
             // stop mapping if the menu is changed
             ui.SetMode(mode, isSnapshotSelected);
-            _menuMode = mode;
+            menuMode = mode;
         }
         
         private async Task HandleShakes(int shakeCount)
@@ -293,7 +293,7 @@ namespace Networking.Tablet
                     break;
                 case TapType.Double:
                     Debug.Log($"Double Tap received at ({x},{y})");
-                    if (_menuMode == MenuMode.Selection && Highlighted != null)
+                    if (menuMode == MenuMode.Selection && Highlighted != null)
                     {
                         Selected = Highlighted;
                         Selected.IsSelected = true;
@@ -304,7 +304,7 @@ namespace Networking.Tablet
                         HandleModeChange(MenuMode.Selected);
                         await SendMenuModeToClient(MenuMode.Selected);
                     }
-                    else if (_menuMode == MenuMode.Analysis)
+                    else if (menuMode == MenuMode.Analysis)
                     {
                         slicer.Slice();
                         Sliced?.Invoke(slicer.transform);
@@ -312,7 +312,7 @@ namespace Networking.Tablet
                     break;
                 case TapType.HoldBegin:
                     Debug.Log($"Tap Hold Start received at: ({x},{y})");
-                    if (_menuMode == MenuMode.Selected &&
+                    if (menuMode == MenuMode.Selected &&
                         Selected != null &&
                         ModelManager.Instance.CurrentModel.gameObject == Selected.gameObject)
                     {
@@ -342,13 +342,13 @@ namespace Networking.Tablet
                 HandleModeChange(MenuMode.None);
                 await SendMenuModeToClient(MenuMode.None);
             }
-            else if (_menuMode == MenuMode.Selected
+            else if (menuMode == MenuMode.Selected
                 && Direction.Up == DirectionMethods.GetDirectionDegree(angle)
                 && Selected != null && Selected.TryGetComponent(out Snapshot snapshot))
             {
                 await ScreenServer.Instance.Send(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
             }
-            else if (_menuMode == MenuMode.Analysis)
+            else if (menuMode == MenuMode.Analysis)
             {
                 SnapshotManager.Instance.CreateSnapshot(angle);
                 //Sliced?.Invoke(slicer.transform);
@@ -360,7 +360,7 @@ namespace Networking.Tablet
         /// </summary>
         private void HandleScaling(float scaleMultiplier)
         {
-            if(_menuMode == MenuMode.Selected
+            if(menuMode == MenuMode.Selected
                && Selected != null)
             {
                 Selected.transform.localScale *= scaleMultiplier;
@@ -384,19 +384,19 @@ namespace Networking.Tablet
             }
 
             // manually set to null, as "IsSelected = null" can cause stack overflows through the constant calls to Unselect()
-            _selected = null;
+            selected = null;
             Highlighted = null;
             ui.SetMode(MenuMode.None);
         }
 
         private async Task SendMenuModeToClient(MenuMode mode)
         {
-            if (_tabletStream == null)
+            if (tabletStream == null)
             {
                 return;
             }
 
-            await _tabletStream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
+            await tabletStream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
         }
     }
 }
