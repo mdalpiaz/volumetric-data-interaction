@@ -137,6 +137,7 @@ namespace Model
                         {
                             for (var x = 0; x < texture.width; x++)
                             {
+                                // rotate the original texture by 90° downwards
                                 slices[(ZCount - y - 1) * XCount * YCount + x + i * XCount] = data[y * texture.width + x];
                             }
                         }
