@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Model;
 using Networking.Tablet;
@@ -159,12 +160,7 @@ namespace Networking.openIA
 
         private async void SnapshotsCleared(List<ulong> snapshotIDs)
         {
-            var tasks = new List<Task>();
-            foreach (var id in snapshotIDs)
-            {
-                tasks.Add(Send(new RemoveSnapshot(id)));
-            }
-
+            var tasks = snapshotIDs.Select(id => Send(new RemoveSnapshot(id)));
             await Task.WhenAll(tasks);
         }
 
