@@ -101,7 +101,9 @@ namespace Networking.openIA.States
                 case Categories.Snapshots.Create:
                 {
                     var createCommand = CreateSnapshotServer.FromByteArray(data);
-                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, createCommand.Position, createCommand.Rotation);
+                    var unityCoords = CoordinateConverter.OpenIAToUnity(createCommand.Position);
+                    var worldCoords = ModelManager.Instance.CurrentModel.transform.TransformPoint(unityCoords);
+                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
                     break;
                 }
                 case Categories.Snapshots.Remove:
