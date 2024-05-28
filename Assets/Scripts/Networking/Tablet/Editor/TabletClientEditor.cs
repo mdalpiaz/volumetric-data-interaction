@@ -12,6 +12,11 @@ namespace Networking.Tablet.Editor
 
             DrawDefaultInspector();
 
+            if (GUILayout.Button("Connect"))
+            {
+                _ = client.Connect();
+            }
+            
             if (GUILayout.Button("Send Menu: Analysis"))
             {
                 _ = client.SendMenuChangedMessage(MenuMode.Analysis);
