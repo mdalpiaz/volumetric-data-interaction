@@ -4,6 +4,11 @@ using System;
 
 namespace Networking.Tablet
 {
+    public interface ICommand
+    {
+        byte[] ToByteArray();
+    }
+
     public record MenuModeCommand(MenuMode Mode) : ICommand
     {
         public byte[] ToByteArray()
@@ -141,4 +146,6 @@ namespace Networking.Tablet
                 BitConverter.ToSingle(buffer, 6));
         }
     }
+
+
 }
