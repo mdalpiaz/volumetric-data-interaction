@@ -7,6 +7,11 @@ using System.Text;
 
 namespace Networking.openIA
 {
+    public interface ICommand
+    {
+        byte[] ToByteArray();
+    }
+
     public record ACK() : ICommand
     {
         public byte[] ToByteArray()
