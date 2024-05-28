@@ -559,7 +559,6 @@ GameObject:
   - component: {fileID: 1089023902}
   - component: {fileID: 1089023901}
   - component: {fileID: 1089023900}
-  - component: {fileID: 1089023903}
   m_Layer: 0
   m_Name: NetworkConfig
   m_TagString: Untagged
@@ -652,22 +651,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &1089023903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089023898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3adb66cc2aeaf1469a2e8ac43e43b75, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ipText: {fileID: 1510429255}
-  log: {fileID: 1605106434}
-  netMan: {fileID: 0}
-  unityTransport: {fileID: 0}
 --- !u!1 &1231858568
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,9 +735,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1089023903}
-        m_TargetAssemblyTypeName: Interaction.NetworkConfigHandler, Assembly-CSharp
-        m_MethodName: Connect
+      - m_Target: {fileID: 1317160090}
+        m_TargetAssemblyTypeName: Client.Menu, Assembly-CSharp
+        m_MethodName: OnConnectClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1024,6 +1007,11 @@ PrefabInstance:
       objectReference: {fileID: 2157202343130445133}
     - target: {fileID: 5213595056518243056, guid: 7c0d154f330d99c4d8221b1578c10d26,
         type: 3}
+      propertyPath: ipInputField
+      value: 
+      objectReference: {fileID: 1510429255}
+    - target: {fileID: 5213595056518243056, guid: 7c0d154f330d99c4d8221b1578c10d26,
+        type: 3}
       propertyPath: spatialInput
       value: 
       objectReference: {fileID: 2912687070456278249}
@@ -1159,6 +1147,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c0d154f330d99c4d8221b1578c10d26, type: 3}
+--- !u!114 &1317160090 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5213595056518243056, guid: 7c0d154f330d99c4d8221b1578c10d26,
+    type: 3}
+  m_PrefabInstance: {fileID: 1317160089}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a66f29caf3371ad4d9d55756c6fafd4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1317160092 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5213595057382178444, guid: 7c0d154f330d99c4d8221b1578c10d26,

@@ -1,7 +1,9 @@
 ﻿#nullable enable
 
+using System;
 using System.Threading.Tasks;
 using Networking.Tablet;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,14 +32,12 @@ namespace Client
         
         [SerializeField]
         private GameObject networkConfigMenu = null!;
+
+        [SerializeField]
+        private TMP_InputField ipInputField = null!;
         
         [SerializeField]
         private Text headerText = null!;
-
-        private void Awake()
-        {
-            SwitchToMainMenu();
-        }
 
         private void OnEnable()
         {
@@ -46,6 +46,11 @@ namespace Client
             touchInput.Scaled += OnScale;
             touchInput.Tapped += OnTap;
             spatialInput.Shook += OnShake;
+        }
+
+        private void Start()
+        {
+            ipInputField.text = tabletClient.IP;
         }
 
         private void OnDisable()
@@ -57,6 +62,13 @@ namespace Client
             spatialInput.Shook -= OnShake;
         }
 
+        public async void OnConnectClick()
+        {
+            tabletClient.IP = ipInputField.text;
+            await tabletClient.Connect();
+            SwitchToMainMenu();
+        }
+        
         public async void OnSelectionClick() => await StartSelection();
         
         public async void OnAnalysisClick() => await StartAnalysis();
