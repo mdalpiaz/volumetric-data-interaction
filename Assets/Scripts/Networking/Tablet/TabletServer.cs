@@ -152,7 +152,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[MenuModeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = MenuModeCommand.FromByteArray(buffer);
                                 HandleModeChange(cmd.Mode);
                                 break;
@@ -161,7 +161,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[SwipeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = SwipeCommand.FromByteArray(buffer);
                                 await HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
                                 break;
@@ -170,7 +170,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[ScaleCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = new ScaleCommand(buffer);
                                 HandleScaling(cmd.Scale);
                                 break;
@@ -179,7 +179,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[ShakeCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = ShakeCommand.FromByteArray(buffer);
                                 await HandleShakes(cmd.Count);
                                 break;
@@ -188,7 +188,7 @@ namespace Networking.Tablet
                             {
                                 var buffer = new byte[TapCommand.Size];
                                 buffer[0] = commandIdentifier[0];
-                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
                                 var cmd = TapCommand.FromByteArray(buffer);
                                 await HandleTap(cmd.Type, cmd.X, cmd.Y);
                                 break;
@@ -236,11 +236,6 @@ namespace Networking.Tablet
                         case Categories.ToggleAttach:
                             {
                                 OnToggleAttach();
-                                break;
-                            }
-                        case Categories.RestoreModel:
-                            {
-                                OnRestoreModel();
                                 break;
                             }
                         case Categories.HoldBegin:
@@ -561,11 +556,6 @@ namespace Networking.Tablet
 
             // TODO
             snapshot.AttachToTransform(interfaceController.Main.parent, interfaceController.Additions[0].position);
-        }
-
-        private void OnRestoreModel()
-        {
-
         }
 
         private void OnHoldBegin()
