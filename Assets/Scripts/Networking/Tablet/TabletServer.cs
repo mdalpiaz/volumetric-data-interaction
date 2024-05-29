@@ -45,7 +45,6 @@ namespace Networking.Tablet
         private TcpListener server = null!;
         private TcpClient tabletClient = null!;
         private NetworkStream tabletStream = null!;
-        private Thread receivingThread = null!;
 
         private MenuMode menuMode = MenuMode.None;
         
@@ -118,136 +117,132 @@ namespace Networking.Tablet
             Debug.Log("Client connected");
             tabletStream = tabletClient.GetStream();
 
-            receivingThread = new Thread(async () =>
+            var commandIdentifier = new byte[1];
+            while (true)
             {
-                var commandIdentifier = new byte[1];
-                while (true)
+                try
                 {
-                    try
+                    await tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
+                    Debug.Log($"Received command {commandIdentifier[0]}");
+                    switch (commandIdentifier[0])
                     {
-                        tabletStream.ReadAll(commandIdentifier, 0, 1);
-                        Debug.Log($"Received command {commandIdentifier[0]}");
-                        switch (commandIdentifier[0])
-                        {
-                            case Categories.MenuMode:
-                                {
-                                    var buffer = new byte[MenuModeCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
-                                    var cmd = MenuModeCommand.FromByteArray(buffer);
-                                    HandleModeChange(cmd.Mode);
-                                    break;
-                                }
-                            case Categories.Swipe:
-                                {
-                                    var buffer = new byte[SwipeCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
-                                    var cmd = SwipeCommand.FromByteArray(buffer);
-                                    await HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
-                                    break;
-                                }
-                            case Categories.Scale:
-                                {
-                                    var buffer = new byte[ScaleCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
-                                    var cmd = new ScaleCommand(buffer);
-                                    HandleScaling(cmd.Scale);
-                                    break;
-                                }
-                            case Categories.Shake:
-                                {
-                                    var buffer = new byte[ShakeCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
-                                    var cmd = ShakeCommand.FromByteArray(buffer);
-                                    await HandleShakes(cmd.Count);
-                                    break;
-                                }
-                            case Categories.Tap:
-                                {
-                                    var buffer = new byte[TapCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
-                                    var cmd = TapCommand.FromByteArray(buffer);
-                                    await HandleTap(cmd.Type, cmd.X, cmd.Y);
-                                    break;
-                                }
-                            case Categories.Rotate:
-                                {
-                                    Debug.Log("Rotate command is ignored");
-                                    break;
-                                }
-                            case Categories.Tilt:
-                                {
-                                    Debug.Log("Tilt command is ignored");
-                                    break;
-                                }
-                            case Categories.SelectionMode:
-                                {
-                                    OnSelectionMode();
-                                    break;
-                                }
-                            case Categories.SlicingMode:
-                                {
-                                    OnSlicingMode();
-                                    break;
-                                }
-                            case Categories.Select:
-                                {
-                                    OnSelect();
-                                    break;
-                                }
-                            case Categories.Unselect:
-                                {
-                                    OnUnselect();
-                                    break;
-                                }
-                            case Categories.Slice:
-                                {
-                                    OnSlice();
-                                    break;
-                                }
-                            case Categories.RemoveSnapshot:
-                                {
-                                    OnRemoveSnapshot();
-                                    break;
-                                }
-                            case Categories.ToggleAttach:
-                                {
-                                    OnToggleAttach();
-                                    break;
-                                }
-                            case Categories.RestoreModel:
-                                {
-                                    OnRestoreModel();
-                                    break;
-                                }
-                            case Categories.HoldBegin:
-                                {
-                                    OnHoldBegin();
-                                    break;
-                                }
-                            case Categories.HoldEnd:
-                                {
-                                    OnHoldEnd();
-                                    break;
-                                }
-                            case Categories.SendToScreen:
-                                {
-                                    OnSendToScreen();
-                                    break;
-                                }
-                        }
-                    }
-                    catch
-                    {
-                        break;
+                        case Categories.MenuMode:
+                            {
+                                var buffer = new byte[MenuModeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                var cmd = MenuModeCommand.FromByteArray(buffer);
+                                HandleModeChange(cmd.Mode);
+                                break;
+                            }
+                        case Categories.Swipe:
+                            {
+                                var buffer = new byte[SwipeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                var cmd = SwipeCommand.FromByteArray(buffer);
+                                await HandleSwipe(cmd.Inward, cmd.EndPointX, cmd.EndPointY, cmd.Angle);
+                                break;
+                            }
+                        case Categories.Scale:
+                            {
+                                var buffer = new byte[ScaleCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                var cmd = new ScaleCommand(buffer);
+                                HandleScaling(cmd.Scale);
+                                break;
+                            }
+                        case Categories.Shake:
+                            {
+                                var buffer = new byte[ShakeCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                var cmd = ShakeCommand.FromByteArray(buffer);
+                                await HandleShakes(cmd.Count);
+                                break;
+                            }
+                        case Categories.Tap:
+                            {
+                                var buffer = new byte[TapCommand.Size];
+                                buffer[0] = commandIdentifier[0];
+                                tabletStream.ReadAll(buffer, 1, buffer.Length - 1);
+                                var cmd = TapCommand.FromByteArray(buffer);
+                                await HandleTap(cmd.Type, cmd.X, cmd.Y);
+                                break;
+                            }
+                        case Categories.Rotate:
+                            {
+                                Debug.Log("Rotate command is ignored");
+                                break;
+                            }
+                        case Categories.Tilt:
+                            {
+                                Debug.Log("Tilt command is ignored");
+                                break;
+                            }
+                        case Categories.SelectionMode:
+                            {
+                                OnSelectionMode();
+                                break;
+                            }
+                        case Categories.SlicingMode:
+                            {
+                                OnSlicingMode();
+                                break;
+                            }
+                        case Categories.Select:
+                            {
+                                OnSelect();
+                                break;
+                            }
+                        case Categories.Unselect:
+                            {
+                                OnUnselect();
+                                break;
+                            }
+                        case Categories.Slice:
+                            {
+                                OnSlice();
+                                break;
+                            }
+                        case Categories.RemoveSnapshot:
+                            {
+                                OnRemoveSnapshot();
+                                break;
+                            }
+                        case Categories.ToggleAttach:
+                            {
+                                OnToggleAttach();
+                                break;
+                            }
+                        case Categories.RestoreModel:
+                            {
+                                OnRestoreModel();
+                                break;
+                            }
+                        case Categories.HoldBegin:
+                            {
+                                OnHoldBegin();
+                                break;
+                            }
+                        case Categories.HoldEnd:
+                            {
+                                OnHoldEnd();
+                                break;
+                            }
+                        case Categories.SendToScreen:
+                            {
+                                OnSendToScreen();
+                                break;
+                            }
                     }
                 }
-            });
-            receivingThread.Start();
+                catch
+                {
+                    break;
+                }
+            }
         }
 
         private void Start()
@@ -260,7 +255,6 @@ namespace Networking.Tablet
         {
             tabletClient.Close();
             server.Stop();
-            receivingThread.Join();
         }
 
         #region Legacy Input Handling
@@ -579,7 +573,7 @@ namespace Networking.Tablet
             mappingAnchor.StopMapping();
         }
 
-        private void OnSendToScreen()
+        private async Task OnSendToScreen()
         {
             if (Selected == null)
             {
@@ -590,7 +584,7 @@ namespace Networking.Tablet
                 return;
             }
 
-            ScreenServer.Instance.Send(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
+            await ScreenServer.Instance.SendAsync(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
         }
     }
 }
