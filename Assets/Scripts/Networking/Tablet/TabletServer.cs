@@ -45,6 +45,7 @@ namespace Networking.Tablet
         private TcpListener server = null!;
         private TcpClient tabletClient = null!;
         private NetworkStream tabletStream = null!;
+        private Task? receivingTask;
 
         private MenuMode menuMode = MenuMode.None;
         
@@ -117,6 +118,27 @@ namespace Networking.Tablet
             Debug.Log("Client connected");
             tabletStream = tabletClient.GetStream();
 
+            receivingTask = Run();
+        }
+
+        private void Start()
+        {
+            ray.SetActive(false);
+            Selected = ModelManager.Instance.CurrentModel.Selectable;
+        }
+
+        private async void OnDisable()
+        {
+            tabletClient.Close();
+            server.Stop();
+            if (receivingTask != null)
+            {
+                await receivingTask;
+            }
+        }
+
+        private async Task Run()
+        {
             var commandIdentifier = new byte[1];
             while (true)
             {
@@ -233,7 +255,7 @@ namespace Networking.Tablet
                             }
                         case Categories.SendToScreen:
                             {
-                                OnSendToScreen();
+                                await OnSendToScreen();
                                 break;
                             }
                     }
@@ -243,18 +265,6 @@ namespace Networking.Tablet
                     break;
                 }
             }
-        }
-
-        private void Start()
-        {
-            ray.SetActive(false);
-            Selected = ModelManager.Instance.CurrentModel.Selectable;
-        }
-
-        private void OnDisable()
-        {
-            tabletClient.Close();
-            server.Stop();
         }
 
         #region Legacy Input Handling

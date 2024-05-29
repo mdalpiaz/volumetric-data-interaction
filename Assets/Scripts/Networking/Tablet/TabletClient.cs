@@ -55,8 +55,10 @@ namespace Networking.Tablet
             await tcpClient.ConnectAsync(IP, Port);
             stream = tcpClient.GetStream();
             Debug.Log("Connected to server");
+        }
 
-            // the only command which can be received is "changing menu mode"
+        public async Task Run()
+        {
             var buffer = new byte[1];
             while (true)
             {
