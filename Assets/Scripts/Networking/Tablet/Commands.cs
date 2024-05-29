@@ -148,54 +148,6 @@ namespace Networking.Tablet
     }
 
     // new commands
-    public class SelectCommand : ICommand
-    {
-        public SelectCommand() { }
-
-        public byte[] ToByteArray()
-        {
-            return new byte[] { Categories.Select };
-        }
-
-        public static int Size => 1;
-    }
-
-    public class UnselectCommand : ICommand
-    {
-        public UnselectCommand() { }
-
-        public byte[] ToByteArray()
-        {
-            return new byte[] { Categories.Unselect };
-        }
-
-        public static int Size => 1;
-    }
-
-    public class SelectedModelCommand : ICommand
-    {
-        public SelectedModelCommand() { }
-
-        public byte[] ToByteArray()
-        {
-            return new byte[] { Categories.SelectedModel };
-        }
-
-        public static int Size => 1;
-    }
-
-    public class SelectedSnapshotCommand : ICommand
-    {
-        public SelectedSnapshotCommand() { }
-
-        public byte[] ToByteArray()
-        {
-            return new byte[] { Categories.SelectedSnapshot };
-        }
-
-        public static int Size => 1;
-    }
-
     public class ScaleCommand : ICommand
     {
         public float Scale { get; private set; }
@@ -216,17 +168,5 @@ namespace Networking.Tablet
         }
 
         public static int Size => 1 + sizeof(float);
-    }
-
-    public class SliceCommand : ICommand
-    {
-        public SliceCommand() { }
-
-        public byte[] ToByteArray()
-        {
-            return new byte[] { Categories.Slice };
-        }
-
-        public static int Size => 1;
     }
 }
