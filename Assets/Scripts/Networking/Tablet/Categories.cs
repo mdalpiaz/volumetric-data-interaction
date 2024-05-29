@@ -9,5 +9,22 @@ namespace Networking.Tablet
         public const byte Tilt = 4;
         public const byte Shake = 5;
         public const byte Tap = 6;
+
+        // here begin the new command types
+        public const byte SelectionMode = 7;
+        public const byte SlicingMode = 8;
+        public const byte Select = 9;
+        public const byte Unselect = 10;
+        public const byte SelectedModel = 11;
+        public const byte SelectedSnapshot = 12;
+        public const byte Slice = 13;
+        public const byte RemoveSnapshot = 14;
+        public const byte SnapshotRemoved = 15;
+        public const byte ToggleAttach = 16;
+        public const byte DetachAll = 17;
+        public const byte RestoreModel = 18;
+        public const byte HoldBegin = 19;
+        public const byte HoldEnd = 20;
+        public const byte SendToScreen = 21;
     }
 }

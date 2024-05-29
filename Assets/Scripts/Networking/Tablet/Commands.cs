@@ -52,23 +52,23 @@ namespace Networking.Tablet
         }
     }
 
-    public record ScaleCommand(float Scale) : ICommand
-    {
-        public byte[] ToByteArray()
-        {
-            var buffer = new byte[Size];
-            buffer[0] = Categories.Scale;
-            Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
-            return buffer;
-        }
+    //public record ScaleCommand(float Scale) : ICommand
+    //{
+    //    public byte[] ToByteArray()
+    //    {
+    //        var buffer = new byte[Size];
+    //        buffer[0] = Categories.Scale;
+    //        Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
+    //        return buffer;
+    //    }
 
-        public static int Size => 1 + sizeof(float);
+    //    public static int Size => 1 + sizeof(float);
 
-        public static ScaleCommand FromByteArray(byte[] buffer)
-        {
-            return new ScaleCommand(BitConverter.ToSingle(buffer, 1));
-        }
-    }
+    //    public static ScaleCommand FromByteArray(byte[] buffer)
+    //    {
+    //        return new ScaleCommand(BitConverter.ToSingle(buffer, 1));
+    //    }
+    //}
 
     public record RotateCommand(float Rotation) : ICommand
     {
@@ -147,5 +147,86 @@ namespace Networking.Tablet
         }
     }
 
+    // new commands
+    public class SelectCommand : ICommand
+    {
+        public SelectCommand() { }
 
+        public byte[] ToByteArray()
+        {
+            return new byte[] { Categories.Select };
+        }
+
+        public static int Size => 1;
+    }
+
+    public class UnselectCommand : ICommand
+    {
+        public UnselectCommand() { }
+
+        public byte[] ToByteArray()
+        {
+            return new byte[] { Categories.Unselect };
+        }
+
+        public static int Size => 1;
+    }
+
+    public class SelectedModelCommand : ICommand
+    {
+        public SelectedModelCommand() { }
+
+        public byte[] ToByteArray()
+        {
+            return new byte[] { Categories.SelectedModel };
+        }
+
+        public static int Size => 1;
+    }
+
+    public class SelectedSnapshotCommand : ICommand
+    {
+        public SelectedSnapshotCommand() { }
+
+        public byte[] ToByteArray()
+        {
+            return new byte[] { Categories.SelectedSnapshot };
+        }
+
+        public static int Size => 1;
+    }
+
+    public class ScaleCommand : ICommand
+    {
+        public float Scale { get; private set; }
+
+        public ScaleCommand(float scale)
+        {
+            Scale = scale;
+        }
+
+        public ScaleCommand(byte[] buffer) : this(BitConverter.ToSingle(buffer, 1)) { }
+
+        public byte[] ToByteArray()
+        {
+            var buffer = new byte[Size];
+            buffer[0] = Categories.Scale;
+            Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
+            return buffer;
+        }
+
+        public static int Size => 1 + sizeof(float);
+    }
+
+    public class SliceCommand : ICommand
+    {
+        public SliceCommand() { }
+
+        public byte[] ToByteArray()
+        {
+            return new byte[] { Categories.Slice };
+        }
+
+        public static int Size => 1;
+    }
 }

@@ -13,6 +13,7 @@ using Snapshots;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using static Networking.openIA.Categories;
 
 namespace Networking.Tablet
 {
@@ -33,14 +34,17 @@ namespace Networking.Tablet
         private GameObject tablet = null!;
 
         [SerializeField]
+        private InterfaceController interfaceController = null!;
+
+        [SerializeField]
         private MappingAnchor mappingAnchor = null!;
         
         [SerializeField]
         private int port = Ports.TabletPort;
         
         private TcpListener server = null!;
-        private TcpClient? tabletClient;
-        private NetworkStream? tabletStream;
+        private TcpClient tabletClient = null!;
+        private NetworkStream tabletStream = null!;
 
         private MenuMode menuMode = MenuMode.None;
         
@@ -145,7 +149,7 @@ namespace Networking.Tablet
                                 var buffer = new byte[ScaleCommand.Size];
                                 buffer[0] = commandIdentifier[0];
                                 await tabletStream.ReadAllAsync(buffer, 1, buffer.Length - 1);
-                                var cmd = ScaleCommand.FromByteArray(buffer);
+                                var cmd = new ScaleCommand(buffer);
                                 HandleScaling(cmd.Scale);
                                 break;
                             }
@@ -177,6 +181,61 @@ namespace Networking.Tablet
                                 Debug.Log("Tilt command is ignored");
                                 break;
                             }
+                        case Categories.SelectionMode:
+                            {
+                                OnSelectionMode();
+                                break;
+                            }
+                        case Categories.SlicingMode:
+                            {
+                                OnSlicingMode();
+                                break;
+                            }
+                        case Categories.Select:
+                            {
+                                OnSelect();
+                                break;
+                            }
+                        case Categories.Unselect:
+                            {
+                                OnUnselect();
+                                break;
+                            }
+                        case Categories.Slice:
+                            {
+                                OnSlice();
+                                break;
+                            }
+                        case Categories.RemoveSnapshot:
+                            {
+                                OnRemoveSnapshot();
+                                break;
+                            }
+                        case Categories.ToggleAttach:
+                            {
+                                OnToggleAttach();
+                                break;
+                            }
+                        case Categories.RestoreModel:
+                            {
+                                OnRestoreModel();
+                                break;
+                            }
+                        case Categories.HoldBegin:
+                            {
+                                OnHoldBegin();
+                                break;
+                            }
+                        case Categories.HoldEnd:
+                            {
+                                OnHoldEnd();
+                                break;
+                            }
+                        case Categories.SendToScreen:
+                            {
+                                await OnSendToScreen();
+                                break;
+                            }
                     }
                 }
                 catch
@@ -194,10 +253,12 @@ namespace Networking.Tablet
 
         private void OnDisable()
         {
-            tabletClient?.Close();
+            tabletClient.Close();
             server.Stop();
         }
-        
+
+        #region Legacy Input Handling
+
         private void HandleModeChange(MenuMode mode)
         {
             Debug.Log($"Menu Mode change requested: \"{mode}\"");
@@ -397,6 +458,133 @@ namespace Networking.Tablet
             }
 
             await tabletStream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
+        }
+
+        #endregion
+
+        private void OnSelectionMode()
+        {
+            slicer.SetCuttingActive(false);
+            ray.SetActive(true);
+        }
+
+        private void OnSlicingMode()
+        {
+            slicer.SetCuttingActive(true);
+            ray.SetActive(false);
+        }
+
+        private void OnSelect()
+        {
+            if (Highlighted == null)
+            {
+                return;
+            }
+
+            Selected = Highlighted;
+            Selected.IsSelected = true;
+
+            ray.SetActive(false);
+            Highlighted = null;
+
+            if (Selected.TryGetComponent<Snapshot>(out _))
+            {
+                tabletStream.WriteByte(Categories.SelectedSnapshot);
+            }
+            else
+            {
+                tabletStream.WriteByte(Categories.SelectedModel);
+            }
+        }
+
+        private void OnUnselect()
+        {
+            if (Highlighted != null)
+            {
+                Highlighted.IsSelected = false;
+            }
+            else if (Selected != null)
+            {
+                Selected.IsSelected = false;
+            }
+
+            // manually set to null, as "IsSelected = null" can cause stack overflows through the constant calls to Unselect()
+            selected = null;
+            Highlighted = null;
+
+            ray.SetActive(true);
+        }
+
+        private void OnSlice()
+        {
+            slicer.Slice();
+        }
+
+        private void OnRemoveSnapshot()
+        {
+            if (Selected == null)
+            {
+                return;
+            }
+            if (!Selected.TryGetComponent<Snapshot>(out var snapshot))
+            {
+                return;
+            }
+
+            if (SnapshotManager.Instance.DeleteSnapshot(snapshot))
+            {
+                tabletStream.WriteByte(Categories.SnapshotRemoved);
+                SnapshotRemoved?.Invoke(snapshot);
+            }
+        }
+
+        private void OnToggleAttach()
+        {
+            if (Selected == null)
+            {
+                return;
+            }
+            if (!Selected.TryGetComponent<Snapshot>(out var snapshot))
+            {
+                return;
+            }
+
+            // TODO
+            snapshot.AttachToTransform(interfaceController.Main.parent, interfaceController.Additions[0].position);
+        }
+
+        private void OnRestoreModel()
+        {
+
+        }
+
+        private void OnHoldBegin()
+        {
+            if (Selected == null)
+            {
+                return;
+            }
+
+            mappingAnchor.StartMapping(Selected.transform);
+        }
+
+        private void OnHoldEnd()
+        {
+            mappingAnchor.StopMapping();
+        }
+
+        private async Task OnSendToScreen()
+        {
+            if (Selected == null)
+            {
+                return;
+            }
+            if (!Selected.TryGetComponent<Snapshot>(out var snapshot))
+            {
+                return;
+            }
+
+            await ScreenServer.Instance.Send(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
         }
     }
 }

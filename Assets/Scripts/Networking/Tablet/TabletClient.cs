@@ -35,6 +35,12 @@ namespace Networking.Tablet
         
         public event Action<MenuMode>? MenuModeChanged;
 
+        public event Action? ModelSelected;
+
+        public event Action? SnapshotSelected;
+
+        public event Action? SnapshotRemoved;
+
         private void Awake()
         {
             tcpClient = new TcpClient();
@@ -55,23 +61,32 @@ namespace Networking.Tablet
             receivingThread = new Thread(() =>
             {
                 // the only command which can be received is "changing menu mode"
-                var buffer = new byte[2];
+                var buffer = new byte[1];
                 while (true)
                 {
                     try
                     {
-                        stream.ReadAll(buffer, 0, 2);
+                        stream.ReadAll(buffer, 0, 1);
                     }
                     catch
                     {
                         break;
                     }
-                    if (buffer[0] != Categories.MenuMode)
+                    switch (buffer[1])
                     {
-                        Debug.LogWarning("Unsupported command was received!");
-                        continue;
+                        case Categories.SelectedModel:
+                            ModelSelected?.Invoke();
+                            break;
+                        case Categories.SelectedSnapshot:
+                            SnapshotSelected?.Invoke();
+                            break;
+                        case Categories.SnapshotRemoved:
+                            SnapshotRemoved?.Invoke();
+                            break;
+                        default:
+                            Debug.LogWarning("Unsupported command was received!");
+                            break;
                     }
-                    MenuModeChanged?.Invoke((MenuMode)buffer[1]);
                 }
             });
             receivingThread.Start();
@@ -105,6 +120,16 @@ namespace Networking.Tablet
         {
             Debug.Log($"Sending tap: {type} at ({x},{y})");
             await stream.WriteAsync(new TapCommand(type, x, y).ToByteArray());
+        }
+
+        public async Task Send(ICommand command)
+        {
+            await stream.WriteAsync(command.ToByteArray());
+        }
+
+        public void Send(byte command)
+        {
+            stream.WriteByte(command);
         }
     }
 }
