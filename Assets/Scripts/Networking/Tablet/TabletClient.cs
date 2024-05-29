@@ -72,7 +72,7 @@ namespace Networking.Tablet
                     {
                         break;
                     }
-                    switch (buffer[1])
+                    switch (buffer[0])
                     {
                         case Categories.SelectedModel:
                             ModelSelected?.Invoke();
