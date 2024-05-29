@@ -75,8 +75,6 @@ namespace Client
 
         public void RemoveSnapshot() => tabletClient.Send(Categories.RemoveSnapshot);
 
-        public void RestoreModel() => tabletClient.Send(Categories.RestoreModel);
-
         public void Select() => tabletClient.Send(Categories.Select);
 
         public void Unselect() => tabletClient.Send(Categories.Unselect);
