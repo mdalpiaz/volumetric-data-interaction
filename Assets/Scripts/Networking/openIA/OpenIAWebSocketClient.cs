@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model;
 using Networking.Tablet;
+using Selection;
 using Snapshots;
 using UnityEngine;
 
@@ -38,6 +39,8 @@ namespace Networking.openIA
 
         public ulong? ClientID { get; set; }
 
+        private Selectable? selected;
+
         private void Awake()
         {
             if (Instance == null)
@@ -58,6 +61,7 @@ namespace Networking.openIA
                 return;
             }
 
+            TabletServer.Instance.MappingStarted += MappingStarted;
             TabletServer.Instance.MappingStopped += MappingStopped;
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.SnapshotRemoved += SnapshotRemoved;
@@ -101,6 +105,7 @@ namespace Networking.openIA
                 return;
             }
 
+            TabletServer.Instance.MappingStarted -= MappingStarted;
             TabletServer.Instance.MappingStopped -= MappingStopped;
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.SnapshotRemoved -= SnapshotRemoved;
@@ -132,8 +137,23 @@ namespace Networking.openIA
             await interpreter.Interpret(data);
         }
         
-        private async void MappingStopped(Model.Model model)
+        private void MappingStarted(Selectable selected)
         {
+            this.selected = selected;
+        }
+
+        private async void MappingStopped()
+        {
+            if (selected == null)
+            {
+                return;
+            }
+
+            if (!selected.TryGetComponent<Model.Model>(out var model))
+            {
+                return;
+            }
+
             model.transform.GetPositionAndRotation(out var position, out var rotation);
             await Send(new SetObjectTranslation(model.ID, position));
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
@@ -146,12 +166,6 @@ namespace Networking.openIA
             var openIAPosition = CoordinateConverter.UnityToOpenIA(localPosition);
             await Send(new CreateSnapshotClient(openIAPosition, rotation));
         }
-
-        //private async void SnapshotCreated(Snapshot s)
-        //{
-        //    s.OriginPlane.transform.GetPositionAndRotation(out var position, out var rotation);
-        //    await Send(new CreateSnapshotClient(position, rotation));
-        //}
 
         private async void SnapshotRemoved(Snapshot s)
         {

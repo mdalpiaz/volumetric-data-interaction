@@ -76,9 +76,9 @@ namespace Networking.Tablet
             }
         }
 
-        public event Action<Model.Model>? MappingStarted;
+        public event Action<Selectable>? MappingStarted;
 
-        public event Action<Model.Model>? MappingStopped;
+        public event Action? MappingStopped;
 
         public event Action<Transform>? Sliced;
 
@@ -288,7 +288,7 @@ namespace Networking.Tablet
                     }
                     if (mappingAnchor.StopMapping())
                     {
-                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                        MappingStopped?.Invoke();
                     }
                     SnapshotManager.Instance.UnselectAllSnapshots();
                     break;
@@ -296,7 +296,7 @@ namespace Networking.Tablet
                     ray.SetActive(true);
                     if (mappingAnchor.StopMapping())
                     {
-                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                        MappingStopped?.Invoke();
                     }
                     break;
                 case MenuMode.Selected:
@@ -306,7 +306,7 @@ namespace Networking.Tablet
                     slicer.SetCuttingActive(true);
                     if (mappingAnchor.StopMapping())
                     {
-                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                        MappingStopped?.Invoke();
                     }
                     break;
                 default:
@@ -383,14 +383,14 @@ namespace Networking.Tablet
                         ModelManager.Instance.CurrentModel.gameObject == Selected.gameObject)
                     {
                         mappingAnchor.StartMapping(Selected.transform);
-                        MappingStarted?.Invoke(ModelManager.Instance.CurrentModel);
+                        MappingStarted?.Invoke(Selected);
                     }
                     break;
                 case TapType.HoldEnd:
                     Debug.Log($"Tap Hold End received at: ({x},{y})");
                     if (mappingAnchor.StopMapping())
                     {
-                        MappingStopped?.Invoke(ModelManager.Instance.CurrentModel);
+                        MappingStopped?.Invoke();
                     }
                     break;
                 default:
@@ -570,11 +570,15 @@ namespace Networking.Tablet
             }
 
             mappingAnchor.StartMapping(Selected.transform);
+            MappingStarted?.Invoke(Selected);
         }
 
         private void OnHoldEnd()
         {
-            mappingAnchor.StopMapping();
+            if (mappingAnchor.StopMapping())
+            {
+                MappingStopped?.Invoke();
+            }
         }
 
         private async Task OnSendToScreen()
