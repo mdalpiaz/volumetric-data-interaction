@@ -6,6 +6,7 @@ using System.Linq;
 using Extensions;
 using EzySlice;
 using Model;
+using Snapshots;
 using UnityEngine;
 using Plane = UnityEngine.Plane;
 
@@ -107,6 +108,12 @@ namespace Slicing
             quad.name = "cut";
             quad.Mesh = mesh;
             quad.Material = transparentMaterial;
+        }
+
+        public Snapshot? CreateSnapshot()
+        {
+            transform.GetPositionAndRotation(out var position, out var rotation);
+            return SnapshotManager.Instance.CreateSnapshot(0, position, rotation);
         }
         
         public void SetCuttingActive(bool active)
