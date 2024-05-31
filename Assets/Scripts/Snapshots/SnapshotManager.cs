@@ -69,6 +69,7 @@ namespace Snapshots
             sectionQuad.transform.GetPositionAndRotation(out var slicerPosition, out var slicerRotation);
             tracker.transform.GetPositionAndRotation(out var currPos, out var currRot);
 
+            // this is a position on an invisible circle around the user
             var newPosition = currPos + Quaternion.AngleAxis(angle + currRot.eulerAngles.y + CenteringRotation, Vector3.up) * Vector3.back * SnapshotDistance;
 
             var snapshot = CreateSnapshot(0, slicerPosition, slicerRotation);
