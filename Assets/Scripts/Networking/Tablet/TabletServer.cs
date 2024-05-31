@@ -522,7 +522,11 @@ namespace Networking.Tablet
 
         private void OnSlice()
         {
-            slicer.Slice();
+            var snapshot = slicer.CreateSnapshot();
+            if (snapshot != null)
+            {
+                Sliced?.Invoke(slicer.transform);
+            }
         }
 
         private void OnRemoveSnapshot()
