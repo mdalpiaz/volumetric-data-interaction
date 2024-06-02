@@ -13,6 +13,11 @@ namespace Networking.Tablet.Editor
         private MethodInfo _tiltMethod;
         private MethodInfo _shakeMethod;
 
+        private MethodInfo onSelectionMethod;
+        private MethodInfo onSlicingMethod;
+        private MethodInfo onSelect;
+        private MethodInfo onDeselect;
+
         private void Awake()
         {
             _modeMethod = typeof(TabletServer).GetMethod("HandleModeChange", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -20,6 +25,9 @@ namespace Networking.Tablet.Editor
             _swipeMethod = typeof(TabletServer).GetMethod("HandleSwipe", BindingFlags.NonPublic | BindingFlags.Instance);
             _tiltMethod = typeof(TabletServer).GetMethod("HandleTilt", BindingFlags.NonPublic | BindingFlags.Instance);
             _shakeMethod = typeof(TabletServer).GetMethod("HandleShakes", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            // new commands
+
         }
 
         public override void OnInspectorGUI()
@@ -106,6 +114,9 @@ namespace Networking.Tablet.Editor
                 var host = (TabletServer)serializedObject.targetObject;
                 _shakeMethod.Invoke(host, new object[] { 2 });
             }
+
+            GUILayout.Label("New Commands");
+
 
             serializedObject.ApplyModifiedProperties();
         }

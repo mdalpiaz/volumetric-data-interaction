@@ -218,9 +218,9 @@ namespace Networking.Tablet
                                 OnSelect();
                                 break;
                             }
-                        case Categories.Unselect:
+                        case Categories.Deselect:
                             {
-                                OnUnselect();
+                                OnDeselect();
                                 break;
                             }
                         case Categories.Slice:
@@ -502,7 +502,7 @@ namespace Networking.Tablet
             }
         }
 
-        private void OnUnselect()
+        private void OnDeselect()
         {
             if (Highlighted != null)
             {

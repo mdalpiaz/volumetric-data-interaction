@@ -14,7 +14,7 @@ namespace Networking.Tablet
         public const byte SelectionMode = 7;
         public const byte SlicingMode = 8;
         public const byte Select = 9;
-        public const byte Unselect = 10;
+        public const byte Deselect = 10;
         public const byte SelectedModel = 11;
         public const byte SelectedSnapshot = 12;
         public const byte Slice = 13;

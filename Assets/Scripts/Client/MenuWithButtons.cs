@@ -77,7 +77,7 @@ namespace Client
 
         public void Select() => tabletClient.Send(Categories.Select);
 
-        public void Unselect() => tabletClient.Send(Categories.Unselect);
+        public void Unselect() => tabletClient.Send(Categories.Deselect);
 
         public void SlicingMode()
         {
