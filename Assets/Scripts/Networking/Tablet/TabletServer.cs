@@ -233,9 +233,9 @@ namespace Networking.Tablet
                                 OnRemoveSnapshot();
                                 break;
                             }
-                        case Categories.ToggleAttach:
+                        case Categories.ToggleAttached:
                             {
-                                OnToggleAttach();
+                                OnToggleAttached();
                                 break;
                             }
                         case Categories.HoldBegin:
@@ -547,7 +547,7 @@ namespace Networking.Tablet
             }
         }
 
-        private void OnToggleAttach()
+        private void OnToggleAttached()
         {
             if (Selected == null)
             {

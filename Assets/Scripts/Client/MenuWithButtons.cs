@@ -71,7 +71,7 @@ namespace Client
 
         public void Slice() => tabletClient.Send(Categories.Slice);
 
-        public void ToggleAttached() => tabletClient.Send(Categories.ToggleAttach);
+        public void ToggleAttached() => tabletClient.Send(Categories.ToggleAttached);
 
         public void RemoveSnapshot() => tabletClient.Send(Categories.RemoveSnapshot);
 

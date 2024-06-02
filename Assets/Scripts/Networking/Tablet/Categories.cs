@@ -20,7 +20,7 @@ namespace Networking.Tablet
         public const byte Slice = 13;
         public const byte RemoveSnapshot = 14;
         public const byte SnapshotRemoved = 15;
-        public const byte ToggleAttach = 16;
+        public const byte ToggleAttached = 16;
         public const byte DetachAll = 17;
         public const byte RestoreModel = 18;
         public const byte HoldBegin = 19;
