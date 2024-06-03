@@ -101,7 +101,8 @@ namespace Networking.openIA.States
                 case Categories.Snapshots.Create:
                 {
                     var createCommand = CreateSnapshotServer.FromByteArray(data);
-                    var unityCoords = CoordinateConverter.OpenIAToUnity(createCommand.Position);
+                    var currentModel = ModelManager.Instance.CurrentModel;
+                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
                     var worldCoords = ModelManager.Instance.CurrentModel.transform.TransformPoint(unityCoords);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
                     break;
@@ -147,8 +148,9 @@ namespace Networking.openIA.States
                 return;
             }
 
-            translation = CoordinateConverter.OpenIAToUnity(translation);
-            ModelManager.Instance.CurrentModel.transform.position += translation;
+            var model = ModelManager.Instance.CurrentModel;
+            translation = CoordinateConverter.OpenIAToUnity(model, translation);
+            model.transform.position += translation;
         }
 
         private static void ScaleObject(ulong id, Vector3 scale)

@@ -40,24 +40,51 @@ namespace Model
 
         public int ZCount { get; private set; }
         
+        /// <summary>
+        /// Box collider size in local coordinates.
+        /// </summary>
         public Vector3 Size { get; private set; } = Vector3.zero;
 
         public Vector3 StepSize { get; private set; } = Vector3.zero;
 
+        /// <summary>
+        /// Bottom front left corner in local space.
+        /// </summary>
         public Vector3 BottomFrontLeftCorner { get; private set; }
 
+        /// <summary>
+        /// Bottom front right corner in local space.
+        /// </summary>
         public Vector3 BottomFrontRightCorner { get; private set; }
 
+        /// <summary>
+        /// Top front left corner in local space.
+        /// </summary>
         public Vector3 TopFrontLeftCorner { get; private set; }
 
+        /// <summary>
+        /// Top front right corner in local space.
+        /// </summary>
         public Vector3 TopFrontRightCorner { get; private set; }
 
+        /// <summary>
+        /// Bottom back left corner in local space.
+        /// </summary>
         public Vector3 BottomBackLeftCorner { get; private set; }
 
+        /// <summary>
+        /// Bottom back right corner in local space.
+        /// </summary>
         public Vector3 BottomBackRightCorner { get; private set; }
 
+        /// <summary>
+        /// Top back left corner in local space.
+        /// </summary>
         public Vector3 TopBackLeftCorner { get; private set; }
 
+        /// <summary>
+        /// Top back right corner in local space.
+        /// </summary>
         public Vector3 TopBackRightCorner { get; private set; }
 
         private void Awake()
