@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3121,41 +3121,6 @@ PrefabInstance:
       propertyPath: sectionQuadMeshFilter
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Size.x
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Size.y
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Size.z
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Center.x
-      value: -4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Center.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_Center.z
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 5182067467409771013, guid: 342293c18dcff8c40b8afc38bddac6ad,
-        type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 342293c18dcff8c40b8afc38bddac6ad, type: 3}
 --- !u!1001 &2334987735148006714
@@ -3747,41 +3712,6 @@ PrefabInstance:
       propertyPath: plane
       value: 
       objectReference: {fileID: 500436827}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Size.x
-      value: 0.12
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Size.y
-      value: 0.175
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Size.z
-      value: 0.46
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Center.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Center.y
-      value: -0.03
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_Center.z
-      value: 0.0425
-      objectReference: {fileID: 0}
-    - target: {fileID: 2651409909245628423, guid: 8c19878c87f2626499691d6d67d9edb1,
-        type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: stackPath
@@ -3810,7 +3740,7 @@ PrefabInstance:
     - target: {fileID: 5906740283371962224, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7918484323655579182, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
@@ -3916,7 +3846,7 @@ PrefabInstance:
     - target: {fileID: 3853433644230905135, guid: 353b404aa1b42304e854fa8ff44a5509,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5213814242413030034, guid: 353b404aa1b42304e854fa8ff44a5509,
         type: 3}
