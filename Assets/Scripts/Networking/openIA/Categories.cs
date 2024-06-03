@@ -40,12 +40,14 @@ namespace Networking.openIA
             public const byte Scale = 0x4;
             public const byte RotateQuaternion = 0x5;
             public const byte RotateEuler = 0x6;
+            public const byte RotateNormalAndUp = 0x7;
         }
 
         public static class Snapshots
         {
             public const byte Value = 0x6;
-            public const byte Create = 0x0;
+            public const byte CreateQuaternion = 0x0;
+            public const byte CreateNormal = 0x1;
             public const byte Remove = 0x2;
             public const byte Clear = 0x3;
         }

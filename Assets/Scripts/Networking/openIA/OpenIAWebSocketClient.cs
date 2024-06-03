@@ -165,7 +165,7 @@ namespace Networking.openIA
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
             var localPosition = ModelManager.Instance.CurrentModel.transform.InverseTransformPoint(position);
             var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
-            await Send(new CreateSnapshotClient(openIAPosition, rotation));
+            await Send(new CreateSnapshotQuaternionClient(openIAPosition, rotation));
         }
 
         private async void SnapshotRemoved(Snapshot s)

@@ -69,7 +69,7 @@ namespace Networking.openIA
             return request;
         }
 
-        public static int Size = 1 + 1;
+        public static int Size => 1 + 1;
     }
 
     public record LoadDataset(string Name) : ICommand
@@ -247,13 +247,47 @@ namespace Networking.openIA
         }
     }
 
-    public record CreateSnapshotClient(Vector3 Position, Quaternion Rotation) : ICommand
+    public record SetObjectRotationNormal(ulong ID, Vector3 Normal, Vector3 Up) : ICommand
+    {
+        public byte[] ToByteArray()
+        {
+            var request = new byte[Size];
+            request[0] = Categories.Objects.Value;
+            request[1] = Categories.Objects.RotateNormalAndUp;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.x), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.y), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.z), 0, request, 18, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Up.x), 0, request, 22, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Up.y), 0, request, 26, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Up.z), 0, request, 30, sizeof(float));
+            return request;
+        }
+
+        public static int Size => 1 + 1 + sizeof(ulong) + sizeof(float) * 3 + sizeof(float) * 3;
+
+        public static SetObjectRotationNormal FromByteArray(byte[] buffer)
+        {
+            var id = BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(2, sizeof(ulong)));
+            var normal = new Vector3(
+                BitConverter.ToSingle(buffer.AsSpan(10, sizeof(float))),
+                BitConverter.ToSingle(buffer.AsSpan(14, sizeof(float))),
+                BitConverter.ToSingle(buffer.AsSpan(18, sizeof(float))));
+            var up = new Vector3(
+                BitConverter.ToSingle(buffer.AsSpan(22, sizeof(float))),
+                BitConverter.ToSingle(buffer.AsSpan(26, sizeof(float))),
+                BitConverter.ToSingle(buffer.AsSpan(30, sizeof(float))));
+            return new SetObjectRotationNormal(id, normal, up);
+        }
+    }
+    
+    public record CreateSnapshotQuaternionClient(Vector3 Position, Quaternion Rotation) : ICommand
     {
         public byte[] ToByteArray()
         {
             var request = new byte[Size];
             request[0] = Categories.Snapshots.Value;
-            request[1] = Categories.Snapshots.Create;
+            request[1] = Categories.Snapshots.CreateQuaternion;
             Buffer.BlockCopy(BitConverter.GetBytes(Position.x), 0, request, 2, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(Position.y), 0, request, 6, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(Position.z), 0, request, 10, sizeof(float));
@@ -267,13 +301,13 @@ namespace Networking.openIA
         public static int Size => 1 + 1 + sizeof(float) * 3 + sizeof(float) * 4;
     }
 
-    public record CreateSnapshotServer(ulong ID, Vector3 Position, Quaternion Rotation) : ICommand
+    public record CreateSnapshotQuaternionServer(ulong ID, Vector3 Position, Quaternion Rotation) : ICommand
     {
         public byte[] ToByteArray()
         {
             var request = new byte[Size];
             request[0] = Categories.Snapshots.Value;
-            request[1] = Categories.Snapshots.Create;
+            request[1] = Categories.Snapshots.CreateQuaternion;
             BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
             Buffer.BlockCopy(BitConverter.GetBytes(Position.x), 0, request, 10, sizeof(float));
             Buffer.BlockCopy(BitConverter.GetBytes(Position.y), 0, request, 14, sizeof(float));
@@ -287,7 +321,7 @@ namespace Networking.openIA
 
         public static int Size => 1 + 1 + sizeof(float) * 3 + sizeof(float) * 4;
 
-        public static CreateSnapshotServer FromByteArray(byte[] buffer)
+        public static CreateSnapshotQuaternionServer FromByteArray(byte[] buffer)
         {
             var id = BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(2, sizeof(ulong)));
             var position = new Vector3(
@@ -299,10 +333,84 @@ namespace Networking.openIA
                 BitConverter.ToSingle(buffer.AsSpan(26, sizeof(float))),
                 BitConverter.ToSingle(buffer.AsSpan(30, sizeof(float))),
                 BitConverter.ToSingle(buffer.AsSpan(34, sizeof(float))));
-            return new CreateSnapshotServer(id, position, rotation);
+            return new CreateSnapshotQuaternionServer(id, position, rotation);
         }
     }
 
+    public record CreateSnapshotNormalClient(Vector3 Position, Vector3 Normal) : ICommand
+    {
+        public byte[] ToByteArray()
+        {
+            var request = new byte[Size];
+            request[0] = Categories.Snapshots.Value;
+            request[1] = Categories.Snapshots.CreateNormal;
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.x), 0, request, 2, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.y), 0, request, 6, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.z), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.x), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.y), 0, request, 18, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.z), 0, request, 22, sizeof(float));
+            return request;
+        }
+
+        public static int Size => 1 + 1 + sizeof(float) * 3 + sizeof(float) * 3;
+
+        public static CreateSnapshotNormalClient FromByteArray(byte[] buffer)
+        {
+            var position = new Vector3
+            {
+                x = BitConverter.ToSingle(buffer.AsSpan(2, sizeof(float))),
+                y = BitConverter.ToSingle(buffer.AsSpan(6, sizeof(float))),
+                z = BitConverter.ToSingle(buffer.AsSpan(10, sizeof(float)))
+            };
+            var normal = new Vector3
+            {
+                x = BitConverter.ToSingle(buffer.AsSpan(14, sizeof(float))),
+                y = BitConverter.ToSingle(buffer.AsSpan(18, sizeof(float))),
+                z = BitConverter.ToSingle(buffer.AsSpan(22, sizeof(float)))
+            };
+            return new CreateSnapshotNormalClient(position, normal);
+        }
+    }
+    
+    public record CreateSnapshotNormalServer(ulong ID, Vector3 Position, Vector3 Normal) : ICommand
+    {
+        public byte[] ToByteArray()
+        {
+            var request = new byte[Size];
+            request[0] = Categories.Snapshots.Value;
+            request[1] = Categories.Snapshots.CreateNormal;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.x), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.y), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Position.z), 0, request, 18, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.x), 0, request, 22, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.y), 0, request, 26, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Normal.z), 0, request, 30, sizeof(float));
+            return request;
+        }
+
+        public static int Size => 1 + 1 + sizeof(ulong) + sizeof(float) * 3 + sizeof(float) * 3;
+
+        public static CreateSnapshotNormalServer FromByteArray(byte[] buffer)
+        {
+            var id = BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(2, sizeof(ulong)));
+            var position = new Vector3
+            {
+                x = BitConverter.ToSingle(buffer.AsSpan(10, sizeof(float))),
+                y = BitConverter.ToSingle(buffer.AsSpan(14, sizeof(float))),
+                z = BitConverter.ToSingle(buffer.AsSpan(18, sizeof(float)))
+            };
+            var normal = new Vector3
+            {
+                x = BitConverter.ToSingle(buffer.AsSpan(22, sizeof(float))),
+                y = BitConverter.ToSingle(buffer.AsSpan(26, sizeof(float))),
+                z = BitConverter.ToSingle(buffer.AsSpan(30, sizeof(float)))
+            };
+            return new CreateSnapshotNormalServer(id, position, normal);
+        }
+    }
+    
     public record RemoveSnapshot(ulong ID) : ICommand
     {
         public byte[] ToByteArray()

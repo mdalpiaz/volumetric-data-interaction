@@ -98,9 +98,9 @@ namespace Networking.openIA.States
         {
             switch (data[1])
             {
-                case Categories.Snapshots.Create:
+                case Categories.Snapshots.CreateQuaternion:
                 {
-                    var createCommand = CreateSnapshotServer.FromByteArray(data);
+                    var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
                     var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
                     var worldCoords = ModelManager.Instance.CurrentModel.transform.TransformPoint(unityCoords);
