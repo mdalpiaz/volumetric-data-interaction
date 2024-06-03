@@ -103,8 +103,19 @@ namespace Networking.openIA.States
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
                     var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
-                    var worldCoords = ModelManager.Instance.CurrentModel.transform.TransformPoint(unityCoords);
+                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
+                    break;
+                }
+                case Categories.Snapshots.CreateNormal:
+                {
+                    var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
+                    var currentModel = ModelManager.Instance.CurrentModel;
+                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
+                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
+                    var worldNormal = currentModel.transform.TransformVector(createCommand.Normal);
+                    var worldQuaternion = Quaternion.LookRotation(worldNormal);
+                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, worldQuaternion);
                     break;
                 }
                 case Categories.Snapshots.Remove:
