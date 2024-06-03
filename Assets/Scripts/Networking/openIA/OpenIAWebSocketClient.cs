@@ -137,9 +137,9 @@ namespace Networking.openIA
             await interpreter.Interpret(data);
         }
         
-        private void MappingStarted(Selectable selected)
+        private void MappingStarted(Selectable sel)
         {
-            this.selected = selected;
+            selected = sel;
         }
 
         private async void MappingStopped()
