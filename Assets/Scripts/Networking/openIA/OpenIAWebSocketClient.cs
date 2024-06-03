@@ -155,17 +155,19 @@ namespace Networking.openIA
             }
 
             model.transform.GetPositionAndRotation(out var position, out var rotation);
-            await Send(new SetObjectTranslation(model.ID, position));
-            await Send(new SetObjectRotationQuaternion(model.ID, rotation));
+            var localPosition = model.transform.InverseTransformPoint(position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
+            await Send(new SetObjectTranslation(model.ID, openIAPosition));
+            await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
         }
 
         private async void Sliced(Transform slicerTransform)
         {
             var model = ModelManager.Instance.CurrentModel;
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
-            var localPosition = ModelManager.Instance.CurrentModel.transform.InverseTransformPoint(position);
+            var localPosition = model.transform.InverseTransformPoint(position);
             var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
-            await Send(new CreateSnapshotQuaternionClient(openIAPosition, rotation));
+            await Send(new CreateSnapshotNormalClient(openIAPosition, rotation * Vector3.back));
         }
 
         private async void SnapshotRemoved(Snapshot s)
