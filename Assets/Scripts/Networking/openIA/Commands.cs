@@ -12,7 +12,7 @@ namespace Networking.openIA
         byte[] ToByteArray();
     }
 
-    public record ACK() : ICommand
+    public record ACK : ICommand
     {
         public byte[] ToByteArray()
         {
@@ -20,7 +20,7 @@ namespace Networking.openIA
         }
     }
 
-    public record NAK() : ICommand
+    public record NAK : ICommand
     {
         public byte[] ToByteArray()
         {
@@ -59,7 +59,7 @@ namespace Networking.openIA
         }
     }
 
-    public record Reset() : ICommand
+    public record Reset : ICommand
     {
         public byte[] ToByteArray()
         {
@@ -144,7 +144,14 @@ namespace Networking.openIA
     {
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            var request = new byte[Size];
+            request[0] = Categories.Objects.Value;
+            request[1] = Categories.Objects.Translate;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            Buffer.BlockCopy(BitConverter.GetBytes(Translation.x), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Translation.y), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Translation.z), 0, request, 18, sizeof(float));
+            return request;
         }
 
         public static int Size => 1 + 1 + sizeof(ulong) + sizeof(float) * 3;
@@ -164,7 +171,14 @@ namespace Networking.openIA
     {
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            var request = new byte[Size];
+            request[0] = Categories.Objects.Value;
+            request[1] = Categories.Objects.Scale;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            Buffer.BlockCopy(BitConverter.GetBytes(Scale.x), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Scale.y), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Scale.z), 0, request, 18, sizeof(float));
+            return request;
         }
 
         public static int Size => 1 + 1 + sizeof(ulong) + sizeof(float) * 3;
@@ -184,7 +198,15 @@ namespace Networking.openIA
     {
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            var request = new byte[Size];
+            request[0] = Categories.Objects.Value;
+            request[1] = Categories.Objects.RotateQuaternion;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.x), 0, request, 10, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.y), 0, request, 14, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.z), 0, request, 18, sizeof(float));
+            Buffer.BlockCopy(BitConverter.GetBytes(Rotation.w), 0, request, 22, sizeof(float));
+            return request;
         }
 
         public static int Size => 1 + 1 + sizeof(ulong) + sizeof(float) * 4;
@@ -205,7 +227,13 @@ namespace Networking.openIA
     {
         public byte[] ToByteArray()
         {
-            throw new NotImplementedException();
+            var request = new byte[Size];
+            request[0] = Categories.Objects.Value;
+            request[1] = Categories.Objects.RotateEuler;
+            BinaryPrimitives.WriteUInt64BigEndian(request.AsSpan(2, sizeof(ulong)), ID);
+            request[10] = (byte)Axis;
+            Buffer.BlockCopy(BitConverter.GetBytes(Value), 0, request, 11, sizeof(float));
+            return request;
         }
 
         public static int Size => 1 + 1 + sizeof(ulong) + sizeof(Axis) + sizeof(float);
