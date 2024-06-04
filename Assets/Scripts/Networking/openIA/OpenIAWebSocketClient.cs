@@ -37,10 +37,12 @@ namespace Networking.openIA
 
         private ICommandSender sender = null!;
 
+        private Selectable? selected;
+        
         public ulong? ClientID { get; set; }
 
-        private Selectable? selected;
-
+        public List<Viewer> Viewers { get; private set; } = new();
+        
         private void Awake()
         {
             if (Instance == null)
