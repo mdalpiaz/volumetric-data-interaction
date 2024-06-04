@@ -13,7 +13,6 @@ using Snapshots;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Networking.Tablet
 {
@@ -43,8 +42,8 @@ namespace Networking.Tablet
         private int port = Ports.TabletPort;
         
         private TcpListener server = null!;
-        private TcpClient tabletClient = null!;
-        private NetworkStream tabletStream = null!;
+        private TcpClient? tabletClient;
+        private NetworkStream? tabletStream;
         private Task? receivingTask;
 
         private MenuMode menuMode = MenuMode.None;
@@ -129,7 +128,7 @@ namespace Networking.Tablet
 
         private async void OnDisable()
         {
-            tabletClient.Close();
+            tabletClient?.Close();
             server.Stop();
             if (receivingTask != null)
             {
@@ -144,6 +143,10 @@ namespace Networking.Tablet
             {
                 try
                 {
+                    if (tabletStream == null)
+                    {
+                        return;
+                    }
                     await tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
                     Debug.Log($"Received command {commandIdentifier[0]}");
                     switch (commandIdentifier[0])
@@ -492,6 +495,11 @@ namespace Networking.Tablet
             ray.SetActive(false);
             Highlighted = null;
 
+            if (tabletStream == null)
+            {
+                return;
+            }
+            
             if (Selected.TryGetComponent<Snapshot>(out _))
             {
                 tabletStream.WriteByte(Categories.SelectedSnapshot);
@@ -542,7 +550,7 @@ namespace Networking.Tablet
 
             if (SnapshotManager.Instance.DeleteSnapshot(snapshot))
             {
-                tabletStream.WriteByte(Categories.SnapshotRemoved);
+                tabletStream?.WriteByte(Categories.SnapshotRemoved);
                 SnapshotRemoved?.Invoke(snapshot);
             }
         }
