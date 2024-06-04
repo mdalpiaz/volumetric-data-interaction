@@ -52,23 +52,23 @@ namespace Networking.Tablet
         }
     }
 
-    public record ScaleCommand(float Scale) : ICommand
-    {
-        public byte[] ToByteArray()
-        {
-            var buffer = new byte[Size];
-            buffer[0] = Categories.Scale;
-            Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
-            return buffer;
-        }
+    //public record ScaleCommand(float Scale) : ICommand
+    //{
+    //    public byte[] ToByteArray()
+    //    {
+    //        var buffer = new byte[Size];
+    //        buffer[0] = Categories.Scale;
+    //        Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
+    //        return buffer;
+    //    }
 
-        public static int Size => 1 + sizeof(float);
+    //    public static int Size => 1 + sizeof(float);
 
-        public static ScaleCommand FromByteArray(byte[] buffer)
-        {
-            return new ScaleCommand(BitConverter.ToSingle(buffer, 1));
-        }
-    }
+    //    public static ScaleCommand FromByteArray(byte[] buffer)
+    //    {
+    //        return new ScaleCommand(BitConverter.ToSingle(buffer, 1));
+    //    }
+    //}
 
     public record RotateCommand(float Rotation) : ICommand
     {
@@ -147,5 +147,26 @@ namespace Networking.Tablet
         }
     }
 
+    // new commands
+    public class ScaleCommand : ICommand
+    {
+        public float Scale { get; private set; }
 
+        public ScaleCommand(float scale)
+        {
+            Scale = scale;
+        }
+
+        public ScaleCommand(byte[] buffer) : this(BitConverter.ToSingle(buffer, 1)) { }
+
+        public byte[] ToByteArray()
+        {
+            var buffer = new byte[Size];
+            buffer[0] = Categories.Scale;
+            Buffer.BlockCopy(BitConverter.GetBytes(Scale), 0, buffer, 1, sizeof(float));
+            return buffer;
+        }
+
+        public static int Size => 1 + sizeof(float);
+    }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model;
 using Networking.Tablet;
+using Selection;
 using Snapshots;
 using UnityEngine;
 
@@ -38,6 +39,8 @@ namespace Networking.openIA
 
         public ulong? ClientID { get; set; }
 
+        private Selectable? selected;
+
         private void Awake()
         {
             if (Instance == null)
@@ -58,6 +61,7 @@ namespace Networking.openIA
                 return;
             }
 
+            TabletServer.Instance.MappingStarted += MappingStarted;
             TabletServer.Instance.MappingStopped += MappingStopped;
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.SnapshotRemoved += SnapshotRemoved;
@@ -101,6 +105,7 @@ namespace Networking.openIA
                 return;
             }
 
+            TabletServer.Instance.MappingStarted -= MappingStarted;
             TabletServer.Instance.MappingStopped -= MappingStopped;
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.SnapshotRemoved -= SnapshotRemoved;
@@ -132,26 +137,38 @@ namespace Networking.openIA
             await interpreter.Interpret(data);
         }
         
-        private async void MappingStopped(Model.Model model)
+        private void MappingStarted(Selectable sel)
         {
+            selected = sel;
+        }
+
+        private async void MappingStopped()
+        {
+            if (selected == null)
+            {
+                return;
+            }
+
+            if (!selected.TryGetComponent<Model.Model>(out var model))
+            {
+                return;
+            }
+
             model.transform.GetPositionAndRotation(out var position, out var rotation);
-            await Send(new SetObjectTranslation(model.ID, position));
-            await Send(new SetObjectRotationQuaternion(model.ID, rotation));
+            var localPosition = model.transform.InverseTransformPoint(position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
+            await Send(new SetObjectTranslation(model.ID, openIAPosition));
+            await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
         }
 
         private async void Sliced(Transform slicerTransform)
         {
+            var model = ModelManager.Instance.CurrentModel;
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
-            var localPosition = ModelManager.Instance.CurrentModel.transform.InverseTransformPoint(position);
-            var openIAPosition = CoordinateConverter.UnityToOpenIA(localPosition);
-            await Send(new CreateSnapshotClient(openIAPosition, rotation));
+            var localPosition = model.transform.InverseTransformPoint(position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
+            await Send(new CreateSnapshotNormalClient(openIAPosition, rotation * Vector3.back));
         }
-
-        //private async void SnapshotCreated(Snapshot s)
-        //{
-        //    s.OriginPlane.transform.GetPositionAndRotation(out var position, out var rotation);
-        //    await Send(new CreateSnapshotClient(position, rotation));
-        //}
 
         private async void SnapshotRemoved(Snapshot s)
         {

@@ -70,7 +70,7 @@ namespace Networking.Screens
             _server.Stop();
         }
 
-        public async Task Send(Vector3 trackerPosition, Vector3 trackerPointDirection, Texture2D data)
+        public async Task SendAsync(Vector3 trackerPosition, Vector3 trackerPointDirection, Texture2D data)
         {
             if (!FindScreen(out var screen, trackerPosition, trackerPointDirection))
             {

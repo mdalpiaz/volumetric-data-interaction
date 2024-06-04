@@ -113,11 +113,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5906740283371962224}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0024681648, y: 0.003738391, z: 0.009822294}
-  m_Center: {x: 0.00009835407, y: -0.0005738233, z: 0.0008473697}
+  m_Size: {x: 0.12, y: 0.175, z: 0.46}
+  m_Center: {x: 0, y: -0.03, z: 0.0425}
 --- !u!114 &5139340232998513935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stackPath: C:\Users\p42652\Desktop\Janine_VIVE_Data\Data\Stack_converted
-  sectionQuad: {fileID: 0}
+  loadingDirection: 0
 --- !u!114 &3030928561608911230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 360d3e20528c4210b21f84d95396cbb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  greenMaterial: {fileID: 2100000, guid: 5b2a21d0f3326184f928f34b5ffd3249, type: 2}
+  selectedMaterial: {fileID: 2100000, guid: 5b2a21d0f3326184f928f34b5ffd3249, type: 2}
   highlightedMaterial: {fileID: 2100000, guid: ef5ca9acfdda25946b85657bcfc815cf, type: 2}
 --- !u!114 &428122248200250419
 MonoBehaviour:

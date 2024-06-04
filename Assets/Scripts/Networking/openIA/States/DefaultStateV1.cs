@@ -98,12 +98,24 @@ namespace Networking.openIA.States
         {
             switch (data[1])
             {
-                case Categories.Snapshots.Create:
+                case Categories.Snapshots.CreateQuaternion:
                 {
-                    var createCommand = CreateSnapshotServer.FromByteArray(data);
-                    var unityCoords = CoordinateConverter.OpenIAToUnity(createCommand.Position);
-                    var worldCoords = ModelManager.Instance.CurrentModel.transform.TransformPoint(unityCoords);
+                    var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
+                    var currentModel = ModelManager.Instance.CurrentModel;
+                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
+                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
+                    break;
+                }
+                case Categories.Snapshots.CreateNormal:
+                {
+                    var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
+                    var currentModel = ModelManager.Instance.CurrentModel;
+                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
+                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
+                    var worldNormal = currentModel.transform.TransformVector(createCommand.Normal);
+                    var worldQuaternion = Quaternion.LookRotation(worldNormal);
+                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, worldQuaternion);
                     break;
                 }
                 case Categories.Snapshots.Remove:
@@ -147,8 +159,9 @@ namespace Networking.openIA.States
                 return;
             }
 
-            translation = CoordinateConverter.OpenIAToUnity(translation);
-            ModelManager.Instance.CurrentModel.transform.position += translation;
+            var model = ModelManager.Instance.CurrentModel;
+            translation = CoordinateConverter.OpenIAToUnity(model, translation);
+            model.transform.position += translation;
         }
 
         private static void ScaleObject(ulong id, Vector3 scale)

@@ -31,9 +31,14 @@ namespace Networking.Tablet
         
         private TcpClient tcpClient = null!;
         private NetworkStream stream = null!;
-        private Thread receivingThread = null!;
         
         public event Action<MenuMode>? MenuModeChanged;
+
+        public event Action? ModelSelected;
+
+        public event Action? SnapshotSelected;
+
+        public event Action? SnapshotRemoved;
 
         private void Awake()
         {
@@ -43,7 +48,6 @@ namespace Networking.Tablet
         private void OnDestroy()
         {
             tcpClient.Close();
-            receivingThread.Join();
         }
 
         public async Task Connect()
@@ -51,30 +55,37 @@ namespace Networking.Tablet
             await tcpClient.ConnectAsync(IP, Port);
             stream = tcpClient.GetStream();
             Debug.Log("Connected to server");
+        }
 
-            receivingThread = new Thread(() =>
+        public async Task Run()
+        {
+            var buffer = new byte[1];
+            while (true)
             {
-                // the only command which can be received is "changing menu mode"
-                var buffer = new byte[2];
-                while (true)
+                try
                 {
-                    try
-                    {
-                        stream.ReadAll(buffer, 0, 2);
-                    }
-                    catch
-                    {
-                        break;
-                    }
-                    if (buffer[0] != Categories.MenuMode)
-                    {
-                        Debug.LogWarning("Unsupported command was received!");
-                        continue;
-                    }
-                    MenuModeChanged?.Invoke((MenuMode)buffer[1]);
+                    await stream.ReadAllAsync(buffer, 0, 1);
                 }
-            });
-            receivingThread.Start();
+                catch
+                {
+                    break;
+                }
+                switch (buffer[0])
+                {
+                    case Categories.SelectedModel:
+                        ModelSelected?.Invoke();
+                        break;
+                    case Categories.SelectedSnapshot:
+                        SnapshotSelected?.Invoke();
+                        break;
+                    case Categories.SnapshotRemoved:
+                        SnapshotRemoved?.Invoke();
+                        break;
+                    default:
+                        Debug.LogWarning("Unsupported command was received!");
+                        break;
+                }
+            }
         }
 
         public async Task SendMenuChangedMessage(MenuMode mode)
@@ -105,6 +116,16 @@ namespace Networking.Tablet
         {
             Debug.Log($"Sending tap: {type} at ({x},{y})");
             await stream.WriteAsync(new TapCommand(type, x, y).ToByteArray());
+        }
+
+        public async Task Send(ICommand command)
+        {
+            await stream.WriteAsync(command.ToByteArray());
+        }
+
+        public void Send(byte command)
+        {
+            stream.WriteByte(command);
         }
     }
 }
