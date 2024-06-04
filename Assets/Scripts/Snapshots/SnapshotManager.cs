@@ -35,7 +35,7 @@ namespace Snapshots
         [SerializeField]
         private GameObject sectionQuad = null!;
 
-        private readonly Timer _snapshotTimer = new();
+        private readonly Timer snapshotTimer = new();
 
         public InterfaceController InterfaceController => interfaceController;
 
@@ -58,11 +58,11 @@ namespace Snapshots
         
         public void CreateSnapshot(float angle)
         {
-            if (!_snapshotTimer.IsTimerElapsed)
+            if (!snapshotTimer.IsTimerElapsed)
             {
                 return;
             }
-            _snapshotTimer.StartTimerSeconds(SnapshotTimeThreshold);
+            snapshotTimer.StartTimerSeconds(SnapshotTimeThreshold);
             
             // The openIA extension requires that all Snapshots are registered at the server and the server sends out the same data with an ID (the actual Snapshot).
             // So just send position and rotation to the server and wait.
@@ -124,11 +124,11 @@ namespace Snapshots
         
         public void ToggleSnapshotsAttached()
         {
-            if (!_snapshotTimer.IsTimerElapsed)
+            if (!snapshotTimer.IsTimerElapsed)
             {
                 return;
             }
-            _snapshotTimer.StartTimerSeconds(SnapshotTimeThreshold);
+            snapshotTimer.StartTimerSeconds(SnapshotTimeThreshold);
 
             if (AreSnapshotsAttached())
             {
