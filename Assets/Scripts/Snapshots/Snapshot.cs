@@ -9,13 +9,13 @@ namespace Snapshots
     [RequireComponent(typeof(Selectable))]
     public class Snapshot : MonoBehaviour
     {
-        private Vector3 _detachedPosition;
-        private Vector3 _detachedScale;
+        private Vector3 detachedPosition;
+        private Vector3 detachedScale;
 
-        private GameObject? _tempNeighbourOverlay;
+        private GameObject? tempNeighbourOverlay;
 
-        private GameObject _textureQuad = null!;
-        private MeshRenderer _textureQuadRenderer = null!;
+        private GameObject textureQuad = null!;
+        private MeshRenderer textureQuadRenderer = null!;
         
         public ulong ID { get; set; }
 
@@ -23,7 +23,7 @@ namespace Snapshots
 
         public GameObject OriginPlane { get; set; } = null!;
 
-        public Texture2D SnapshotTexture => _textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
+        public Texture2D SnapshotTexture => textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
 
         public bool IsAttached { get; private set; }
 
@@ -32,12 +32,12 @@ namespace Snapshots
         private void Awake()
         {
             Selectable = GetComponent<Selectable>();
-            _textureQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(_textureQuad.GetComponent<MeshCollider>());
-            _textureQuadRenderer = _textureQuad.GetComponent<MeshRenderer>();
-            _textureQuad.transform.SetParent(transform);
-            _textureQuad.transform.localPosition = new Vector3(0, 0, 0.01f);
-            _textureQuad.SetActive(false);
+            textureQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(textureQuad.GetComponent<MeshCollider>());
+            textureQuadRenderer = textureQuad.GetComponent<MeshRenderer>();
+            textureQuad.transform.SetParent(transform);
+            textureQuad.transform.localPosition = new Vector3(0, 0, 0.01f);
+            textureQuad.SetActive(false);
         }
 
         private void OnEnable()
@@ -63,9 +63,9 @@ namespace Snapshots
         private void OnDestroy()
         {
             Destroy(OriginPlane);
-            if (_tempNeighbourOverlay != null)
+            if (tempNeighbourOverlay != null)
             {
-                Destroy(_tempNeighbourOverlay);
+                Destroy(tempNeighbourOverlay);
             }
         }
 
@@ -73,8 +73,8 @@ namespace Snapshots
         {
             IsAttached = true;
             var cachedTransform = transform;
-            _detachedScale = cachedTransform.localScale;
-            _detachedPosition = cachedTransform.localPosition;
+            detachedScale = cachedTransform.localScale;
+            detachedPosition = cachedTransform.localPosition;
             cachedTransform.SetParent(t);
             cachedTransform.SetPositionAndRotation(position, new Quaternion());
             cachedTransform.localScale = new Vector3(1, 0.65f, 0.1f);
@@ -85,20 +85,20 @@ namespace Snapshots
             IsAttached = false;
             var cachedTransform = transform;
             cachedTransform.SetParent(null);
-            cachedTransform.localScale = _detachedScale; 
-            cachedTransform.position = _detachedPosition;
+            cachedTransform.localScale = detachedScale; 
+            cachedTransform.position = detachedPosition;
         }
 
         public void SetIntersectionChild(Texture2D texture, Vector3 startPoint, Model.Model model)
         {
             var quadScale = MaterialTools.GetTextureAspectRatioSize(transform.localScale, texture);
-            _textureQuad.transform.localScale = quadScale;
+            textureQuad.transform.localScale = quadScale;
 
-            var quadMaterial = _textureQuadRenderer.material;
+            var quadMaterial = textureQuadRenderer.material;
             quadMaterial.mainTexture = texture;
-            _textureQuadRenderer.material = MaterialTools.GetMaterialOrientation(quadMaterial, model, startPoint);
+            textureQuadRenderer.material = MaterialTools.GetMaterialOrientation(quadMaterial, model, startPoint);
             
-            _textureQuad.SetActive(true);
+            textureQuad.SetActive(true);
         }
 
         private void SetOverlayTexture(bool isSelected)
@@ -108,7 +108,7 @@ namespace Snapshots
                 SnapshotManager.Instance.InterfaceController.BlackenOut();
 
                 var overlay = SnapshotManager.Instance.InterfaceController.Main;
-                var snapshotQuad = Instantiate(_textureQuad);
+                var snapshotQuad = Instantiate(textureQuad);
                 var cachedQuadTransform = snapshotQuad.transform;
                 var cachedQuadScale = cachedQuadTransform.localScale;
                 var scale = MaterialTools.GetAspectRatioSize(overlay.localScale, cachedQuadScale.y, cachedQuadScale.x); //new Vector3(1, 0.65f, 0.1f);
@@ -116,13 +116,13 @@ namespace Snapshots
                 cachedQuadTransform.SetParent(overlay);
                 cachedQuadTransform.localScale = scale;
                 cachedQuadTransform.SetLocalPositionAndRotation(new Vector3(0, 0, -0.1f), new Quaternion());
-                Destroy(_tempNeighbourOverlay);
-                _tempNeighbourOverlay = snapshotQuad;
+                Destroy(tempNeighbourOverlay);
+                tempNeighbourOverlay = snapshotQuad;
             }
             else
             {
                 SnapshotManager.Instance.InterfaceController.RestorePreviousOverlay();
-                Destroy(_tempNeighbourOverlay);
+                Destroy(tempNeighbourOverlay);
             }
         }
 
