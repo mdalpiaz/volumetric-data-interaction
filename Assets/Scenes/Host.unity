@@ -3678,7 +3678,7 @@ PrefabInstance:
     - target: {fileID: 3093493636759829460, guid: 788047c14613d22429d6302f3a5e9e59,
         type: 3}
       propertyPath: m_Name
-      value: WebSocketManager
+      value: OpenIAWebSocketManager
       objectReference: {fileID: 0}
     - target: {fileID: 7551893551569320363, guid: 788047c14613d22429d6302f3a5e9e59,
         type: 3}
