@@ -29,6 +29,8 @@ namespace Snapshots
 
         private void Awake()
         {
+            tag = Tags.Snapshot;
+            
             Selectable = GetComponent<Selectable>();
             textureQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroy(textureQuad.GetComponent<MeshCollider>());

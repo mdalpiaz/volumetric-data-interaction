@@ -102,7 +102,6 @@ namespace Snapshots
 
             var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
             snapshot.ID = id;
-            snapshot.tag = Tags.Snapshot;
             snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
 
             var mainTransform = interfaceController.Main.transform;
