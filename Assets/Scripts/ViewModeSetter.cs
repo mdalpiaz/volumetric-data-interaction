@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public class ViewModeSetter : MonoBehaviour
 {
+    public static ViewModeSetter Instance { get; private set; } = null!;
+    
     /// <summary>
     /// Holds a viewing mode
     /// </summary>
@@ -20,19 +22,26 @@ public class ViewModeSetter : MonoBehaviour
         AR = 2
     }
 
-    [SerializeField] private ViewMode viewMode = ViewMode.Display;
+    [SerializeField]
+    private Camera displayCamera = null!;
+
+    [SerializeField]
+    private Camera xrCamera = null!;
+    
+    [SerializeField]
+    private ViewMode viewMode = ViewMode.Display;
 
     [Header("Regular Display")]
     [SerializeField]
-    private List<GameObject> displayObjects = new List<GameObject>();
+    private List<GameObject> displayObjects = new();
 
     [Header("VR")]
     [SerializeField]
-    private List<GameObject> vrObjects = new List<GameObject>();
+    private List<GameObject> vrObjects = new();
 
     [Header("AR")]
     [SerializeField]
-    private List<GameObject> arObjects = new List<GameObject>();
+    private List<GameObject> arObjects = new();
         
     public ViewMode CurrentViewMode
     {
@@ -48,11 +57,22 @@ public class ViewModeSetter : MonoBehaviour
         }
     }
 
-    private void Start()
+    public Camera Camera => CurrentViewMode == ViewMode.Display ? displayCamera : xrCamera;
+
+    private void Awake()
     {
-        // don't initialize, XR will autoinitialize if set in "Project Settings" -> "XR Plug-in Management"
-        //StartCoroutine(XRGeneralSettings.Instance.Manager.InitializeLoader());
-        RefreshViewMode();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this);
+            // don't initialize, XR will autoinitialize if set in "Project Settings" -> "XR Plug-in Management"
+            //StartCoroutine(XRGeneralSettings.Instance.Manager.InitializeLoader());
+            RefreshViewMode();
+        }
+        else
+        {
+            Destroy(this);
+        }
     }
 
     private void RefreshViewMode()

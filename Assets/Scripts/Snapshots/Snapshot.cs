@@ -19,8 +19,6 @@ namespace Snapshots
         
         public ulong ID { get; set; }
 
-        public GameObject Viewer { get; set; } = null!;
-
         public GameObject OriginPlane { get; set; } = null!;
 
         public Texture2D SnapshotTexture => textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
@@ -52,12 +50,14 @@ namespace Snapshots
 
         private void Update()
         {
-            if (Viewer && !IsAttached)
+            if (IsAttached)
             {
-                var cachedTransform = transform;
-                cachedTransform.LookAt(Viewer.transform);
-                cachedTransform.forward = -cachedTransform.forward; //need to adjust as quad is else not visible
+                return;
             }
+            
+            var cachedTransform = transform;
+            cachedTransform.LookAt(ViewModeSetter.Instance.Camera.transform);
+            cachedTransform.forward = -cachedTransform.forward; //need to adjust as quad is else not visible
         }
 
         private void OnDestroy()

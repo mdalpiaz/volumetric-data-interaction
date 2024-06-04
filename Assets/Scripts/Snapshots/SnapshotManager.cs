@@ -24,9 +24,6 @@ namespace Snapshots
         private GameObject tracker = null!;
 
         [SerializeField]
-        private GameObject trackedCamera = null!;
-
-        [SerializeField]
         private GameObject snapshotPrefab = null!;
         
         [SerializeField]
@@ -113,7 +110,6 @@ namespace Snapshots
             originPlane.transform.SetParent(model.transform);
             originPlane.SetActive(false);
 
-            snapshot.Viewer = trackedCamera;
             snapshot.OriginPlane = originPlane;
             snapshot.Selectable.IsSelected = false;
 

@@ -2985,6 +2985,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6227cdcafdd2b33448ec8cceffefe1e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  displayCamera: {fileID: 1465551936}
+  xrCamera: {fileID: 406083503}
   viewMode: 0
   displayObjects:
   - {fileID: 1465551934}
