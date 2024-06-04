@@ -11,11 +11,11 @@ namespace Networking.openIA.States
 {
     public class DefaultStateV1 : IInterpreterState
     {
-        private readonly ICommandSender _sender;
+        private readonly ICommandSender sender;
 
         public DefaultStateV1(ICommandSender sender)
         {
-            _sender = sender;
+            this.sender = sender;
         }
 
         public Task<IInterpreterState> Client(byte[] data)
@@ -41,11 +41,11 @@ namespace Networking.openIA.States
                     var loadCommand = LoadDataset.FromByteArray(data);
                     if (ModelManager.Instance.ModelExists(loadCommand.Name))
                     {
-                        await _sender.Send(new ACK());
+                        await sender.Send(new ACK());
                         return new WaitingForServerACK(this, () => ModelManager.Instance.ChangeModel(loadCommand.Name));
                     }
 
-                    await _sender.Send(new NAK());
+                    await sender.Send(new NAK());
                     return this;
                 }
                 default:
