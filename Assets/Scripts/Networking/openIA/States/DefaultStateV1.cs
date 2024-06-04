@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Model;
 using Snapshots;
@@ -89,6 +90,12 @@ namespace Networking.openIA.States
                     RotateObject(rotateCommand.ID, rotateCommand.Axis, rotateCommand.Value);
                     break;
                 }
+                case Categories.Objects.RotateNormalAndUp:
+                {
+                    var rotateCommand = SetObjectRotationNormal.FromByteArray(data);
+                    RotateObject(rotateCommand.ID, Quaternion.LookRotation(rotateCommand.Normal, rotateCommand.Up));
+                    break;
+                }
             }
 
             return Task.FromResult<IInterpreterState>(this);
@@ -136,54 +143,77 @@ namespace Networking.openIA.States
 
         private static void MatrixToObject(ulong id, Matrix4x4 matrix)
         {
-            if (id != 0)
+            if (id == 1)
             {
-                // my slicing plane is the tablet...
-                // how would this work?
-                Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
-                return;
-            }
-
-            var transform = ModelManager.Instance.CurrentModel.transform;
-            transform.SetPositionAndRotation(matrix.GetPosition(), matrix.rotation);
-            transform.localScale = matrix.lossyScale;
-        }
-
-        private static void TranslateObject(ulong id, Vector3 translation)
-        {
-            if (id != 0)
-            {
-                // my slicing plane is the tablet...
-                // how would this work?
-                Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
                 return;
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            translation = CoordinateConverter.OpenIAToUnity(model, translation);
-            model.transform.position += translation;
+            var position = matrix.GetPosition();
+            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, position);
+            
+            if (id == 0)
+            {
+                model.transform.SetPositionAndRotation(convertedPosition, matrix.rotation);
+                model.transform.localScale = matrix.lossyScale;
+                return;
+            }
+
+            var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer != null)
+            {
+                viewer.transform.SetPositionAndRotation(convertedPosition, matrix.rotation);
+            }
+        }
+
+        private static void TranslateObject(ulong id, Vector3 translation)
+        {
+            if (id == 1)
+            {
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
+                return;
+            }
+
+            var model = ModelManager.Instance.CurrentModel;
+            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, translation);
+            
+            if (id == 0)
+            {
+                model.transform.position = convertedPosition;
+                return;
+            }
+
+            var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer != null)
+            {
+                viewer.transform.position = convertedPosition;
+            }
         }
 
         private static void ScaleObject(ulong id, Vector3 scale)
         {
-            if (id != 0)
+            if (id == 1)
             {
-                // my slicing plane is the tablet...
-                // how would this work?
-                Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
                 return;
             }
-
-            ModelManager.Instance.CurrentModel.transform.localScale += scale;
+            
+            if (id == 0)
+            {
+                var model = ModelManager.Instance.CurrentModel;
+                model.transform.localScale = scale;
+                return;
+            }
+            
+            Debug.Log("Tried to change one of the viewers. Stopped.");
         }
         
         private static void RotateObject(ulong id, Axis axis, float value)
         {
-            if (id != 0)
+            if (id == 1)
             {
-                // my slicing plane is the tablet...
-                // how would this work?
-                Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
                 return;
             }
 
@@ -194,21 +224,39 @@ namespace Networking.openIA.States
                 2 => new Vector3(0, 0, 1),
                 _ => throw new ArgumentException($"Invalid axis: {axis}")
             };
+
+            if (id == 0)
+            {
+                ModelManager.Instance.CurrentModel.transform.Rotate(vec, value);
+                return;
+            }
             
-            ModelManager.Instance.CurrentModel.transform.Rotate(vec, value);
+            var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer != null)
+            {
+                viewer.transform.Rotate(vec, value);
+            }
         }
 
         private static void RotateObject(ulong id, Quaternion quaternion)
         {
-            if (id != 0)
+            if (id == 1)
             {
-                // my slicing plane is the tablet...
-                // how would this work?
-                Debug.LogWarning("The SlicingPlane is the Tablet. It cannot be changed.");
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
                 return;
             }
 
-            ModelManager.Instance.CurrentModel.transform.rotation *= quaternion;
+            if (id == 0)
+            {
+                ModelManager.Instance.CurrentModel.transform.rotation = quaternion;
+                return;
+            }
+
+            var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer != null)
+            {
+                viewer.transform.rotation = quaternion;
+            }
         }
     }
 }
