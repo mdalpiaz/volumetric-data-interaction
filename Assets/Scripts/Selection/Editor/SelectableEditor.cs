@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.Reflection;
 using Networking.Tablet;
 using UnityEditor;
@@ -8,11 +10,11 @@ namespace Selection.Editor
     [CustomEditor(typeof(Selectable))]
     public class SelectableEditor : UnityEditor.Editor
     {
-        private MethodInfo _method;
+        private MethodInfo? selectMethod;
 
         private void OnEnable()
         {
-            _method = typeof(TabletServer).GetMethod("HandleTap", BindingFlags.NonPublic | BindingFlags.Instance);
+            selectMethod = typeof(TabletServer).GetMethod("OnSelect", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public override void OnInspectorGUI()
@@ -24,7 +26,7 @@ namespace Selection.Editor
             if (GUILayout.Button("Select"))
             {
                 TabletServer.Instance.Highlighted = (Selectable)serializedObject.targetObject;
-                _method.Invoke(TabletServer.Instance, new object[] { TapType.Double, 0.0f, 0.0f });
+                selectMethod?.Invoke(TabletServer.Instance, null);
             }
 
             serializedObject.ApplyModifiedProperties();
