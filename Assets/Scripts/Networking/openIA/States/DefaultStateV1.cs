@@ -272,8 +272,8 @@ namespace Networking.openIA.States
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            normal = CoordinateConverter.OpenIAToUnityDirection(model, normal);
-            up = CoordinateConverter.OpenIAToUnityDirection(model, up);
+            normal = CoordinateConverter.OpenIAToUnityDirection(normal);
+            up = CoordinateConverter.OpenIAToUnityDirection(up);
 
             if (id == 0)
             {

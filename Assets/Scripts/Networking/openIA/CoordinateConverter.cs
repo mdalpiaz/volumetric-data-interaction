@@ -25,21 +25,21 @@ namespace Networking.openIA
             return newPosition;
         }
 
-        public static Vector3 UnityToOpenIADirection(Model.Model model, Vector3 direction)
+        public static Vector3 UnityToOpenIADirection(Vector3 direction)
         {
             return SwapCoordinates(direction);
         }
 
-        public static Vector3 OpenIAToUnityDirection(Model.Model model, Vector3 direction)
+        public static Vector3 OpenIAToUnityDirection(Vector3 direction)
         {
             return SwapCoordinates(direction);
         }
 
         public static Vector3 UnityToOpenIANoOffset(Model.Model model, Vector3 localPosition)
         {
-            var scale = model.transform.localScale;
-            var modelUnitToLocal = Mathf.Max(model.Size.x * scale.x, model.Size.y * scale.y, model.Size.z * scale.z);
-            var newPosition = localPosition / modelUnitToLocal;
+            var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
+            var diffPosition = model.BottomBackRightCorner - localPosition;
+            var newPosition = diffPosition * modelUnitToLocal;
             return SwapCoordinates(newPosition);
         }
 

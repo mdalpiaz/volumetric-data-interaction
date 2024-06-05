@@ -160,8 +160,8 @@ namespace Networking.openIA
             position = CoordinateConverter.UnityToOpenIA(model, position);
             var normal = rotation * Vector3.back;
             var up = rotation * Vector3.up;
-            normal = CoordinateConverter.UnityToOpenIADirection(model, normal);
-            up = CoordinateConverter.UnityToOpenIADirection(model, up);
+            normal = CoordinateConverter.UnityToOpenIADirection(normal);
+            up = CoordinateConverter.UnityToOpenIADirection(up);
             await Send(new SetObjectTranslation(id.Value, position));
             await Send(new SetObjectRotationNormal(id.Value, normal, up));
         }
@@ -222,8 +222,9 @@ namespace Networking.openIA
             var localPosition = model.transform.InverseTransformPoint(position);
             var normal = model.transform.InverseTransformDirection(rotation * Vector3.back);
             Debug.DrawRay(localPosition, normal, Color.green, 120);
+            Debug.DrawLine(localPosition, model.BottomBackRightCorner, Color.yellow, 60);
             var openIAPosition = CoordinateConverter.UnityToOpenIANoOffset(model, localPosition);
-            var openIANormal = CoordinateConverter.UnityToOpenIADirection(model, normal);
+            var openIANormal = CoordinateConverter.UnityToOpenIADirection(normal);
             Debug.Log($"Slice at: world: {position}, local: {localPosition}, openIA: {openIAPosition}");
             await Send(new CreateSnapshotNormalClient(openIAPosition, openIANormal));
         }
