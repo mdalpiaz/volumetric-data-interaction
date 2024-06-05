@@ -156,6 +156,7 @@ namespace Networking.openIA
             }
 
             var model = ModelManager.Instance.CurrentModel;
+            position = model.transform.InverseTransformPoint(position);
             position = CoordinateConverter.UnityToOpenIA(model, position);
             var normal = rotation * Vector3.back;
             var up = rotation * Vector3.up;

@@ -10,6 +10,7 @@ namespace Networking.openIA
         {
             var scale = model.transform.localScale;
             var modelUnitToLocal = Mathf.Max(model.Size.x * scale.x, model.Size.y * scale.y, model.Size.z * scale.z);
+            localPosition += model.transform.TransformPoint(model.BottomBackRightCorner);
             var newPosition = localPosition / modelUnitToLocal;
             return SwapCoordinates(newPosition);
         }
