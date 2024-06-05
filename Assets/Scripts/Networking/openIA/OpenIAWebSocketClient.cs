@@ -160,7 +160,8 @@ namespace Networking.openIA
             var localPosition = model.transform.InverseTransformPoint(position);
             var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
             await Send(new SetObjectTranslation(model.ID, openIAPosition));
-            await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
+            //await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
+            await Send(new SetObjectRotationQuaternion(model.ID, rotation));
         }
 
         private async void Sliced(Transform slicerTransform)
