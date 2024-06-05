@@ -110,8 +110,7 @@ namespace Networking.openIA.States
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
                     var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
-                    var openIANormal = createCommand.Rotation * Vector3.back;
-                    var localNormal = CoordinateConverter.OpenIAToUnityDirection(openIANormal);
+                    var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Rotation * Vector3.back);
                     var worldNormal = currentModel.transform.TransformVector(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, worldQuaternion);
