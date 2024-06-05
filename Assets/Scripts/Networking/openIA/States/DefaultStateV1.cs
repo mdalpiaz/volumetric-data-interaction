@@ -109,18 +109,21 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var unityCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
-                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
-                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
+                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var openIANormal = createCommand.Rotation * Vector3.back;
+                    var localNormal = CoordinateConverter.OpenIAToUnityDirection(openIANormal);
+                    var worldNormal = currentModel.transform.TransformVector(localNormal);
+                    var worldQuaternion = Quaternion.LookRotation(worldNormal);
+                    SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, worldQuaternion);
                     break;
                 }
                 case Categories.Snapshots.CreateNormal:
                 {
                     var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var unityCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
-                    var worldCoords = currentModel.transform.TransformPoint(unityCoords);
-                    var worldNormal = currentModel.transform.TransformVector(createCommand.Normal);
+                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Normal);
+                    var worldNormal = currentModel.transform.TransformVector(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, worldQuaternion);
                     break;
