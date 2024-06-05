@@ -10,7 +10,7 @@ namespace Networking.openIA
         {
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var newPosition = localPosition / modelUnitToLocal;
-            Debug.DrawRay(newPosition, Vector3.forward, Color.red, 60);
+            //Debug.DrawRay(newPosition, Vector3.forward, Color.red, 60);
             return SwapCoordinates(newPosition);
         }
         
@@ -19,7 +19,7 @@ namespace Networking.openIA
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var convertedCoordinates = SwapCoordinates(position);
             var newPosition = convertedCoordinates * modelUnitToLocal;
-            Debug.DrawRay(newPosition, Vector3.forward, Color.green, 60);
+            //Debug.DrawRay(newPosition, Vector3.forward, Color.green, 60);
             return newPosition;
         }
         

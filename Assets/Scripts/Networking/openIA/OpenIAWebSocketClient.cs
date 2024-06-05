@@ -169,6 +169,7 @@ namespace Networking.openIA
             model.transform.GetPositionAndRotation(out var position, out var rotation);
             var localPosition = model.transform.InverseTransformPoint(position);
             var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
+            Debug.Log($"New positions for object: wordl: {position}, local: {localPosition}, openIA: {openIAPosition}");
             await Send(new SetObjectTranslation(model.ID, openIAPosition));
             //await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
@@ -180,6 +181,7 @@ namespace Networking.openIA
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
             var localPosition = model.transform.InverseTransformPoint(position);
             var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
+            Debug.Log($"Slice at: world: {position}, local: {localPosition}, openIA: {openIAPosition}");
             await Send(new CreateSnapshotNormalClient(openIAPosition, rotation * Vector3.back));
         }
 
