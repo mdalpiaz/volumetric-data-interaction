@@ -32,6 +32,12 @@ namespace Networking.openIA
         private string path = "/";
 
         [SerializeField]
+        private Camera camera = null!;
+
+        [SerializeField]
+        private float tickRate = 2.0f;
+
+        [SerializeField]
         private GameObject viewerPrefab = null!;
 
         private WebSocketClient ws = null!;
@@ -98,8 +104,9 @@ namespace Networking.openIA
             }
             Debug.Log("Connected WebSocket client");
             var runTask = ws.Run();
+            var periodicCameraSender = PeriodicCameraSender();
             await newInterpreter.Start();
-            await runTask;
+            await Task.WhenAll(runTask, periodicCameraSender);
             Debug.Log("WebSocket client stopped");
         }
 
@@ -126,6 +133,36 @@ namespace Networking.openIA
             }
             
             ws.Dispose();
+        }
+
+        private async Task PeriodicCameraSender()
+        {
+            while (true)
+            {
+                camera.transform.GetPositionAndRotation(out var position, out var rotation);
+                await SendCameraPosition(position, rotation);
+                var tickDelay = 1000.0f / tickRate;
+                var timeBetweenTicks = TimeSpan.FromMilliseconds(tickDelay);
+                await Task.Delay(timeBetweenTicks);
+            }
+        }
+
+        public async Task SendCameraPosition(Vector3 position, Quaternion rotation)
+        {
+            var id = ClientID;
+            if (!id.HasValue)
+            {
+                return;
+            }
+
+            var model = ModelManager.Instance.CurrentModel;
+            position = CoordinateConverter.UnityToOpenIA(model, position);
+            var normal = rotation * Vector3.back;
+            var up = rotation * Vector3.up;
+            normal = CoordinateConverter.UnityToOpenIADirection(model, normal);
+            up = CoordinateConverter.UnityToOpenIADirection(model, up);
+            await Send(new SetObjectTranslation(id.Value, position));
+            await Send(new SetObjectRotationNormal(id.Value, normal, up));
         }
 
         public void CreateViewer(ulong id)

@@ -84,7 +84,7 @@ namespace Networking
             }
             _cancellationTokenSource.Dispose();
         }
-        
+
         public async Task Close() => await _cws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Requested", _cancellationTokenSource.Token);
 
         public void Dispose()
