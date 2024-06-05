@@ -14,11 +14,6 @@ namespace Networking.openIA
 
         public static Vector3 UnityToOpenIALocal(Model.Model model, Vector3 localPosition)
         {
-            //var scale = model.transform.localScale;
-            //var modelUnitToLocal = Mathf.Max(model.Size.x * scale.x, model.Size.y * scale.y, model.Size.z * scale.z);
-            //localPosition += model.transform.TransformPoint(model.BottomBackRightCorner);
-            //var newPosition = localPosition / modelUnitToLocal;
-            //return SwapCoordinates(newPosition);
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var diffPosition = model.BottomBackRightCorner - localPosition;
             var newPosition = diffPosition * modelUnitToLocal;
