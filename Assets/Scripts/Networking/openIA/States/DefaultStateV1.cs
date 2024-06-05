@@ -109,7 +109,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
+                    var unityCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
                     var worldCoords = currentModel.transform.TransformPoint(unityCoords);
                     SnapshotManager.Instance.CreateSnapshot(createCommand.ID, worldCoords, createCommand.Rotation);
                     break;
@@ -118,7 +118,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var unityCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
+                    var unityCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
                     var worldCoords = currentModel.transform.TransformPoint(unityCoords);
                     var worldNormal = currentModel.transform.TransformVector(createCommand.Normal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
@@ -151,7 +151,7 @@ namespace Networking.openIA.States
 
             var model = ModelManager.Instance.CurrentModel;
             var position = matrix.GetPosition();
-            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, position);
+            var convertedPosition = CoordinateConverter.OpenIAToUnityWorld(model, position);
             
             if (id == 0)
             {
@@ -176,7 +176,7 @@ namespace Networking.openIA.States
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, translation);
+            var convertedPosition = CoordinateConverter.OpenIAToUnityWorld(model, translation);
             
             if (id == 0)
             {
@@ -189,8 +189,8 @@ namespace Networking.openIA.States
             {
                 viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-                viewer.transform.position = convertedPosition;
-            }
+            viewer.transform.position = convertedPosition;
+        }
 
         private static void ScaleObject(ulong id, Vector3 scale)
         {
@@ -237,8 +237,8 @@ namespace Networking.openIA.States
             {
                 viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-                viewer.transform.Rotate(vec, value);
-            }
+            viewer.transform.Rotate(vec, value);
+        }
 
         private static void RotateObject(ulong id, Quaternion quaternion)
         {
@@ -259,8 +259,8 @@ namespace Networking.openIA.States
             {
                 viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-                viewer.transform.rotation = quaternion;
-            }
+            viewer.transform.rotation = quaternion;
+        }
 
         private static void RotateObject(ulong id, Vector3 normal, Vector3 up)
         {
@@ -285,7 +285,7 @@ namespace Networking.openIA.States
             {
                 viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-                viewer.transform.localRotation = Quaternion.LookRotation(normal, up);
-            }
+            viewer.transform.localRotation = Quaternion.LookRotation(normal, up);
         }
     }
+}

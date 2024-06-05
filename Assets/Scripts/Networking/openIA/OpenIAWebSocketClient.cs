@@ -156,13 +156,10 @@ namespace Networking.openIA
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            position = model.transform.InverseTransformPoint(position);
-            position = CoordinateConverter.UnityToOpenIA(model, position);
-            var normal = rotation * Vector3.back;
-            var up = rotation * Vector3.up;
-            normal = CoordinateConverter.UnityToOpenIADirection(normal);
-            up = CoordinateConverter.UnityToOpenIADirection(up);
-            await Send(new SetObjectTranslation(id.Value, position));
+            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
+            var normal = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.back);
+            var up = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.up);
+            await Send(new SetObjectTranslation(id.Value, openIAPosition));
             await Send(new SetObjectRotationNormal(id.Value, normal, up));
         }
 
@@ -206,11 +203,8 @@ namespace Networking.openIA
             }
 
             model.transform.GetPositionAndRotation(out var position, out var rotation);
-            var localPosition = model.transform.InverseTransformPoint(position);
-            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
-            Debug.Log($"New positions for object: wordl: {position}, local: {localPosition}, openIA: {openIAPosition}");
+            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
             await Send(new SetObjectTranslation(model.ID, openIAPosition));
-            //await Send(new SetObjectRotationNormal(model.ID, rotation * Vector3.forward, rotation * Vector3.up));
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
         }
 
@@ -224,9 +218,8 @@ namespace Networking.openIA
             var normal = model.transform.InverseTransformDirection(rotation * Vector3.back);
             Debug.DrawRay(localPosition, normal, Color.green, 120);
             Debug.DrawLine(localPosition, model.BottomBackRightCorner, Color.yellow, 60);
-            var openIAPosition = CoordinateConverter.UnityToOpenIANoOffset(model, localPosition);
-            var openIANormal = CoordinateConverter.UnityToOpenIADirection(normal);
-            Debug.Log($"Slice at: world: {position}, local: {localPosition}, openIA: {openIAPosition}");
+            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
+            var openIANormal = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.back);
             await Send(new CreateSnapshotNormalClient(openIAPosition, openIANormal));
         }
 
