@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Model;
 using Networking.Tablet;
@@ -32,15 +33,14 @@ namespace Networking.openIA
         private string path = "/";
 
         [SerializeField]
-        private Camera camera = null!;
-
-        [SerializeField]
         private float tickRate = 2.0f;
 
         [SerializeField]
         private GameObject viewerPrefab = null!;
 
         private WebSocketClient ws = null!;
+
+        private Transform cameraTransform = null!;
 
         private ICommandInterpreter interpreter = null!;
 
@@ -86,6 +86,7 @@ namespace Networking.openIA
             {
                 return;
             }
+            cameraTransform = ViewModeSetter.Instance.Camera.transform;
             ws = new WebSocketClient($"{(https ? "wss" : "ws")}://{ip}:{port}{(path.StartsWith("/") ? path : "/" + path)}", HandleBinaryData, HandleText);
 
             var newInterpreter = new InterpreterV1(ws);
@@ -135,11 +136,19 @@ namespace Networking.openIA
             ws.Dispose();
         }
 
-        private async Task PeriodicCameraSender()
+        public Viewer CreateViewer(ulong id)
         {
-            while (true)
+            var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
+            viewer.ID = id;
+            Viewers.Add(viewer);
+            return viewer;
+        }
+
+        private async Task PeriodicCameraSender(CancellationToken token = default)
+        {
+            while (!token.IsCancellationRequested)
             {
-                camera.transform.GetPositionAndRotation(out var position, out var rotation);
+                cameraTransform.GetPositionAndRotation(out var position, out var rotation);
                 await SendCameraPosition(position, rotation);
                 var tickDelay = 1000.0f / tickRate;
                 var timeBetweenTicks = TimeSpan.FromMilliseconds(tickDelay);
@@ -147,28 +156,21 @@ namespace Networking.openIA
             }
         }
 
-        public async Task SendCameraPosition(Vector3 position, Quaternion rotation)
+        private async Task SendCameraPosition(Vector3 position, Quaternion rotation)
         {
-            var id = ClientID;
-            if (!id.HasValue)
+            if (!ClientID.HasValue)
             {
                 return;
             }
 
             var model = ModelManager.Instance.CurrentModel;
             var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
-            var normal = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.back);
-            var up = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.up);
-            await Send(new SetObjectTranslation(id.Value, openIAPosition));
-            await Send(new SetObjectRotationNormal(id.Value, normal, up));
-        }
-
-        public Viewer CreateViewer(ulong id)
-        {
-            var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
-            viewer.ID = id;
-            Viewers.Add(viewer);
-            return viewer;
+            var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
+            var localUp = model.transform.InverseTransformDirection(rotation * Vector3.up);
+            var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
+            var openIAUp = CoordinateConverter.UnityToOpenIADirection(localUp);
+            await Send(new SetObjectTranslation(ClientID.Value, openIAPosition));
+            await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
         }
 
         private async Task Send(ICommand cmd) => await sender.Send(cmd);
@@ -210,16 +212,11 @@ namespace Networking.openIA
 
         private async void Sliced(Transform slicerTransform)
         {
-            // TODO normal is working correctly, but position is taken from local position and then not offset correctly
-
             var model = ModelManager.Instance.CurrentModel;
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
-            var localPosition = model.transform.InverseTransformPoint(position);
-            var normal = model.transform.InverseTransformDirection(rotation * Vector3.back);
-            Debug.DrawRay(localPosition, normal, Color.green, 120);
-            Debug.DrawLine(localPosition, model.BottomBackRightCorner, Color.yellow, 60);
+            var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
             var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
-            var openIANormal = CoordinateConverter.UnityToOpenIADirection(rotation * Vector3.back);
+            var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
             await Send(new CreateSnapshotNormalClient(openIAPosition, openIANormal));
         }
 
