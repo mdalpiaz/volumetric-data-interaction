@@ -31,6 +31,9 @@ namespace Networking.openIA
         [SerializeField]
         private string path = "/";
 
+        [SerializeField]
+        private GameObject viewerPrefab = null!;
+
         private WebSocketClient ws = null!;
 
         private ICommandInterpreter interpreter = null!;
