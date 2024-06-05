@@ -128,6 +128,13 @@ namespace Networking.openIA
             ws.Dispose();
         }
 
+        public void CreateViewer(ulong id)
+        {
+            var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
+            viewer.ID = id;
+            Viewers.Add(viewer);
+        }
+
         private async Task Send(ICommand cmd) => await sender.Send(cmd);
         
         private Task HandleText(string text)

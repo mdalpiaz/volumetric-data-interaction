@@ -185,6 +185,10 @@ namespace Networking.openIA.States
             }
 
             var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer == null)
+            {
+                OpenIAWebSocketClient.Instance.CreateViewer(id);
+            }
             if (viewer != null)
             {
                 viewer.transform.position = convertedPosition;
