@@ -209,23 +209,23 @@ namespace Model
             TopFrontLeftCorner =     points.OrderBy(p => p.x)          .Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
             TopFrontRightCorner =    points.OrderByDescending(p => p.x).Take(4).OrderByDescending(p => p.y).Take(2).OrderBy(p => p.z).First();
 
-            // connecting edges
-            Debug.DrawLine(BottomFrontLeftCorner, BottomBackLeftCorner, Color.black, 120);
-            Debug.DrawLine(BottomFrontRightCorner, BottomBackRightCorner, Color.black, 120);
-            Debug.DrawLine(TopFrontLeftCorner, TopBackLeftCorner, Color.black, 120);
-            Debug.DrawLine(TopFrontRightCorner, TopBackRightCorner, Color.black, 120);
+            //// connecting edges
+            //Debug.DrawLine(BottomFrontLeftCorner, BottomBackLeftCorner, Color.black, 120);
+            //Debug.DrawLine(BottomFrontRightCorner, BottomBackRightCorner, Color.black, 120);
+            //Debug.DrawLine(TopFrontLeftCorner, TopBackLeftCorner, Color.black, 120);
+            //Debug.DrawLine(TopFrontRightCorner, TopBackRightCorner, Color.black, 120);
 
-            // backside edges
-            Debug.DrawLine(BottomBackLeftCorner, TopBackLeftCorner, Color.black, 120);
-            Debug.DrawLine(BottomBackRightCorner, TopBackRightCorner, Color.black, 120);
-            Debug.DrawLine(BottomBackLeftCorner, BottomBackRightCorner, Color.black, 120);
-            Debug.DrawLine(TopBackLeftCorner, TopBackRightCorner, Color.black, 120);
+            //// backside edges
+            //Debug.DrawLine(BottomBackLeftCorner, TopBackLeftCorner, Color.black, 120);
+            //Debug.DrawLine(BottomBackRightCorner, TopBackRightCorner, Color.black, 120);
+            //Debug.DrawLine(BottomBackLeftCorner, BottomBackRightCorner, Color.black, 120);
+            //Debug.DrawLine(TopBackLeftCorner, TopBackRightCorner, Color.black, 120);
 
-            // frontside edges
-            Debug.DrawLine(BottomFrontLeftCorner, TopFrontLeftCorner, Color.black, 120);
-            Debug.DrawLine(BottomFrontRightCorner, TopFrontRightCorner, Color.black, 120);
-            Debug.DrawLine(BottomFrontLeftCorner, BottomFrontRightCorner, Color.black, 120);
-            Debug.DrawLine(TopFrontLeftCorner, TopFrontRightCorner, Color.black, 120);
+            //// frontside edges
+            //Debug.DrawLine(BottomFrontLeftCorner, TopFrontLeftCorner, Color.black, 120);
+            //Debug.DrawLine(BottomFrontRightCorner, TopFrontRightCorner, Color.black, 120);
+            //Debug.DrawLine(BottomFrontLeftCorner, BottomFrontRightCorner, Color.black, 120);
+            //Debug.DrawLine(TopFrontLeftCorner, TopFrontRightCorner, Color.black, 120);
 
             Size = new Vector3
             {
