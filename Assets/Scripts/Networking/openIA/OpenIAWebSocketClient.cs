@@ -166,11 +166,12 @@ namespace Networking.openIA
             await Send(new SetObjectRotationNormal(id.Value, normal, up));
         }
 
-        public void CreateViewer(ulong id)
+        public Viewer CreateViewer(ulong id)
         {
             var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
             viewer.ID = id;
             Viewers.Add(viewer);
+            return viewer;
         }
 
         private async Task Send(ICommand cmd) => await sender.Send(cmd);

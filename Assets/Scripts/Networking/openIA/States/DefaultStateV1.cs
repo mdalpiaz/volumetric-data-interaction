@@ -187,13 +187,10 @@ namespace Networking.openIA.States
             var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
             if (viewer == null)
             {
-                OpenIAWebSocketClient.Instance.CreateViewer(id);
+                viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-            if (viewer != null)
-            {
                 viewer.transform.position = convertedPosition;
             }
-        }
 
         private static void ScaleObject(ulong id, Vector3 scale)
         {
@@ -236,11 +233,12 @@ namespace Networking.openIA.States
             }
             
             var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
-            if (viewer != null)
+            if (viewer == null)
             {
+                viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
+            }
                 viewer.transform.Rotate(vec, value);
             }
-        }
 
         private static void RotateObject(ulong id, Quaternion quaternion)
         {
@@ -257,11 +255,12 @@ namespace Networking.openIA.States
             }
 
             var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
-            if (viewer != null)
+            if (viewer == null)
             {
+                viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
+            }
                 viewer.transform.rotation = quaternion;
             }
-        }
 
         private static void RotateObject(ulong id, Vector3 normal, Vector3 up)
         {
@@ -282,10 +281,11 @@ namespace Networking.openIA.States
             }
 
             var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
-            if (viewer != null)
+            if (viewer == null)
             {
+                viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
+            }
                 viewer.transform.localRotation = Quaternion.LookRotation(normal, up);
             }
         }
     }
-}
