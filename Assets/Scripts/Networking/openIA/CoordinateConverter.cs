@@ -35,6 +35,14 @@ namespace Networking.openIA
             return SwapCoordinates(direction);
         }
 
+        public static Vector3 UnityToOpenIANoOffset(Model.Model model, Vector3 localPosition)
+        {
+            var scale = model.transform.localScale;
+            var modelUnitToLocal = Mathf.Max(model.Size.x * scale.x, model.Size.y * scale.y, model.Size.z * scale.z);
+            var newPosition = localPosition / modelUnitToLocal;
+            return SwapCoordinates(newPosition);
+        }
+
         private static Vector3 SwapCoordinates(Vector3 vec)
         {
             return new Vector3(-vec.x, vec.z, -vec.y);

@@ -215,11 +215,15 @@ namespace Networking.openIA
 
         private async void Sliced(Transform slicerTransform)
         {
+            // TODO normal is working correctly, but position is taken from local position and then not offset correctly
+
             var model = ModelManager.Instance.CurrentModel;
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
             var localPosition = model.transform.InverseTransformPoint(position);
-            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, localPosition);
-            var openIANormal = CoordinateConverter.UnityToOpenIADirection(model, rotation * Vector3.back);
+            var normal = model.transform.InverseTransformDirection(rotation * Vector3.back);
+            Debug.DrawRay(localPosition, normal, Color.green, 120);
+            var openIAPosition = CoordinateConverter.UnityToOpenIANoOffset(model, localPosition);
+            var openIANormal = CoordinateConverter.UnityToOpenIADirection(model, normal);
             Debug.Log($"Slice at: world: {position}, local: {localPosition}, openIA: {openIAPosition}");
             await Send(new CreateSnapshotNormalClient(openIAPosition, openIANormal));
         }
