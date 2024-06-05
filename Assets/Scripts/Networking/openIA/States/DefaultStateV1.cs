@@ -93,7 +93,7 @@ namespace Networking.openIA.States
                 case Categories.Objects.RotateNormalAndUp:
                 {
                     var rotateCommand = SetObjectRotationNormal.FromByteArray(data);
-                    RotateObject(rotateCommand.ID, Quaternion.LookRotation(rotateCommand.Normal, rotateCommand.Up));
+                    RotateObject(rotateCommand.ID, rotateCommand.Normal, rotateCommand.Up);
                     break;
                 }
             }
@@ -260,6 +260,31 @@ namespace Networking.openIA.States
             if (viewer != null)
             {
                 viewer.transform.rotation = quaternion;
+            }
+        }
+
+        private static void RotateObject(ulong id, Vector3 normal, Vector3 up)
+        {
+            if (id == 1)
+            {
+                Debug.LogWarning("Tried changing the slicing plane. Stopped.");
+                return;
+            }
+
+            var model = ModelManager.Instance.CurrentModel;
+            normal = CoordinateConverter.OpenIAToUnityDirection(model, normal);
+            up = CoordinateConverter.OpenIAToUnityDirection(model, up);
+
+            if (id == 0)
+            {
+                ModelManager.Instance.CurrentModel.transform.localRotation = Quaternion.LookRotation(normal, up);
+                return;
+            }
+
+            var viewer = OpenIAWebSocketClient.Instance.Viewers.FirstOrDefault(v => v.ID == id);
+            if (viewer != null)
+            {
+                viewer.transform.localRotation = Quaternion.LookRotation(normal, up);
             }
         }
     }
