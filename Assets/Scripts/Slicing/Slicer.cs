@@ -185,20 +185,20 @@ namespace Slicing
                 return null;
             }
 
-            var colorArray = new[]
-            {
-                Color.red,
-                Color.yellow,
-                Color.green,
-                Color.blue,
-                Color.cyan,
-                Color.magenta
-            };
+            //var colorArray = new[]
+            //{
+            //    Color.red,
+            //    Color.yellow,
+            //    Color.green,
+            //    Color.blue,
+            //    Color.cyan,
+            //    Color.magenta
+            //};
             
-            for (var i = 0; i < points.Count; i++)
-            {
-                Debug.DrawLine(points[i], points[(i + 1) % points.Count], colorArray[i]);
-            }
+            //for (var i = 0; i < points.Count; i++)
+            //{
+            //    Debug.DrawLine(points[i], points[(i + 1) % points.Count], colorArray[i]);
+            //}
             
             points = ConvertTo4Points(rotation, points).ToList();
 
@@ -240,10 +240,10 @@ namespace Slicing
                 bottomRight = bottomPoints[0];
             }
 
-            Debug.DrawLine(topLeft, bottomLeft, Color.blue);
-            Debug.DrawLine(bottomLeft, bottomRight, Color.green);
-            Debug.DrawLine(bottomRight, topRight, Color.yellow);
-            Debug.DrawLine(topRight, topLeft, Color.red);
+            //Debug.DrawLine(topLeft, bottomLeft, Color.blue);
+            //Debug.DrawLine(bottomLeft, bottomRight, Color.green);
+            //Debug.DrawLine(bottomRight, topRight, Color.yellow);
+            //Debug.DrawLine(topRight, topLeft, Color.red);
 
             return new IntersectionPoints
             {
