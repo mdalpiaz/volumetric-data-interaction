@@ -109,7 +109,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var worldCoords = CoordinateConverter.OpenIAToUnityLocal(currentModel, createCommand.Position);
                     var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Rotation * Vector3.back);
                     var worldNormal = currentModel.transform.TransformVector(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
@@ -120,7 +120,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var worldCoords = CoordinateConverter.OpenIAToUnityLocal(currentModel, createCommand.Position);
                     var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Normal);
                     var worldNormal = currentModel.transform.TransformVector(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
