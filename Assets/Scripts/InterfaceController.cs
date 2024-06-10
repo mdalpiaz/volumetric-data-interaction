@@ -46,7 +46,7 @@ public class InterfaceController : MonoBehaviour
     
     public Transform Main => main;
 
-    public List<AttachmentPoint> Additions { get; } = new(AdditionCount);
+    public List<AttachmentPoint> AttachmentPoints { get; } = new(AdditionCount);
 
     private void Awake()
     {
@@ -57,7 +57,7 @@ public class InterfaceController : MonoBehaviour
         // get all additions and add them to the list
         for (var i = 0; i < AdditionCount; i++)
         {
-            Additions.Add(parent.transform.GetChild(i + 1).GetComponent<AttachmentPoint>());
+            AttachmentPoints.Add(parent.transform.GetChild(i + 1).GetComponent<AttachmentPoint>());
         }
     }
 
@@ -68,7 +68,7 @@ public class InterfaceController : MonoBehaviour
 
     public AttachmentPoint? GetNextAddition()
     {
-        return Additions.FirstOrDefault(ap => !ap.HasAttachment);
+        return AttachmentPoints.FirstOrDefault(ap => !ap.HasAttachment);
     }
     
     public void SetMode(MenuMode mode, bool isSnapshotSelected = false)
