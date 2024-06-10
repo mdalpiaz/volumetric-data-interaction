@@ -12,10 +12,6 @@ using UnityEngine.UI;
 /// </summary>
 public class InterfaceController : MonoBehaviour
 {
-    private const string MainModeInfo = "Main Menu";
-    private const string SelectionModeInfo = "Selection Mode";
-    private const string ExplorationModeInfo = "Exploration Mode";
-    
     [SerializeField]
     private TextMeshProUGUI hud = null!;
 
@@ -25,22 +21,6 @@ public class InterfaceController : MonoBehaviour
     [SerializeField]
     private Text centerText = null!;
 
-    [SerializeField]
-    private Material uiMain = null!;
-    
-    [SerializeField]
-    private Material uiExploration = null!;
-    
-    [SerializeField]
-    private Material uiSelection = null!;
-    
-    [SerializeField]
-    private Material uiSelected = null!;
-
-    [SerializeField]
-    private Material blackMaterial = null!;
-
-    private MeshRenderer mainMeshRenderer = null!;
     private Material? previousMaterial;
     
     private readonly List<AttachmentPoint> attachmentPoints = new();
@@ -49,10 +29,6 @@ public class InterfaceController : MonoBehaviour
 
     private void Awake()
     {
-        mainMeshRenderer = Main.GetComponent<MeshRenderer>();
-        var parent = Main.parent;
-
-
         for (var i = 0; i < transform.childCount; i++)
         {
             if (transform.GetChild(i).TryGetComponent<AttachmentPoint>(out var ap))
@@ -62,66 +38,8 @@ public class InterfaceController : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        SetMode(MenuMode.None);
-    }
-
     public AttachmentPoint? GetNextAttachmentPoint()
     {
         return attachmentPoints.FirstOrDefault(ap => !ap.HasAttachment);
     }
-    
-    public void SetMode(MenuMode mode, bool isSnapshotSelected = false)
-    {
-        switch (mode)
-        {
-            case MenuMode.None:
-                SetMaterial(uiMain);
-                SetHUD(MainModeInfo);
-                SetCenterText(MainModeInfo);
-                break;
-            case MenuMode.Analysis:
-                SetMaterial(uiExploration);
-                SetHUD(ExplorationModeInfo);
-                SetCenterText(ExplorationModeInfo);
-                break;
-            case MenuMode.Selection:
-                SetMaterial(uiSelection);
-                SetHUD(SelectionModeInfo);
-                SetCenterText(SelectionModeInfo);
-                break;
-            case MenuMode.Selected:
-                if (!isSnapshotSelected)
-                {
-                    SetMaterial(uiSelected);
-                }
-                break;
-            default:
-                SetMaterial(uiMain);
-                break;
-        }
-    }
-
-    public void BlackenOut()
-    {
-        previousMaterial = mainMeshRenderer.material;
-        SetMaterial(blackMaterial);
-    }
-
-    public void RestorePreviousOverlay()
-    {
-        if (previousMaterial == null)
-        {
-            return;
-        }
-        SetMaterial(previousMaterial);
-        previousMaterial = null;
-    }
-
-    private void SetCenterText(string text) => centerText.text = text;
-
-    private void SetHUD(string text = "") => hud.text = text;
-
-    private void SetMaterial(Material mat) => mainMeshRenderer.material = mat;
 }

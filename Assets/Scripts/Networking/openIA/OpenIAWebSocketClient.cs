@@ -78,8 +78,6 @@ namespace Networking.openIA
             TabletServer.Instance.MappingStopped += MappingStopped;
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.SnapshotRemoved += SnapshotRemoved;
-            TabletServer.Instance.SnapshotsCleared += SnapshotsCleared;
-            TabletServer.Instance.ResettedState += ResettedState;
         }
 
         private async void Start()
@@ -124,8 +122,6 @@ namespace Networking.openIA
             TabletServer.Instance.MappingStopped -= MappingStopped;
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.SnapshotRemoved -= SnapshotRemoved;
-            TabletServer.Instance.SnapshotsCleared -= SnapshotsCleared;
-            TabletServer.Instance.ResettedState -= ResettedState;
         }
 
         private void OnDestroy()
@@ -226,17 +222,6 @@ namespace Networking.openIA
         private async void SnapshotRemoved(Snapshot s)
         {
             await Send(new RemoveSnapshot(s.ID));
-        }
-
-        private async void SnapshotsCleared(List<ulong> snapshotIDs)
-        {
-            var tasks = snapshotIDs.Select(id => Send(new RemoveSnapshot(id)));
-            await Task.WhenAll(tasks);
-        }
-
-        private async void ResettedState()
-        {
-            await Send(new Reset());
         }
     }
 }

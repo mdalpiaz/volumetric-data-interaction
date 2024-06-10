@@ -16,31 +16,6 @@ namespace Networking.Tablet.Editor
             {
                 _ = client.Connect().ContinueWith(async task => await client.Run());
             }
-            
-            if (GUILayout.Button("Send Menu: Analysis"))
-            {
-                _ = client.SendMenuChangedMessage(MenuMode.Analysis);
-            }
-
-            if (GUILayout.Button("Send Menu: Selection"))
-            {
-                _ = client.SendMenuChangedMessage(MenuMode.Selection);
-            }
-
-            if (GUILayout.Button("Send Swipe"))
-            {
-                _ = client.SendSwipeMessage(true, 250, 250, 0);
-            }
-
-            if (GUILayout.Button("Send Shake"))
-            {
-                _ = client.SendShakeMessage(3);
-            }
-
-            if (GUILayout.Button("Send Double Tap"))
-            {
-                _ = client.SendTapMessage(TapType.Double, 250, 250);
-            }
         }
     }
 }

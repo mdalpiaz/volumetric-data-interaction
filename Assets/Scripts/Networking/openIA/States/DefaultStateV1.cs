@@ -220,11 +220,11 @@ namespace Networking.openIA.States
                 return;
             }
 
-            var vec = (byte)axis switch
+            var vec = axis switch
             {
-                0 => new Vector3(1, 0, 0),
-                1 => new Vector3(0, 1, 0),
-                2 => new Vector3(0, 0, 1),
+                Axis.X => new Vector3(1, 0, 0),
+                Axis.Y => new Vector3(0, 1, 0),
+                Axis.Z => new Vector3(0, 0, 1),
                 _ => throw new ArgumentException($"Invalid axis: {axis}")
             };
 

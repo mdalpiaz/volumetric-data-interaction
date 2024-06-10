@@ -111,8 +111,6 @@ namespace Snapshots
         {
             if (isSelected)
             {
-                SnapshotManager.Instance.InterfaceController.BlackenOut();
-
                 var overlay = SnapshotManager.Instance.InterfaceController.Main;
                 var snapshotQuad = Instantiate(textureQuad);
                 var cachedQuadTransform = snapshotQuad.transform;
@@ -127,7 +125,6 @@ namespace Snapshots
             }
             else
             {
-                SnapshotManager.Instance.InterfaceController.RestorePreviousOverlay();
                 Destroy(tempNeighbourOverlay);
             }
         }

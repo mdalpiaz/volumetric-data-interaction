@@ -39,6 +39,7 @@ namespace Client
         {
             tabletClient.ModelSelected += OnModelSelected;
             tabletClient.SnapshotSelected += OnSnapshotSelected;
+            tabletClient.SnapshotRemoved += OnSnapshotRemoved;
             touchInput.Swiped += OnSwipe;
             touchInput.Scaled += OnScale;
             touchInput.Tapped += OnTap;
@@ -103,6 +104,17 @@ namespace Client
         {
             DeactivateAll();
             snapshotSelectedPanel.SetActive(true);
+        }
+
+        private void OnSnapshotRemoved()
+        {
+            if (!snapshotSelectedPanel.activeInHierarchy)
+            {
+                return;
+            }
+            
+            DeactivateAll();
+            modePanel.SetActive(true);
         }
 
         private void OnSwipe(bool inward, float endPointX, float endPointY, float angle)
