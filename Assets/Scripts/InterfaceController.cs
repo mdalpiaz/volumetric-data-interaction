@@ -2,9 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// Menu class
@@ -13,15 +11,7 @@ using UnityEngine.UI;
 public class InterfaceController : MonoBehaviour
 {
     [SerializeField]
-    private TextMeshProUGUI hud = null!;
-
-    [SerializeField]
     private Transform main = null!;
-    
-    [SerializeField]
-    private Text centerText = null!;
-
-    private Material? previousMaterial;
     
     private readonly List<AttachmentPoint> attachmentPoints = new();
     
