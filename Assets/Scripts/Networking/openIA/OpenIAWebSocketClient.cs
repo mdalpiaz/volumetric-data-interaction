@@ -49,7 +49,10 @@ namespace Networking.openIA
         private Selectable? selected;
 
         public bool IsOnline => isOnline;
-        
+
+        private Vector3 oldCamPos = new Vector3(0, 0, 0);
+        private Quaternion oldCamRot = new Quaternion(0, 0, 0, 0);
+
         public ulong? ClientID { get; set; }
 
         public List<Viewer> Viewers { get; } = new();
@@ -160,15 +163,23 @@ namespace Networking.openIA
             {
                 return;
             }
-
             var model = ModelManager.Instance.CurrentModel;
-            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
-            var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
-            var localUp = model.transform.InverseTransformDirection(rotation * Vector3.up);
-            var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
-            var openIAUp = CoordinateConverter.UnityToOpenIADirection(localUp);
-            await Send(new SetObjectTranslation(ClientID.Value, openIAPosition));
-            await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
+            if (oldCamPos != position)
+            {
+                oldCamPos = position;
+                var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
+                await Send(new SetObjectTranslation(ClientID.Value, openIAPosition));
+            }
+            if (oldCamRot != rotation)
+            {
+                oldCamRot = rotation;
+                var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
+                var localUp = model.transform.InverseTransformDirection(rotation * Vector3.up);
+                var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
+                var openIAUp = CoordinateConverter.UnityToOpenIADirection(localUp);
+                //await Send(new SetObjectRotationQuaternion(ClientID.Value, Quaternion.LookRotation(openIANormal, openIAUp)));
+                await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
+            }
         }
 
         private async Task Send(ICommand cmd) => await sender.Send(cmd);
