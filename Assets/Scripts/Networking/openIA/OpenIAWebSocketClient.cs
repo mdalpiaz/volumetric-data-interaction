@@ -168,8 +168,7 @@ namespace Networking.openIA
             var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
             var openIAUp = CoordinateConverter.UnityToOpenIADirection(localUp);
             await Send(new SetObjectTranslation(ClientID.Value, openIAPosition));
-            //await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
-            await Send(new SetObjectRotationQuaternion(ClientID.Value, Quaternion.LookRotation(openIANormal, openIAUp)));
+            await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
         }
 
         private async Task Send(ICommand cmd) => await sender.Send(cmd);
