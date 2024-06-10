@@ -12,7 +12,6 @@ using UnityEngine.UI;
 /// </summary>
 public class InterfaceController : MonoBehaviour
 {
-    public const int AdditionCount = 5;
     private const string MainModeInfo = "Main Menu";
     private const string SelectionModeInfo = "Selection Mode";
     private const string ExplorationModeInfo = "Exploration Mode";
@@ -46,18 +45,22 @@ public class InterfaceController : MonoBehaviour
     
     public Transform Main => main;
 
-    public List<AttachmentPoint> AttachmentPoints { get; } = new(AdditionCount);
+    public List<AttachmentPoint> AttachmentPoints { get; } = new();
+
+    public int AdditionCount => AttachmentPoints.Count;
 
     private void Awake()
     {
         mainMeshRenderer = Main.GetComponent<MeshRenderer>();
         var parent = Main.parent;
-        
-        // the first one is main
-        // get all additions and add them to the list
-        for (var i = 0; i < AdditionCount; i++)
+
+
+        for (var i = 0; i < transform.childCount; i++)
         {
-            AttachmentPoints.Add(parent.transform.GetChild(i + 1).GetComponent<AttachmentPoint>());
+            if (transform.GetChild(i).TryGetComponent<AttachmentPoint>(out var ap))
+            {
+                AttachmentPoints.Add(ap);
+            }
         }
     }
 
