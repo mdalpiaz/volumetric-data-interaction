@@ -150,7 +150,7 @@ namespace Networking.openIA
                 await SendCameraPosition(position, rotation);
                 var tickDelay = 1000.0f / tickRate;
                 var timeBetweenTicks = TimeSpan.FromMilliseconds(tickDelay);
-                await Task.Delay(timeBetweenTicks);
+                await Task.Delay(timeBetweenTicks, token);
             }
         }
 
