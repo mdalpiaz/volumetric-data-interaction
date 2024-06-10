@@ -573,8 +573,19 @@ namespace Networking.Tablet
                 return;
             }
 
-            // TODO
-            snapshot.AttachToTransform(interfaceController.Main.parent, interfaceController.Additions[0].position);
+            if (snapshot.IsAttached)
+            {
+                snapshot.Detach();
+            }
+            else
+            {
+                var addition = interfaceController.GetNextAddition();
+                if (addition == null)
+                {
+                    return;
+                }
+                snapshot.AttachToTransform(interfaceController.Main.parent, addition);
+            }
         }
 
         private void OnHoldBegin()

@@ -16,6 +16,8 @@ namespace Snapshots
 
         private GameObject textureQuad = null!;
         private MeshRenderer textureQuadRenderer = null!;
+
+        private AttachmentPoint? attachmentPoint;
         
         public ulong ID { get; set; }
 
@@ -71,20 +73,27 @@ namespace Snapshots
             }
         }
 
-        public void AttachToTransform(Transform t, Vector3 position)
+        public void AttachToTransform(Transform t, AttachmentPoint ap)
         {
             IsAttached = true;
+            attachmentPoint = ap;
+            attachmentPoint.HasAttachment = true;
             var cachedTransform = transform;
             detachedScale = cachedTransform.localScale;
             detachedPosition = cachedTransform.localPosition;
             cachedTransform.SetParent(t);
-            cachedTransform.SetPositionAndRotation(position, new Quaternion());
+            cachedTransform.SetPositionAndRotation(ap.transform.position, new Quaternion());
             cachedTransform.localScale = new Vector3(1, 0.65f, 0.1f);
         }
 
         public void Detach()
         {
             IsAttached = false;
+            if (attachmentPoint != null)
+            {
+                attachmentPoint.HasAttachment = false;
+                attachmentPoint = null;
+            }
             var cachedTransform = transform;
             cachedTransform.SetParent(null);
             cachedTransform.localScale = detachedScale; 
