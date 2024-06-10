@@ -47,10 +47,12 @@ namespace Networking.openIA
         private ICommandSender sender = null!;
 
         private Selectable? selected;
+
+        public bool IsOnline => isOnline;
         
         public ulong? ClientID { get; set; }
 
-        public List<Viewer> Viewers { get; private set; } = new();
+        public List<Viewer> Viewers { get; } = new();
         
         private void Awake()
         {

@@ -13,6 +13,7 @@ using Snapshots;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Networking.openIA;
 
 namespace Networking.Tablet
 {
@@ -530,6 +531,12 @@ namespace Networking.Tablet
 
         private void OnSlice()
         {
+            if (OpenIAWebSocketClient.Instance.IsOnline)
+            {
+                Sliced?.Invoke(slicer.transform);
+                return;
+            }
+            
             var snapshot = slicer.CreateSnapshot();
             if (snapshot != null)
             {
