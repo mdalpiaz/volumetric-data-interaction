@@ -20,9 +20,6 @@ namespace Networking.Tablet
         public static TabletServer Instance { get; private set; } = null!;
         
         [SerializeField]
-        private InterfaceController ui = null!;
-        
-        [SerializeField]
         private GameObject ray = null!;
         
         [SerializeField]
