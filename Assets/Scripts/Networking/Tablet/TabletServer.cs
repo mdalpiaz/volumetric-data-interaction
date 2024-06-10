@@ -579,7 +579,7 @@ namespace Networking.Tablet
             }
             else
             {
-                var addition = interfaceController.GetNextAddition();
+                var addition = interfaceController.GetNextAttachmentPoint();
                 if (addition == null)
                 {
                     return;

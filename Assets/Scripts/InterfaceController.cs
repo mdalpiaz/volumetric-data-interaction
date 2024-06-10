@@ -69,7 +69,7 @@ public class InterfaceController : MonoBehaviour
         SetMode(MenuMode.None);
     }
 
-    public AttachmentPoint? GetNextAddition()
+    public AttachmentPoint? GetNextAttachmentPoint()
     {
         return AttachmentPoints.FirstOrDefault(ap => !ap.HasAttachment);
     }
