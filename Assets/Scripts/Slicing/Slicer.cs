@@ -12,8 +12,8 @@ namespace Slicing
 {
     public class Slicer : MonoBehaviour
     {
-        [SerializeField]
-        private CutQuad cutQuadPrefab = null!;
+        //[SerializeField]
+        //private CutQuad cutQuadPrefab = null!;
         
         [SerializeField]
         private Material materialTemporarySlice = null!;
@@ -21,8 +21,8 @@ namespace Slicing
         [SerializeField]
         private Material materialWhite = null!;
         
-        [SerializeField]
-        private Material slicedObjectSecondaryMaterial = null!;
+        //[SerializeField]
+        //private Material slicedObjectSecondaryMaterial = null!;
         
         [SerializeField]
         private Shader materialShader = null!;
