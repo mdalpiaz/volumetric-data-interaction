@@ -202,7 +202,7 @@ namespace Snapshots
         {
             for (var i = 0; i < Snapshots.Count && i < InterfaceController.AdditionCount; i++)
             {
-                Snapshots[i].AttachToTransform(interfaceController.Main.parent, interfaceController.Additions[i]);
+                Snapshots[i].AttachToTransform(interfaceController.Main.parent, interfaceController.AttachmentPoints[i]);
             }
         }
         
