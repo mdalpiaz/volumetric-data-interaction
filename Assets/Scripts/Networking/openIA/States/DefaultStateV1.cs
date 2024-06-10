@@ -109,7 +109,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotQuaternionServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var worldCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
                     var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Rotation * Vector3.back);
                     var worldNormal = currentModel.transform.TransformDirection(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
@@ -120,7 +120,7 @@ namespace Networking.openIA.States
                 {
                     var createCommand = CreateSnapshotNormalServer.FromByteArray(data);
                     var currentModel = ModelManager.Instance.CurrentModel;
-                    var worldCoords = CoordinateConverter.OpenIAToUnityWorld(currentModel, createCommand.Position);
+                    var worldCoords = CoordinateConverter.OpenIAToUnity(currentModel, createCommand.Position);
                     var localNormal = CoordinateConverter.OpenIAToUnityDirection(createCommand.Normal);
                     var worldNormal = currentModel.transform.TransformDirection(localNormal);
                     var worldQuaternion = Quaternion.LookRotation(worldNormal);
@@ -153,7 +153,7 @@ namespace Networking.openIA.States
 
             var model = ModelManager.Instance.CurrentModel;
             var position = matrix.GetPosition();
-            var convertedPosition = CoordinateConverter.OpenIAToUnityWorld(model, position);
+            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, position);
             
             if (id == 0)
             {
@@ -178,7 +178,7 @@ namespace Networking.openIA.States
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            var convertedPosition = CoordinateConverter.OpenIAToUnityWorld(model, translation);
+            var convertedPosition = CoordinateConverter.OpenIAToUnity(model, translation);
             
             if (id == 0)
             {

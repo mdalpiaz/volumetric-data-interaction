@@ -162,7 +162,7 @@ namespace Networking.openIA
             }
 
             var model = ModelManager.Instance.CurrentModel;
-            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
             var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
             var localUp = model.transform.InverseTransformDirection(rotation * Vector3.up);
             var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
@@ -203,7 +203,7 @@ namespace Networking.openIA
             }
 
             model.transform.GetPositionAndRotation(out var position, out var rotation);
-            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
             await Send(new SetObjectTranslation(model.ID, openIAPosition));
             await Send(new SetObjectRotationQuaternion(model.ID, rotation));
         }
@@ -213,7 +213,7 @@ namespace Networking.openIA
             var model = ModelManager.Instance.CurrentModel;
             slicerTransform.GetPositionAndRotation(out var position, out var rotation);
             var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
-            var openIAPosition = CoordinateConverter.UnityToOpenIAWorld(model, position);
+            var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
             var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
             await Send(new CreateSnapshotNormalClient(openIAPosition, openIANormal));
         }

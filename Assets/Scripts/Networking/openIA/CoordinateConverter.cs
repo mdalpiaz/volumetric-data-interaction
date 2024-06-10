@@ -6,7 +6,7 @@ namespace Networking.openIA
 {
     public static class CoordinateConverter
     {
-        public static Vector3 UnityToOpenIAWorld(Model.Model model, Vector3 position)
+        public static Vector3 UnityToOpenIA(Model.Model model, Vector3 position)
         {
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var localPosition = model.transform.InverseTransformPoint(position);
@@ -15,7 +15,7 @@ namespace Networking.openIA
             return UnityToOpenIACoordinates(newPosition);
         }
 
-        public static Vector3 OpenIAToUnityWorld(Model.Model model, Vector3 position)
+        public static Vector3 OpenIAToUnity(Model.Model model, Vector3 position)
         {
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var unityCoordinates = OpenIAToUnityCoordinates(position);
