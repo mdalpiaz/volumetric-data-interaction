@@ -41,8 +41,8 @@ public class InterfaceController : MonoBehaviour
     [SerializeField]
     private Material blackMaterial = null!;
 
-    private MeshRenderer _mainMeshRenderer = null!;
-    private Material? _previousMaterial;
+    private MeshRenderer mainMeshRenderer = null!;
+    private Material? previousMaterial;
     
     public Transform Main => main;
 
@@ -50,7 +50,7 @@ public class InterfaceController : MonoBehaviour
 
     private void Awake()
     {
-        _mainMeshRenderer = Main.GetComponent<MeshRenderer>();
+        mainMeshRenderer = Main.GetComponent<MeshRenderer>();
         var parent = Main.parent;
         
         // the first one is main
@@ -104,23 +104,23 @@ public class InterfaceController : MonoBehaviour
 
     public void BlackenOut()
     {
-        _previousMaterial = _mainMeshRenderer.material;
+        previousMaterial = mainMeshRenderer.material;
         SetMaterial(blackMaterial);
     }
 
     public void RestorePreviousOverlay()
     {
-        if (_previousMaterial == null)
+        if (previousMaterial == null)
         {
             return;
         }
-        SetMaterial(_previousMaterial);
-        _previousMaterial = null;
+        SetMaterial(previousMaterial);
+        previousMaterial = null;
     }
 
     private void SetCenterText(string text) => centerText.text = text;
 
     private void SetHUD(string text = "") => hud.text = text;
 
-    private void SetMaterial(Material mat) => _mainMeshRenderer.material = mat;
+    private void SetMaterial(Material mat) => mainMeshRenderer.material = mat;
 }
