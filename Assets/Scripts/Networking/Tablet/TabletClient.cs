@@ -3,7 +3,6 @@
 using Extensions;
 using System;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -32,8 +31,6 @@ namespace Networking.Tablet
         private TcpClient tcpClient = null!;
         private NetworkStream stream = null!;
         
-        public event Action<MenuMode>? MenuModeChanged;
-
         public event Action? ModelSelected;
 
         public event Action? SnapshotSelected;
@@ -88,41 +85,11 @@ namespace Networking.Tablet
             }
         }
 
-        public async Task SendMenuChangedMessage(MenuMode mode)
+        public async Task Send(ICommand cmd)
         {
-            Debug.Log($"Sending menu change: {mode}");
-            await stream.WriteAsync(new MenuModeCommand(mode).ToByteArray());
+            await stream.WriteAsync(cmd.ToByteArray());
         }
-
-        public async Task SendSwipeMessage(bool inward, float endPointX, float endPointY, float angle)
-        {
-            Debug.Log($"Sending swipe: inward: {inward} at ({endPointX}, {endPointY}), angle: {angle}");
-            await stream.WriteAsync(new SwipeCommand(inward, endPointX, endPointY, angle).ToByteArray());
-        }
-
-        public async Task SendScaleMessage(float scale)
-        {
-            Debug.Log($"Sending scale: {scale}");
-            await stream.WriteAsync(new ScaleCommand(scale).ToByteArray());
-        }
-
-        public async Task SendShakeMessage(int count)
-        {
-            Debug.Log($"Sending shake: {count}");
-            await stream.WriteAsync(new ShakeCommand(count).ToByteArray());
-        }
-
-        public async Task SendTapMessage(TapType type, float x, float y)
-        {
-            Debug.Log($"Sending tap: {type} at ({x},{y})");
-            await stream.WriteAsync(new TapCommand(type, x, y).ToByteArray());
-        }
-
-        public async Task Send(ICommand command)
-        {
-            await stream.WriteAsync(command.ToByteArray());
-        }
-
+        
         public void Send(byte command)
         {
             stream.WriteByte(command);

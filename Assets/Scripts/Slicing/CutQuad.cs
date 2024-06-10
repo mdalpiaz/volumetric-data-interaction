@@ -1,32 +1,36 @@
+#nullable enable
+
 using UnityEngine;
 
 namespace Slicing
 {
+    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshRenderer))]
     public class CutQuad : MonoBehaviour
     {
-        private MeshFilter _meshFilter;
-        private MeshRenderer _meshRenderer;
+        private MeshFilter meshFilter = null!;
+        private MeshRenderer meshRenderer = null!;
 
         public Mesh Mesh
         {
-            set => _meshFilter.mesh = value;
+            set => meshFilter.mesh = value;
         }
 
         public Material Material
         {
-            set => _meshRenderer.material = value;
+            set => meshRenderer.material = value;
         }
 
         private void Awake()
         {
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshRenderer = GetComponent<MeshRenderer>();
+            meshFilter = GetComponent<MeshFilter>();
+            meshRenderer = GetComponent<MeshRenderer>();
         }
 
         private void OnDestroy()
         {
-            Destroy(_meshFilter.mesh);
-            Destroy(_meshRenderer.material);
+            Destroy(meshFilter.mesh);
+            Destroy(meshRenderer.material);
         }
     }
 }

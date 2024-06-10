@@ -200,9 +200,13 @@ namespace Snapshots
         /// </summary>
         private void AttachSnapshots()
         {
-            for (var i = 0; i < Snapshots.Count && i < InterfaceController.AdditionCount; i++)
+            var i = 0;
+            var ap = interfaceController.GetNextAttachmentPoint();
+            while (i < Snapshots.Count && ap != null)
             {
-                Snapshots[i].AttachToTransform(interfaceController.Main.parent, interfaceController.Additions[i].position);
+                Snapshots[i].Attach(interfaceController.Main.parent, ap);
+                i++;
+                ap = interfaceController.GetNextAttachmentPoint();
             }
         }
         

@@ -3,8 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Extensions;
-using EzySlice;
 using Model;
 using Snapshots;
 using UnityEngine;
@@ -29,86 +27,86 @@ namespace Slicing
         [SerializeField]
         private Shader materialShader = null!;
         
-        private bool isTouched;
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!other.CompareTag(Tags.Model))
-            {
-                return;
-            }
-
-            isTouched = true;
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (!other.CompareTag(Tags.Model))
-            {
-                return;
-            }
-
-            isTouched = false;
-        }
-
-        public void Slice()
-        {
-            if (!isTouched)
-            {
-                return;
-            }
-            
-            Debug.Log("Slicing");
-
-            var cachedTransform = transform;
-            var model = ModelManager.Instance.CurrentModel;
-            var modelGo = model.gameObject;
-            
-            var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
-            if (slicedObject == null)
-            {
-                Debug.LogError("Nothing sliced");
-                return;
-            }
-            AudioManager.Instance.PlayCameraSound();
-
-            transform.GetPositionAndRotation(out var position, out var rotation);
-            var points = GetIntersectionPointsFromWorld(model, position, rotation);
-            if (points == null)
-            {
-                Debug.LogWarning("Intersection image can't be calculated!");
-                return;
-            }
-            
-            var dimensions = GetTextureDimension(model, points);
-            if (dimensions == null)
-            {
-                Debug.LogWarning("SliceCoords can't be calculated!");
-                return;
-            }
-            var texData = CreateSliceTextureData(model, dimensions, points);
-            var texture = CreateSliceTexture(dimensions, texData);
-            var mesh = CreateMesh(model, points);
-            
-            var transparentMaterial = MaterialTools.CreateTransparentMaterial();
-            transparentMaterial.name = "SliceMaterial";
-            transparentMaterial.mainTexture = texture;
-
-            Debug.Log($"Sliced gameobject \"{model.name}\"");
-            var lowerHull = slicedObject.CreateUpperHull(modelGo, slicedObjectSecondaryMaterial);
-            model.UpdateModel(lowerHull, gameObject);
-            Destroy(lowerHull);
-            SetCuttingActive(true);
-
-            var quad = Instantiate(cutQuadPrefab, model.transform, true);
-            // stop Z-fighting by moving slightly up
-            var pos = quad.transform.position;
-            pos += transform.back().normalized * 0.0001f;
-            quad.transform.position = pos;
-            quad.name = "cut";
-            quad.Mesh = mesh;
-            quad.Material = transparentMaterial;
-        }
+        // private bool isTouched;
+        //
+        // private void OnTriggerEnter(Collider other)
+        // {
+        //     if (!other.CompareTag(Tags.Model))
+        //     {
+        //         return;
+        //     }
+        //
+        //     isTouched = true;
+        // }
+        //
+        // private void OnTriggerExit(Collider other)
+        // {
+        //     if (!other.CompareTag(Tags.Model))
+        //     {
+        //         return;
+        //     }
+        //
+        //     isTouched = false;
+        // }
+        //
+        // public void Slice()
+        // {
+        //     if (!isTouched)
+        //     {
+        //         return;
+        //     }
+        //     
+        //     Debug.Log("Slicing");
+        //
+        //     var cachedTransform = transform;
+        //     var model = ModelManager.Instance.CurrentModel;
+        //     var modelGo = model.gameObject;
+        //     
+        //     var slicedObject = modelGo.Slice(cachedTransform.position, cachedTransform.forward);
+        //     if (slicedObject == null)
+        //     {
+        //         Debug.LogError("Nothing sliced");
+        //         return;
+        //     }
+        //     AudioManager.Instance.PlayCameraSound();
+        //
+        //     transform.GetPositionAndRotation(out var position, out var rotation);
+        //     var points = GetIntersectionPointsFromWorld(model, position, rotation);
+        //     if (points == null)
+        //     {
+        //         Debug.LogWarning("Intersection image can't be calculated!");
+        //         return;
+        //     }
+        //     
+        //     var dimensions = GetTextureDimension(model, points);
+        //     if (dimensions == null)
+        //     {
+        //         Debug.LogWarning("SliceCoords can't be calculated!");
+        //         return;
+        //     }
+        //     var texData = CreateSliceTextureData(model, dimensions, points);
+        //     var texture = CreateSliceTexture(dimensions, texData);
+        //     var mesh = CreateMesh(model, points);
+        //     
+        //     var transparentMaterial = MaterialTools.CreateTransparentMaterial();
+        //     transparentMaterial.name = "SliceMaterial";
+        //     transparentMaterial.mainTexture = texture;
+        //
+        //     Debug.Log($"Sliced gameobject \"{model.name}\"");
+        //     var lowerHull = slicedObject.CreateUpperHull(modelGo, slicedObjectSecondaryMaterial);
+        //     model.UpdateModel(lowerHull, gameObject);
+        //     Destroy(lowerHull);
+        //     SetCuttingActive(true);
+        //
+        //     var quad = Instantiate(cutQuadPrefab, model.transform, true);
+        //     // stop Z-fighting by moving slightly up
+        //     var pos = quad.transform.position;
+        //     pos += transform.back().normalized * 0.0001f;
+        //     quad.transform.position = pos;
+        //     quad.name = "cut";
+        //     quad.Mesh = mesh;
+        //     quad.Material = transparentMaterial;
+        // }
 
         public Snapshot? CreateSnapshot()
         {

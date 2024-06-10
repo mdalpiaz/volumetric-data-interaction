@@ -48,12 +48,14 @@ namespace Networking.openIA
 
         private Selectable? selected;
 
+        public bool IsOnline => isOnline;
+
         private Vector3 oldCamPos = new Vector3(0, 0, 0);
         private Quaternion oldCamRot = new Quaternion(0, 0, 0, 0);
-        
+
         public ulong? ClientID { get; set; }
 
-        public List<Viewer> Viewers { get; private set; } = new();
+        public List<Viewer> Viewers { get; } = new();
         
         private void Awake()
         {
@@ -79,8 +81,6 @@ namespace Networking.openIA
             TabletServer.Instance.MappingStopped += MappingStopped;
             TabletServer.Instance.Sliced += Sliced;
             TabletServer.Instance.SnapshotRemoved += SnapshotRemoved;
-            TabletServer.Instance.SnapshotsCleared += SnapshotsCleared;
-            TabletServer.Instance.ResettedState += ResettedState;
         }
 
         private async void Start()
@@ -125,8 +125,6 @@ namespace Networking.openIA
             TabletServer.Instance.MappingStopped -= MappingStopped;
             TabletServer.Instance.Sliced -= Sliced;
             TabletServer.Instance.SnapshotRemoved -= SnapshotRemoved;
-            TabletServer.Instance.SnapshotsCleared -= SnapshotsCleared;
-            TabletServer.Instance.ResettedState -= ResettedState;
         }
 
         private void OnDestroy()
@@ -141,7 +139,7 @@ namespace Networking.openIA
 
         public Viewer CreateViewer(ulong id)
         {
-            var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
+            var viewer = Instantiate(viewerPrefab, transform).GetComponent<Viewer>();
             viewer.ID = id;
             Viewers.Add(viewer);
             return viewer;
@@ -237,16 +235,5 @@ namespace Networking.openIA
         {
             await Send(new RemoveSnapshot(s.ID));
         }
-
-        private async void SnapshotsCleared(List<ulong> snapshotIDs)
-        {
-            var tasks = snapshotIDs.Select(id => Send(new RemoveSnapshot(id)));
-            await Task.WhenAll(tasks);
         }
-
-        private async void ResettedState()
-        {
-            await Send(new Reset());
-        }
-    }
 }
