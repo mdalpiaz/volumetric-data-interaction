@@ -138,7 +138,7 @@ namespace Networking.openIA
 
         public Viewer CreateViewer(ulong id)
         {
-            var viewer = Instantiate(viewerPrefab).GetComponent<Viewer>();
+            var viewer = Instantiate(viewerPrefab, transform).GetComponent<Viewer>();
             viewer.ID = id;
             Viewers.Add(viewer);
             return viewer;
