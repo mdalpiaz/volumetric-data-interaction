@@ -584,7 +584,7 @@ namespace Networking.Tablet
                 {
                     return;
                 }
-                snapshot.AttachToTransform(interfaceController.Main.parent, addition);
+                snapshot.Attach(interfaceController.Main.parent, addition);
             }
         }
 

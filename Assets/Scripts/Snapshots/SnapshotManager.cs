@@ -204,7 +204,7 @@ namespace Snapshots
             var ap = interfaceController.GetNextAttachmentPoint();
             while (i < Snapshots.Count && ap != null)
             {
-                Snapshots[i].AttachToTransform(interfaceController.Main.parent, ap);
+                Snapshots[i].Attach(interfaceController.Main.parent, ap);
                 i++;
                 ap = interfaceController.GetNextAttachmentPoint();
             }

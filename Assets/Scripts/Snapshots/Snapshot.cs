@@ -18,14 +18,14 @@ namespace Snapshots
         private MeshRenderer textureQuadRenderer = null!;
 
         private AttachmentPoint? attachmentPoint;
-        
+
         public ulong ID { get; set; }
 
         public GameObject OriginPlane { get; set; } = null!;
 
         public Texture2D SnapshotTexture => textureQuadRenderer.material.mainTexture as Texture2D ?? throw new NullReferenceException("Snapshot texture was null!");
 
-        public bool IsAttached { get; private set; }
+        public bool IsAttached => attachmentPoint != null;
 
         public Selectable Selectable { get; private set; } = null!;
 
@@ -73,31 +73,26 @@ namespace Snapshots
             }
         }
 
-        public void AttachToTransform(Transform t, AttachmentPoint ap)
+        public void Attach(Transform parent, AttachmentPoint point)
         {
-            IsAttached = true;
-            attachmentPoint = ap;
-            attachmentPoint.HasAttachment = true;
-            var cachedTransform = transform;
-            detachedScale = cachedTransform.localScale;
-            detachedPosition = cachedTransform.localPosition;
-            cachedTransform.SetParent(t);
-            cachedTransform.SetPositionAndRotation(ap.transform.position, new Quaternion());
-            cachedTransform.localScale = new Vector3(1, 0.65f, 0.1f);
+            if (attachmentPoint != null)
+            {
+                Debug.LogError("Snapshot is already attached!");
+                return;
+            }
+            
+            attachmentPoint = point;
+            attachmentPoint.Attach(transform);
         }
 
         public void Detach()
         {
-            IsAttached = false;
-            if (attachmentPoint != null)
+            if (attachmentPoint == null)
             {
-                attachmentPoint.HasAttachment = false;
-                attachmentPoint = null;
+                return;
             }
-            var cachedTransform = transform;
-            cachedTransform.SetParent(null);
-            cachedTransform.localScale = detachedScale; 
-            cachedTransform.position = detachedPosition;
+            
+            attachmentPoint.Detach();
         }
 
         public void SetIntersectionChild(Texture2D texture, Vector3 startPoint, Model.Model model)
