@@ -43,11 +43,9 @@ public class InterfaceController : MonoBehaviour
     private MeshRenderer mainMeshRenderer = null!;
     private Material? previousMaterial;
     
+    private readonly List<AttachmentPoint> attachmentPoints = new();
+    
     public Transform Main => main;
-
-    public List<AttachmentPoint> AttachmentPoints { get; } = new();
-
-    public int AdditionCount => AttachmentPoints.Count;
 
     private void Awake()
     {
@@ -59,7 +57,7 @@ public class InterfaceController : MonoBehaviour
         {
             if (transform.GetChild(i).TryGetComponent<AttachmentPoint>(out var ap))
             {
-                AttachmentPoints.Add(ap);
+                attachmentPoints.Add(ap);
             }
         }
     }
@@ -71,7 +69,7 @@ public class InterfaceController : MonoBehaviour
 
     public AttachmentPoint? GetNextAttachmentPoint()
     {
-        return AttachmentPoints.FirstOrDefault(ap => !ap.HasAttachment);
+        return attachmentPoints.FirstOrDefault(ap => !ap.HasAttachment);
     }
     
     public void SetMode(MenuMode mode, bool isSnapshotSelected = false)
