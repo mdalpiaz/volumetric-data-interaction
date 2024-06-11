@@ -83,7 +83,7 @@ namespace Networking.Tablet
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                server = new TcpListener(IPAddress.Loopback, port);
+                server = new TcpListener(IPAddress.Any, port);
             }
             else
             {
