@@ -10,7 +10,7 @@ namespace Networking.openIA
         {
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var localPosition = model.transform.InverseTransformPoint(position);
-            var diffPosition = model.BottomBackRightCorner - localPosition;
+            var diffPosition = localPosition - model.BottomBackRightCorner;
             var newPosition = diffPosition / modelUnitToLocal;
             return UnityToOpenIACoordinates(newPosition);
         }
@@ -30,6 +30,6 @@ namespace Networking.openIA
 
         private static Vector3 OpenIAToUnityCoordinates(Vector3 vec) => new(-vec.x, vec.z, -vec.y);
 
-        private static Vector3 UnityToOpenIACoordinates(Vector3 vec) => new(vec.x, -vec.y, vec.z);
+        private static Vector3 UnityToOpenIACoordinates(Vector3 vec) => new(-vec.x, -vec.z, vec.y);
     }
 }
