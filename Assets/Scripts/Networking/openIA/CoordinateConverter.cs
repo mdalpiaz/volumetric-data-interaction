@@ -20,7 +20,7 @@ namespace Networking.openIA
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var unityCoordinates = OpenIAToUnityCoordinates(position);
             var converted = unityCoordinates * modelUnitToLocal;
-            var diffPosition = model.BottomBackRightCorner - converted;
+            var diffPosition = converted + model.BottomBackRightCorner;
             return model.transform.TransformPoint(diffPosition);
         }
 
