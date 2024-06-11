@@ -31,7 +31,7 @@ namespace Client
         private GameObject snapshotSelectedPanel = null!;
 
         [SerializeField]
-        private TMP_InputField ipInput = null!;
+        private TMP_Text ipInput = null!;
 
         private Task? runningTask;
 
@@ -64,7 +64,9 @@ namespace Client
 
         public async void ConnectClicked()
         {
+            Debug.Log("Clicked");
             tabletClient.IP = ipInput.text;
+            Debug.Log($"IP: {ipInput.text}");
             await tabletClient.Connect();
             runningTask = tabletClient.Run();
             SelectionMode();
