@@ -1807,7 +1807,7 @@ MonoBehaviour:
   slicingPanel: {fileID: 1172563401}
   modelSelectedPanel: {fileID: 1110561708}
   snapshotSelectedPanel: {fileID: 1466279562}
-  ipInput: {fileID: 779447200}
+  ipInput: {fileID: 1510429255}
 --- !u!114 &1285040689
 MonoBehaviour:
   m_ObjectHideFlags: 0
