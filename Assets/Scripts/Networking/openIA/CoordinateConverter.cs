@@ -30,6 +30,6 @@ namespace Networking.openIA
 
         private static Vector3 OpenIAToUnityCoordinates(Vector3 vec) => new(-vec.x, vec.z, -vec.y);
 
-        private static Vector3 UnityToOpenIACoordinates(Vector3 vec) => new(-vec.x, -vec.z, vec.y);
+        private static Vector3 UnityToOpenIACoordinates(Vector3 vec) => new(vec.x, -vec.y, vec.z);
     }
 }
