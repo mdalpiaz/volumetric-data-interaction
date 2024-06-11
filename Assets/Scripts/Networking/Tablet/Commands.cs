@@ -11,11 +11,13 @@ namespace Networking.Tablet
     {
         public byte[] ToByteArray()
         {
-            var request = new byte[1 + sizeof(float)];
+            var request = new byte[Size];
             request[0] = Categories.Scale;
             BitConverter.TryWriteBytes(request.AsSpan(1), Value);
             return request;
         }
+
+        public static int Size => 1 + sizeof(float);
 
         public static ScaleCommand FromByteArray(byte[] buffer)
         {
