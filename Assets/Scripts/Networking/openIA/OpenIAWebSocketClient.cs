@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Model;
@@ -50,8 +49,9 @@ namespace Networking.openIA
 
         public bool IsOnline => isOnline;
 
-        private Vector3 oldCamPos = new Vector3(0, 0, 0);
-        private Quaternion oldCamRot = new Quaternion(0, 0, 0, 0);
+        private Vector3 previousCameraPosition;
+        
+        private Quaternion previousCameraRotation;
 
         public ulong? ClientID { get; set; }
 
@@ -164,20 +164,19 @@ namespace Networking.openIA
                 return;
             }
             var model = ModelManager.Instance.CurrentModel;
-            if (oldCamPos != position)
+            if (previousCameraPosition != position)
             {
-                oldCamPos = position;
+                previousCameraPosition = position;
                 var openIAPosition = CoordinateConverter.UnityToOpenIA(model, position);
                 await Send(new SetObjectTranslation(ClientID.Value, openIAPosition));
             }
-            if (oldCamRot != rotation)
+            if (previousCameraRotation != rotation)
             {
-                oldCamRot = rotation;
+                previousCameraRotation = rotation;
                 var localNormal = model.transform.InverseTransformDirection(rotation * Vector3.back);
                 var localUp = model.transform.InverseTransformDirection(rotation * Vector3.up);
                 var openIANormal = CoordinateConverter.UnityToOpenIADirection(localNormal);
                 var openIAUp = CoordinateConverter.UnityToOpenIADirection(localUp);
-                //await Send(new SetObjectRotationQuaternion(ClientID.Value, Quaternion.LookRotation(openIANormal, openIAUp)));
                 await Send(new SetObjectRotationNormal(ClientID.Value, openIANormal, openIAUp));
             }
         }
