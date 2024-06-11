@@ -14,7 +14,8 @@ namespace Networking.Tablet.Editor
 
             if (GUILayout.Button("Connect"))
             {
-                _ = client.Connect().ContinueWith(async task => await client.Run());
+                client.Connect();
+                client.Run();
             }
         }
     }

@@ -47,9 +47,9 @@ namespace Networking.Tablet
             tcpClient.Close();
         }
 
-        public async Task Connect()
+        public void Connect()
         {
-            await tcpClient.ConnectAsync(IP, Port);
+            tcpClient.Connect(IP, Port);
             stream = tcpClient.GetStream();
             Debug.Log("Connected to server");
         }
@@ -85,9 +85,9 @@ namespace Networking.Tablet
             }
         }
 
-        public async Task Send(ICommand cmd)
+        public void Send(ICommand cmd)
         {
-            await stream.WriteAsync(cmd.ToByteArray());
+            stream.Write(cmd.ToByteArray());
         }
         
         public void Send(byte command)

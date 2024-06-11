@@ -62,12 +62,13 @@ namespace Client
             }
         }
 
-        public async void ConnectClicked()
+        public void ConnectClicked()
         {
             Debug.Log("Clicked");
             tabletClient.IP = ipInput.text.Trim();
             Debug.Log($"IP: {ipInput.text.Trim()}");
-            await tabletClient.Connect();
+            tabletClient.Connect();
+            Debug.Log("Connected");
             runningTask = tabletClient.Run();
             SelectionMode();
         }
@@ -133,11 +134,11 @@ namespace Client
             }
         }
 
-        private async void OnScale(float scale)
+        private void OnScale(float scale)
         {
             if (modelSelectedPanel.activeInHierarchy)
             {
-                await tabletClient.Send(new ScaleCommand(scale));
+                tabletClient.Send(new ScaleCommand(scale));
             }
         }
 
