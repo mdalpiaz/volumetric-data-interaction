@@ -93,6 +93,8 @@ namespace Networking.Tablet
 
         private async void OnEnable()
         {
+            SnapshotManager.Instance.SnapshotRemoved += OnSnapshotRemoved;
+
             Debug.Log($"TabletServer started on port {port}");
             server.Start();
             try
@@ -118,6 +120,8 @@ namespace Networking.Tablet
 
         private async void OnDisable()
         {
+            SnapshotManager.Instance.SnapshotRemoved -= OnSnapshotRemoved;
+
             tabletClient?.Close();
             server.Stop();
             if (receivingTask != null)
@@ -364,6 +368,26 @@ namespace Networking.Tablet
             await ScreenServer.Instance.SendAsync(tablet.transform.position, tablet.transform.up, snapshot.SnapshotTexture);
         }
         
+        private void OnSnapshotRemoved(ulong id)
+        {
+            if (Selected == null)
+            {
+                return;
+            }
+
+            if (!Selected.TryGetComponent<Snapshot>(out var snapshot))
+            {
+                return;
+            }
+
+            if (snapshot.ID != id)
+            {
+                return;
+            }
+
+            tabletStream?.WriteByte(Categories.SnapshotRemoved);
+        }
+
         private void Unselect()
         {
             if (Highlighted != null)

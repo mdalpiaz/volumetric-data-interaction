@@ -36,6 +36,8 @@ namespace Snapshots
 
         public InterfaceController InterfaceController => interfaceController;
 
+        public event Action<ulong>? SnapshotRemoved;
+
         private List<Snapshot> Snapshots { get; } = new();
         
         private void Awake()
@@ -175,6 +177,7 @@ namespace Snapshots
             }
             s.Selectable.IsSelected = false;
             Destroy(s.gameObject);
+            SnapshotRemoved?.Invoke(s.ID);
             return true;
         }
 
