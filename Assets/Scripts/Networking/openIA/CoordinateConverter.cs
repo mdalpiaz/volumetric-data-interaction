@@ -11,7 +11,7 @@ namespace Networking.openIA
             var modelUnitToLocal = Mathf.Max(model.Size.x, model.Size.y, model.Size.z);
             var localPosition = model.transform.InverseTransformPoint(position);
             var diffPosition = model.BottomBackRightCorner - localPosition;
-            var newPosition = diffPosition * modelUnitToLocal;
+            var newPosition = diffPosition / modelUnitToLocal;
             return UnityToOpenIACoordinates(newPosition);
         }
 
