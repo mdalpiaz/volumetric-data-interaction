@@ -25,11 +25,11 @@ namespace Networking.Screens
         [SerializeField]
         private TMP_InputField idInput = null!;
 
-        private TcpClient _client = null!;
+        private TcpClient client = null!;
         
-        private RectTransform _rect = null!;
+        private RectTransform rect = null!;
 
-        private Vector2 _rectSize;
+        private Vector2 rectSize;
 
         private string IP { get; set; } = "127.0.0.1";
 
@@ -37,14 +37,14 @@ namespace Networking.Screens
 
         private void Awake()
         {
-            _client = new TcpClient();
-            _rect = image.GetComponent<RectTransform>();
-            _rectSize = _rect.sizeDelta;
+            client = new TcpClient();
+            rect = image.GetComponent<RectTransform>();
+            rectSize = rect.sizeDelta;
         }
 
         private void OnDisable()
         {
-            _client.Close();
+            client.Close();
         }
 
         public void OnConnectClicked()
@@ -57,8 +57,8 @@ namespace Networking.Screens
             }
             ID = id;
             
-            _client.Connect(IP, port);
-            using var stream = _client.GetStream();
+            client.Connect(IP, port);
+            using var stream = client.GetStream();
             
             networkConfig.SetActive(false);
             image.gameObject.SetActive(true);
@@ -97,7 +97,7 @@ namespace Networking.Screens
                 // we are done with a packet
                 // the texture is correct! it exports to the correct image
                 image.texture = DataToTexture(dims, imageData);
-                _rect.sizeDelta = ExpandToRectSize(dims.Width, dims.Height);
+                rect.sizeDelta = ExpandToRectSize(dims.Width, dims.Height);
             }
             
             Debug.LogWarning("Client loop has stopped!");
@@ -107,8 +107,8 @@ namespace Networking.Screens
         {
             // currently only supports images that are taller than wider
             var aspect = width / (float)height;
-            var newWidth = aspect * _rectSize.y;
-            return new Vector2(newWidth, _rectSize.y);
+            var newWidth = aspect * rectSize.y;
+            return new Vector2(newWidth, rectSize.y);
         }
 
         private static Texture2D DataToTexture(Dimensions dims, ImageData data)
