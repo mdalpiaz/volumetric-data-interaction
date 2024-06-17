@@ -7,6 +7,17 @@ namespace Extensions
 {
     public static class NetworkStreamExtensions
     {
+        public static void ReadAll(this NetworkStream stream, byte[] buffer, int offset, int count)
+        {
+            var innerOffset = 0;
+            while (count != innerOffset)
+            {
+                var missingBytes = count - innerOffset;
+                var bytes = stream.Read(buffer, offset + innerOffset, missingBytes);
+                innerOffset += bytes;
+            }
+        }
+        
         /// <summary>
         /// This method wraps around ReadAsync() in a way, where it will automatically combine fragmented packages.
         /// </summary>
