@@ -477,9 +477,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1036962685}
-        m_TargetAssemblyTypeName: Client.MenuWithButtons, Assembly-CSharp
-        m_MethodName: 
+      - m_Target: {fileID: 1036962690}
+        m_TargetAssemblyTypeName: Networking.Screens.ScreenClient, Assembly-CSharp
+        m_MethodName: OnConnectClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -990,9 +990,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc2219fbaea0484f84833d290a0c3301, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ip: 127.0.0.1
   port: 8643
-  id: 1
   image: {fileID: 1112629396}
   networkConfig: {fileID: 686002604}
   ipInput: {fileID: 1542361691}
