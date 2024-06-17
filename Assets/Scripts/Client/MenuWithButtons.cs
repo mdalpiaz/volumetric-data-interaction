@@ -42,7 +42,7 @@ namespace Client
             tabletClient.SnapshotRemoved += OnSnapshotRemoved;
             touchInput.Swiped += OnSwipe;
             touchInput.Scaled += OnScale;
-            touchInput.Tapped += OnTap;
+            // touchInput.Tapped += OnTap;
         }
 
         private void OnDisable()
@@ -52,7 +52,7 @@ namespace Client
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
             touchInput.Swiped -= OnSwipe;
             touchInput.Scaled -= OnScale;
-            touchInput.Tapped -= OnTap;
+            // touchInput.Tapped -= OnTap;
         }
 
         private async void OnDestroy()
@@ -96,6 +96,16 @@ namespace Client
             tabletClient.Send(Categories.SelectionMode);
             DeactivateAll();
             modePanel.SetActive(true);
+        }
+        
+        public void OnPointerDown()
+        {
+            tabletClient.Send(Categories.HoldBegin);
+        }
+
+        public void OnPointerUp()
+        {
+            tabletClient.Send(Categories.HoldEnd);
         }
 
         private void OnModelSelected()
