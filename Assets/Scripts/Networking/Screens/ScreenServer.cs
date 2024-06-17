@@ -29,7 +29,7 @@ namespace Networking.Screens
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                _server = new TcpListener(IPAddress.Loopback, port);
+                _server = new TcpListener(IPAddress.Any, port);
             }
             else
             {
