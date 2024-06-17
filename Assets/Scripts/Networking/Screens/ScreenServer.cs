@@ -19,9 +19,9 @@ namespace Networking.Screens
         [SerializeField]
         private List<Screen> screens = new();
 
-        private TcpListener _server = null!;
+        private TcpListener server = null!;
 
-        private readonly Dictionary<int, (TcpClient, NetworkStream)> _clients = new();
+        private readonly Dictionary<int, (TcpClient, NetworkStream)> clients = new();
 
         private void Awake()
         {
@@ -29,7 +29,7 @@ namespace Networking.Screens
             {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                _server = new TcpListener(IPAddress.Any, port);
+                server = new TcpListener(IPAddress.Any, port);
             }
             else
             {
@@ -39,19 +39,19 @@ namespace Networking.Screens
 
         private async void Start()
         {
-            _server.Start();
+            server.Start();
             Debug.Log($"Screen server started on port {port}.");
 
             while (true)
             {
                 try
                 {
-                    var client = await _server.AcceptTcpClientAsync();
+                    var client = await server.AcceptTcpClientAsync();
                     var stream = client.GetStream();
                     var buffer = new byte[IDAdvertisement.Size];
                     await stream.ReadAllAsync(buffer, 0, buffer.Length);
                     var idAd = IDAdvertisement.FromByteArray(buffer);
-                    _clients.Add(idAd.ID, (client, stream));
+                    clients.Add(idAd.ID, (client, stream));
                     Debug.Log($"Client {idAd.ID} connected");
                 }
                 catch
@@ -63,11 +63,11 @@ namespace Networking.Screens
 
         private void OnDestroy()
         {
-            foreach (var (_, (c, _)) in _clients)
+            foreach (var (_, (c, _)) in clients)
             {
                 c.Close();
             }
-            _server.Stop();
+            server.Stop();
         }
 
         public async Task SendAsync(Vector3 trackerPosition, Vector3 trackerPointDirection, Texture2D data)
@@ -81,7 +81,7 @@ namespace Networking.Screens
 
             var imageData = new ImageData(data.GetPixels32());
             var dims = new Dimensions(data.width, data.height);
-            var (_, stream) = _clients[screen];
+            var (_, stream) = clients[screen];
             await stream.WriteAsync(dims.ToByteArray());
             await stream.WriteAsync(imageData.ToByteArray());
         }
