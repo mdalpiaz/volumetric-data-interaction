@@ -31,10 +31,6 @@ namespace Networking.Screens
 
         private Vector2 rectSize;
 
-        private string IP { get; set; } = "127.0.0.1";
-
-        private int ID { get; set; }
-
         private void Awake()
         {
             client = new TcpClient();
@@ -49,22 +45,21 @@ namespace Networking.Screens
 
         public void OnConnectClicked()
         {
-            IP = ipInput.text;
+            var ip = ipInput.text;
             if (!int.TryParse(idInput.text, out var id))
             {
                 Debug.LogError("Couldn't parse ID!");
                 return;
             }
-            ID = id;
             
-            client.Connect(IP, port);
+            client.Connect(ip, port);
             using var stream = client.GetStream();
             
             networkConfig.SetActive(false);
             image.gameObject.SetActive(true);
 
-            stream.Write(new IDAdvertisement(ID).ToByteArray());
-            Debug.Log($"ID sent {ID}");
+            stream.Write(new IDAdvertisement(id).ToByteArray());
+            Debug.Log($"ID sent {id}");
 
             var dimBuffer = new byte[Dimensions.Size];
             
