@@ -15,12 +15,11 @@ namespace Networking.Screens
         
         [SerializeField]
         private int port = Ports.ScreenPort;
-
-        [SerializeField]
-        private List<Screen> screens = new();
-
+        
         private TcpListener server = null!;
 
+        private readonly List<Screen> screens = new();
+        
         private readonly Dictionary<int, (TcpClient, NetworkStream)> clients = new();
 
         private void Awake()
@@ -30,6 +29,13 @@ namespace Networking.Screens
                 Instance = this;
                 DontDestroyOnLoad(this);
                 server = new TcpListener(IPAddress.Any, port);
+                for (var i = 0; i < transform.childCount; i++)
+                {
+                    if (transform.GetChild(i).TryGetComponent<Screen>(out var screen))
+                    {
+                        screens.Add(screen);
+                    }
+                }
             }
             else
             {
