@@ -42,7 +42,6 @@ namespace Client
             tabletClient.SnapshotRemoved += OnSnapshotRemoved;
             touchInput.Swiped += OnSwipe;
             touchInput.Scaled += OnScale;
-            // touchInput.Tapped += OnTap;
         }
 
         private void OnDisable()
@@ -52,7 +51,6 @@ namespace Client
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
             touchInput.Swiped -= OnSwipe;
             touchInput.Scaled -= OnScale;
-            // touchInput.Tapped -= OnTap;
         }
 
         private async void OnDestroy()
@@ -149,18 +147,6 @@ namespace Client
             if (modelSelectedPanel.activeInHierarchy)
             {
                 tabletClient.Send(new ScaleCommand(scale));
-            }
-        }
-
-        private void OnTap(TapType tapType, float x, float y)
-        {
-            if (tapType == TapType.HoldBegin)
-            {
-                tabletClient.Send(Categories.HoldBegin);
-            }
-            else if (tapType == TapType.HoldEnd)
-            {
-                tabletClient.Send(Categories.HoldEnd);
             }
         }
 
