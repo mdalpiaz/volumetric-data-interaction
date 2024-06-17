@@ -94,12 +94,12 @@ namespace Networking.Screens
 
         private bool FindScreen(out int id, Vector3 trackerPosition, Vector3 trackerPointDirection)
         {
-            const float MaxCheckDistance = 100.0f;
+            const float maxCheckDistance = 100.0f;
 
             foreach (var s in screens)
             {
                 var ray = new Ray(trackerPosition, trackerPointDirection);
-                if (s.BoxCollider.Raycast(ray, out _, MaxCheckDistance))
+                if (s.BoxCollider.Raycast(ray, out _, maxCheckDistance))
                 {
                     id = s.ID;
                     return true;
