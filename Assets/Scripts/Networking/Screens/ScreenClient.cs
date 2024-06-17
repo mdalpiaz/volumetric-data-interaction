@@ -2,6 +2,7 @@
 
 using System.Net.Sockets;
 using Extensions;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,22 +11,29 @@ namespace Networking.Screens
     public class ScreenClient : MonoBehaviour
     {
         [SerializeField]
-        private string ip = "127.0.0.1";
-
-        [SerializeField]
         private int port = Ports.ScreenPort;
 
         [SerializeField]
-        private int id = 1;
+        private RawImage image = null!;
 
         [SerializeField]
-        private RawImage image = null!;
+        private GameObject networkConfig = null!;
+
+        [SerializeField]
+        private TMP_InputField ipInput = null!;
+
+        [SerializeField]
+        private TMP_InputField idInput = null!;
 
         private TcpClient _client = null!;
         
         private RectTransform _rect = null!;
 
         private Vector2 _rectSize;
+
+        private string IP { get; set; } = "127.0.0.1";
+
+        private int ID { get; set; }
 
         private void Awake()
         {
@@ -34,13 +42,29 @@ namespace Networking.Screens
             _rectSize = _rect.sizeDelta;
         }
 
-        private async void OnEnable()
+        private void OnDisable()
         {
-            await _client.ConnectAsync(ip, port);
-            await using var stream = _client.GetStream();
+            _client.Close();
+        }
 
-            await stream.WriteAsync(new IDAdvertisement(id).ToByteArray());
-            Debug.Log($"ID sent {id}");
+        public void OnConnectClicked()
+        {
+            IP = ipInput.text;
+            if (!int.TryParse(idInput.text, out var id))
+            {
+                Debug.LogError("Couldn't parse ID!");
+                return;
+            }
+            ID = id;
+            
+            _client.Connect(IP, port);
+            using var stream = _client.GetStream();
+            
+            networkConfig.SetActive(false);
+            image.gameObject.SetActive(true);
+
+            stream.Write(new IDAdvertisement(ID).ToByteArray());
+            Debug.Log($"ID sent {ID}");
 
             var dimBuffer = new byte[Dimensions.Size];
             
@@ -48,7 +72,7 @@ namespace Networking.Screens
             {
                 try
                 {
-                    await stream.ReadAllAsync(dimBuffer, 0, Dimensions.Size);
+                    stream.ReadAll(dimBuffer, 0, Dimensions.Size);
                 }
                 catch
                 {
@@ -61,7 +85,7 @@ namespace Networking.Screens
                 var buffer = new byte[ImageData.GetBufferSize(dims)];
                 try
                 {
-                    await stream.ReadAllAsync(buffer, 0, buffer.Length);
+                    stream.ReadAll(buffer, 0, buffer.Length);
                 }
                 catch
                 {
@@ -77,11 +101,6 @@ namespace Networking.Screens
             }
             
             Debug.LogWarning("Client loop has stopped!");
-        }
-
-        private void OnDisable()
-        {
-            _client.Close();
         }
 
         private Vector2 ExpandToRectSize(int width, int height)
