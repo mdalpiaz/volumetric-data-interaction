@@ -18,7 +18,7 @@ namespace Snapshots
         public static SnapshotManager Instance { get; private set; } = null!;
 
         [SerializeField]
-        private InterfaceController interfaceController = null!;
+        private TabletOverlay tabletOverlay = null!;
         
         [SerializeField]
         private GameObject tracker = null!;
@@ -34,7 +34,7 @@ namespace Snapshots
 
         private readonly Timer snapshotTimer = new();
 
-        public InterfaceController InterfaceController => interfaceController;
+        public TabletOverlay TabletOverlay => tabletOverlay;
 
         public event Action<ulong>? SnapshotRemoved;
 
@@ -106,7 +106,7 @@ namespace Snapshots
             snapshot.ID = id;
             snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
 
-            var mainTransform = interfaceController.Main.transform;
+            var mainTransform = tabletOverlay.Main.transform;
             var originPlane = Instantiate(originPlanePrefab, mainTransform.position, mainTransform.rotation);
             originPlane.transform.SetParent(model.transform);
             originPlane.SetActive(false);
@@ -204,12 +204,12 @@ namespace Snapshots
         private void AttachSnapshots()
         {
             var i = 0;
-            var ap = interfaceController.GetNextAttachmentPoint();
+            var ap = tabletOverlay.GetNextAttachmentPoint();
             while (i < Snapshots.Count && ap != null)
             {
-                Snapshots[i].Attach(interfaceController.Main.parent, ap);
+                Snapshots[i].Attach(tabletOverlay.Main.parent, ap);
                 i++;
-                ap = interfaceController.GetNextAttachmentPoint();
+                ap = tabletOverlay.GetNextAttachmentPoint();
             }
         }
         

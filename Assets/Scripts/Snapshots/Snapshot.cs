@@ -111,7 +111,7 @@ namespace Snapshots
         {
             if (isSelected)
             {
-                var overlay = SnapshotManager.Instance.InterfaceController.Main;
+                var overlay = SnapshotManager.Instance.TabletOverlay.Main;
                 var snapshotQuad = Instantiate(textureQuad);
                 var cachedQuadTransform = snapshotQuad.transform;
                 var cachedQuadScale = cachedQuadTransform.localScale;

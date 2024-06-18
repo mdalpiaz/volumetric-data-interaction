@@ -19,8 +19,8 @@ namespace Slicing
         [SerializeField]
         private Material materialTemporarySlice = null!;
         
-        [SerializeField]
-        private Material materialWhite = null!;
+        //[SerializeField]
+        //private Material materialWhite = null!;
         
         //[SerializeField]
         //private Material slicedObjectSecondaryMaterial = null!;

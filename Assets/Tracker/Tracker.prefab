@@ -105,7 +105,6 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
-  m_HasMigratedActions: 1
 --- !u!1 &2899917703070797782
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,7 +136,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6070751582717602564}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2899917703070797779
 MeshFilter:
@@ -379,12 +378,6 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 8935484360742914545, guid: 986a7a0b891237d4b8194f071461a531, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 986a7a0b891237d4b8194f071461a531, type: 3}
---- !u!1 &6070751581031738682 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8935484360742914554, guid: 986a7a0b891237d4b8194f071461a531,
-    type: 3}
-  m_PrefabInstance: {fileID: 2899917701590443200}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2899917703276274418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -505,9 +498,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b68cc9c605dc88d4c941f644dfbeffe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isTouched: 0
-  isTriggered: 0
-  temporaryCuttingPlane: {fileID: 6070751581031738682}
+  materialTemporarySlice: {fileID: 0}
+  materialShader: {fileID: 0}
 --- !u!1001 &5955297067419312246
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -685,7 +677,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: TabletOverlay
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6261812540193478292, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
+    - {fileID: 3851586414911018279, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
+    - {fileID: 5514731093224834922, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
+    - {fileID: 500242518964866308, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
+    - {fileID: 3965596665261532991, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
+    - {fileID: 6443604297677577754, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 5e9c40c1c1904f64a891c7219d63f558, type: 3}
 --- !u!4 &6743523623749967737 stripped
 Transform:

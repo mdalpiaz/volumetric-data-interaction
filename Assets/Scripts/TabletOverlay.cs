@@ -1,20 +1,16 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Menu class
-/// Toggle between menu and detail view
-/// </summary>
-public class InterfaceController : MonoBehaviour
+public class TabletOverlay : MonoBehaviour
 {
     [SerializeField]
     private Transform main = null!;
-    
+
     private readonly List<AttachmentPoint> attachmentPoints = new();
-    
+
     public Transform Main => main;
 
     private void Awake()
