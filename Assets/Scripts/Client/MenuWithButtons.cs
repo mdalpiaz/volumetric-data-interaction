@@ -40,7 +40,7 @@ namespace Client
             tabletClient.ModelSelected += OnModelSelected;
             tabletClient.SnapshotSelected += OnSnapshotSelected;
             tabletClient.SnapshotRemoved += OnSnapshotRemoved;
-            touchInput.Swiped += OnSwipe;
+            // touchInput.Swiped += OnSwipe;
             touchInput.Scaled += OnScale;
         }
 
@@ -49,7 +49,7 @@ namespace Client
             tabletClient.ModelSelected -= OnModelSelected;
             tabletClient.SnapshotSelected -= OnSnapshotSelected;
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
-            touchInput.Swiped -= OnSwipe;
+            // touchInput.Swiped -= OnSwipe;
             touchInput.Scaled -= OnScale;
         }
 
@@ -106,6 +106,11 @@ namespace Client
         public void OnPointerUp()
         {
             tabletClient.Send(Categories.HoldEnd);
+        }
+
+        public void SendToScreen()
+        {
+            tabletClient.Send(Categories.SendToScreen);
         }
         
         private void SelectionMode()
