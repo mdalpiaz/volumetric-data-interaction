@@ -73,16 +73,24 @@ namespace Snapshots
             }
         }
 
-        public void Attach(Transform parent, AttachmentPoint point)
+        public bool Attach()
         {
             if (attachmentPoint != null)
             {
-                Debug.LogError("Snapshot is already attached!");
-                return;
+                Debug.LogWarning("Snapshot already attached!");
+                return true;
             }
-            
-            attachmentPoint = point;
-            attachmentPoint.Attach(transform);
+
+            var ap = SnapshotManager.Instance.TabletOverlay.GetNextAttachmentPoint();
+            if (ap == null)
+            {
+                Debug.LogError("No free attachment points!");
+                return false;
+            }
+
+            attachmentPoint = ap;
+            attachmentPoint.Attach(this);
+            return true;
         }
 
         public void Detach()

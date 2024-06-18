@@ -118,26 +118,6 @@ namespace Snapshots
 
             return snapshot;
         }
-        
-        public void ToggleSnapshotsAttached()
-        {
-            if (!snapshotTimer.IsTimerElapsed)
-            {
-                return;
-            }
-            snapshotTimer.StartTimerSeconds(SnapshotTimeThreshold);
-
-            if (AreSnapshotsAttached())
-            {
-                DetachSnapshots();
-            }
-            else
-            {
-                AttachSnapshots();
-            }
-        }
-
-        public void UnselectAllSnapshots() => Snapshots.ForEach(s => s.Selectable.IsSelected = false);
 
         /// <summary>
         /// Delete all Snapshots.
@@ -159,12 +139,6 @@ namespace Snapshots
             Snapshots.Clear();
 
             return true;
-        }
-
-        public bool DeleteAllSnapshots(Action<IEnumerable<Snapshot>> preDeleteAction)
-        {
-            preDeleteAction(Snapshots);
-            return DeleteAllSnapshots();
         }
 
         public bool DeleteSnapshot(Snapshot s)
@@ -192,27 +166,5 @@ namespace Snapshots
             }
             return DeleteSnapshot(snapshot);
         }
-        
-        /// <summary>
-        /// It could happen that not all snapshots are aligned due to the size restriction.
-        /// </summary>
-        private bool AreSnapshotsAttached() => Snapshots.Any(s => s.IsAttached);
-
-        /// <summary>
-        /// Only up to 5 snapshots can be aligned. The rest needs to stay in their original position.
-        /// </summary>
-        private void AttachSnapshots()
-        {
-            var i = 0;
-            var ap = tabletOverlay.GetNextAttachmentPoint();
-            while (i < Snapshots.Count && ap != null)
-            {
-                Snapshots[i].Attach(tabletOverlay.Main.parent, ap);
-                i++;
-                ap = tabletOverlay.GetNextAttachmentPoint();
-            }
-        }
-        
-        private void DetachSnapshots() => Snapshots.ForEach(s => s.Detach());
     }
 }

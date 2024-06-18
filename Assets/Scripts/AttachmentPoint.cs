@@ -1,46 +1,43 @@
 #nullable enable
 
+using Snapshots;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshRenderer))]
 public class AttachmentPoint : MonoBehaviour
 {
-    public bool HasAttachment => obj != null;
+    public bool HasAttachment => snapshot != null;
 
-    private Transform? obj;
-    private Transform? originalParent;
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
-    private Vector3 originalScale;
+    private MeshRenderer meshRenderer = null!;
 
-    public void Attach(Transform t)
+    private Snapshot? snapshot;
+
+    private void Awake()
     {
-        if (obj != null)
+        meshRenderer = GetComponent<MeshRenderer>();
+    }
+
+    public void Attach(Snapshot s)
+    {
+        if (snapshot != null)
         {
             Debug.LogError("Object is already attached to this point!");
             return;
         }
-        obj = t;
-        originalParent = t.parent;
-        t.transform.GetPositionAndRotation(out originalPosition, out originalRotation);
-        originalScale = t.transform.localScale;
-        
-        t.transform.SetParent(transform);
-        t.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
-        t.transform.localScale = new Vector3(1, 0.65f, 0.1f);
+        snapshot = s;
+        meshRenderer.material.mainTexture = s.SnapshotTexture;
+        s.gameObject.SetActive(false);
+        gameObject.SetActive(true);
     }
 
     public void Detach()
     {
-        if (obj == null)
+        if (snapshot == null)
         {
             return;
         }
-        
-        obj.SetParent(originalParent);
-        obj.SetPositionAndRotation(originalPosition, originalRotation);
-        obj.localScale = originalScale;
 
-        obj = null;
-        originalParent = null;
+        snapshot.gameObject.SetActive(true);
+        gameObject.SetActive(false);
     }
 }

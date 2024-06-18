@@ -29,9 +29,6 @@ namespace Networking.Tablet
         private GameObject tablet = null!;
 
         [SerializeField]
-        private TabletOverlay tabletOverlay = null!;
-
-        [SerializeField]
         private MappingAnchor mappingAnchor = null!;
         
         [SerializeField]
@@ -326,12 +323,7 @@ namespace Networking.Tablet
             }
             else
             {
-                var addition = tabletOverlay.GetNextAttachmentPoint();
-                if (addition == null)
-                {
-                    return;
-                }
-                snapshot.Attach(tabletOverlay.Main.parent, addition);
+                snapshot.Attach();
             }
         }
 
