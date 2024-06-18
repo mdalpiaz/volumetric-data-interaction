@@ -2968,7 +2968,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayCamera: {fileID: 1465551936}
   xrCamera: {fileID: 406083503}
-  viewMode: 2
+  viewMode: 0
   displayObjects:
   - {fileID: 1465551934}
   vrObjects:
@@ -3286,6 +3286,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 307118291403781858, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 939482812392903553, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalPosition.z
@@ -3300,6 +3305,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2618122019900176585, guid: a4c392a7b279f8044a295d9c90e86a98,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2618122019900176585, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
@@ -3470,37 +3480,37 @@ PrefabInstance:
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9311418
+      value: 0.9396927
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.34768677
+      value: 0.3420201
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0031916313
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.10990351
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -40.3
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 6.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6743523623749967737, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -15.74
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7665071966299689420, guid: a4c392a7b279f8044a295d9c90e86a98,
         type: 3}
@@ -3759,7 +3769,7 @@ PrefabInstance:
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
       propertyPath: stackPath
-      value: D:\Markus_Dalpiaz\volume data\Janine_VIVE_Data\Data\Stack_converted
+      value: C:\Users\p42652\Desktop\Janine_VIVE_Data\Data\Stack_converted
       objectReference: {fileID: 0}
     - target: {fileID: 5139340232998513935, guid: 8c19878c87f2626499691d6d67d9edb1,
         type: 3}
