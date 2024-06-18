@@ -240,7 +240,6 @@ namespace Networking.Tablet
             Selected = Highlighted;
             Selected.IsSelected = true;
 
-            ray.SetActive(false);
             Highlighted = null;
 
             if (tabletStream == null)
@@ -255,6 +254,7 @@ namespace Networking.Tablet
             else
             {
                 tabletStream.WriteByte(Categories.SelectedModel);
+                ray.SetActive(false);
             }
         }
 
