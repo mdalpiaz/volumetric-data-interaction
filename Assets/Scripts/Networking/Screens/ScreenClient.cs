@@ -16,6 +16,9 @@ namespace Networking.Screens
         private int port = Ports.ScreenPort;
 
         [SerializeField]
+        private RectTransform uiTransform = null!;
+        
+        [SerializeField]
         private RawImage image = null!;
 
         [SerializeField]
@@ -27,24 +30,25 @@ namespace Networking.Screens
         [SerializeField]
         private TMP_InputField idInput = null!;
 
-        private Thread receivingThread;
+        private Thread? receivingThread;
         
         private TcpClient client = null!;
         
         private RectTransform rect = null!;
 
-        private Vector2 rectSize;
+        private Vector2 uiSize;
 
         private void Awake()
         {
             client = new TcpClient();
             rect = image.GetComponent<RectTransform>();
-            rectSize = rect.sizeDelta;
+            uiSize = uiTransform.sizeDelta;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             client.Close();
+            receivingThread?.Join();
         }
 
         public void OnConnectClicked()
@@ -115,10 +119,17 @@ namespace Networking.Screens
 
         private Vector2 ExpandToRectSize(int width, int height)
         {
-            // currently only supports images that are taller than wider
             var aspect = width / (float)height;
-            var newWidth = aspect * rectSize.y;
-            return new Vector2(newWidth, rectSize.y);
+            if (aspect < 1)
+            {
+                var newWidth = uiSize.y * aspect;
+                return new Vector2(newWidth, uiSize.y);
+            }
+            else
+            {
+                var newHeight = uiSize.x / aspect;
+                return new Vector2(uiSize.x, newHeight);
+            }
         }
 
         private static Texture2D DataToTexture(Dimensions dims, ImageData data)
