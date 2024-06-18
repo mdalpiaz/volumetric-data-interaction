@@ -78,5 +78,10 @@ namespace Selection
             TabletServer.Instance.Highlighted = null;
             IsHighlighted = false;
         }
+
+        public void RerunHighlightEvent()
+        {
+            HighlightChanged?.Invoke(_isHighlighted);
+        }
     }
 }

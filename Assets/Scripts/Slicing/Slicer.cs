@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Model;
+using Selection;
 using Snapshots;
 using UnityEngine;
 using Plane = UnityEngine.Plane;
@@ -126,7 +127,12 @@ namespace Slicing
             }
             else
             {
-                model.SetModelMaterial(materialWhite);
+                if (!model.TryGetComponent<Selectable>(out var selectable))
+                {
+                    return;
+                }
+                // trigger a highlight refresh
+                selectable.RerunHighlightEvent();
             }
         }
         
