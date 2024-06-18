@@ -80,8 +80,6 @@ namespace Client
 
         public void Select() => tabletClient.Send(Categories.Select);
 
-        public void Unselect() => tabletClient.Send(Categories.Deselect);
-
         public void SlicingMode()
         {
             tabletClient.Send(Categories.SlicingMode);
@@ -89,11 +87,15 @@ namespace Client
             slicingPanel.SetActive(true);
         }
 
-        public void SelectionMode()
+        public void SelectionBack()
         {
-            tabletClient.Send(Categories.SelectionMode);
-            DeactivateAll();
-            modePanel.SetActive(true);
+            tabletClient.Send(Categories.Deselect);
+            SelectionMode();
+        }
+
+        public void SlicingBack()
+        {
+            SelectionMode();
         }
         
         public void OnPointerDown()
@@ -104,6 +106,13 @@ namespace Client
         public void OnPointerUp()
         {
             tabletClient.Send(Categories.HoldEnd);
+        }
+        
+        private void SelectionMode()
+        {
+            tabletClient.Send(Categories.SelectionMode);
+            DeactivateAll();
+            modePanel.SetActive(true);
         }
 
         private void OnModelSelected()

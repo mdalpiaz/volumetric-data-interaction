@@ -293,7 +293,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1285040688}
         m_TargetAssemblyTypeName: Client.MenuWithButtons, Assembly-CSharp
-        m_MethodName: SelectionMode
+        m_MethodName: SlicingBack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2960,7 +2960,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1285040688}
         m_TargetAssemblyTypeName: Client.MenuWithButtons, Assembly-CSharp
-        m_MethodName: SelectionMode
+        m_MethodName: SelectionBack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4227,7 +4227,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1285040688}
         m_TargetAssemblyTypeName: Client.MenuWithButtons, Assembly-CSharp
-        m_MethodName: SelectionMode
+        m_MethodName: SelectionBack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
