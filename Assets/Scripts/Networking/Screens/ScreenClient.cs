@@ -60,9 +60,12 @@ namespace Networking.Screens
             {
                 client.Connect(ip, port);
                 using var stream = client.GetStream();
-            
-                networkConfig.SetActive(false);
-                image.gameObject.SetActive(true);
+
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    networkConfig.SetActive(false);
+                    image.gameObject.SetActive(true);
+                });
 
                 stream.Write(new IDAdvertisement(id).ToByteArray());
                 Debug.Log($"ID sent {id}");
