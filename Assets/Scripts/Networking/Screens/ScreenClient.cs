@@ -108,10 +108,7 @@ namespace Networking.Screens
                     });
                 }
             
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    Debug.LogWarning("Client loop has stopped!");
-                });
+                Debug.LogWarning("Client loop has stopped!");
             });
             receivingThread.Start();
         }
