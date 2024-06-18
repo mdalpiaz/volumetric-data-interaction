@@ -1,7 +1,9 @@
 #nullable enable
 
 using System.Net.Sockets;
+using System.Threading;
 using Extensions;
+using PimDeWitte.UnityMainThreadDispatcher;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +27,8 @@ namespace Networking.Screens
         [SerializeField]
         private TMP_InputField idInput = null!;
 
+        private Thread receivingThread;
+        
         private TcpClient client = null!;
         
         private RectTransform rect = null!;
@@ -51,51 +55,62 @@ namespace Networking.Screens
                 Debug.LogError("Couldn't parse ID!");
                 return;
             }
-            
-            client.Connect(ip, port);
-            using var stream = client.GetStream();
-            
-            networkConfig.SetActive(false);
-            image.gameObject.SetActive(true);
 
-            stream.Write(new IDAdvertisement(id).ToByteArray());
-            Debug.Log($"ID sent {id}");
-
-            var dimBuffer = new byte[Dimensions.Size];
-            
-            while (true)
+            receivingThread = new Thread(() =>
             {
-                try
-                {
-                    stream.ReadAll(dimBuffer, 0, Dimensions.Size);
-                }
-                catch
-                {
-                    break;
-                }
-
-                var dims = Dimensions.FromByteArray(dimBuffer);
-                Debug.Log($"Received dimensions: {dims.Width}, {dims.Height}");
-
-                var buffer = new byte[ImageData.GetBufferSize(dims)];
-                try
-                {
-                    stream.ReadAll(buffer, 0, buffer.Length);
-                }
-                catch
-                {
-                    break;
-                }
-                Debug.Log("Image read");
-                var imageData = ImageData.FromByteArray(buffer);
-
-                // we are done with a packet
-                // the texture is correct! it exports to the correct image
-                image.texture = DataToTexture(dims, imageData);
-                rect.sizeDelta = ExpandToRectSize(dims.Width, dims.Height);
-            }
+                client.Connect(ip, port);
+                using var stream = client.GetStream();
             
-            Debug.LogWarning("Client loop has stopped!");
+                networkConfig.SetActive(false);
+                image.gameObject.SetActive(true);
+
+                stream.Write(new IDAdvertisement(id).ToByteArray());
+                Debug.Log($"ID sent {id}");
+
+                var dimBuffer = new byte[Dimensions.Size];
+            
+                while (true)
+                {
+                    try
+                    {
+                        stream.ReadAll(dimBuffer, 0, Dimensions.Size);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
+                    var dims = Dimensions.FromByteArray(dimBuffer);
+                    Debug.Log($"Received dimensions: {dims.Width}, {dims.Height}");
+
+                    var buffer = new byte[ImageData.GetBufferSize(dims)];
+                    try
+                    {
+                        stream.ReadAll(buffer, 0, buffer.Length);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    Debug.Log("Image read");
+                    var imageData = ImageData.FromByteArray(buffer);
+
+                    // we are done with a packet
+                    // the texture is correct! it exports to the correct image
+                    var size = ExpandToRectSize(dims.Width, dims.Height);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {
+                        image.texture = DataToTexture(dims, imageData);
+                        rect.sizeDelta = size;
+                    });
+                }
+            
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    Debug.LogWarning("Client loop has stopped!");
+                });
+            });
+            receivingThread.Start();
         }
 
         private Vector2 ExpandToRectSize(int width, int height)
