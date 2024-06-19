@@ -102,11 +102,10 @@ namespace Networking.Screens
                     Debug.Log("Image read");
                     var imageData = ImageData.FromByteArray(buffer);
 
-                    // we are done with a packet
-                    // the texture is correct! it exports to the correct image
                     var size = ExpandToRectSize(dims.Width, dims.Height);
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {
+                        image.color = Color.white;
                         image.texture = DataToTexture(dims, imageData);
                         rect.sizeDelta = size;
                     });
