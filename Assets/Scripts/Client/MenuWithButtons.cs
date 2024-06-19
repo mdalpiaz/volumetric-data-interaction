@@ -19,6 +19,9 @@ namespace Client
         private GameObject networkingPanel = null!;
 
         [SerializeField]
+        private GameObject connectingPanel = null!;
+
+        [SerializeField]
         private GameObject modePanel = null!;
 
         [SerializeField]
@@ -65,6 +68,9 @@ namespace Client
 
         public void ConnectClicked()
         {
+            DeactivateAll();
+            connectingPanel.SetActive(true);
+
             Debug.Log("Clicked");
             tabletClient.IP = ipInput.text.Trim();
             Debug.Log($"IP: {ipInput.text.Trim()}");
@@ -171,6 +177,7 @@ namespace Client
         private void DeactivateAll()
         {
             networkingPanel.SetActive(false);
+            connectingPanel.SetActive(false);
             modePanel.SetActive(false);
             slicingPanel.SetActive(false);
             modelSelectedPanel.SetActive(false);
