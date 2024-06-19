@@ -37,6 +37,7 @@ namespace Client
 
         private void OnEnable()
         {
+            tabletClient.Connected += OnConnected;
             tabletClient.ModelSelected += OnModelSelected;
             tabletClient.SnapshotSelected += OnSnapshotSelected;
             tabletClient.SnapshotRemoved += OnSnapshotRemoved;
@@ -46,6 +47,7 @@ namespace Client
 
         private void OnDisable()
         {
+            tabletClient.Connected -= OnConnected;
             tabletClient.ModelSelected -= OnModelSelected;
             tabletClient.SnapshotSelected -= OnSnapshotSelected;
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
@@ -67,9 +69,6 @@ namespace Client
             tabletClient.IP = ipInput.text.Trim();
             Debug.Log($"IP: {ipInput.text.Trim()}");
             tabletClient.Connect();
-            Debug.Log("Connected");
-            runningTask = tabletClient.Run();
-            SelectionMode();
         }
 
         public void Slice() => tabletClient.Send(Categories.Slice);
@@ -118,6 +117,11 @@ namespace Client
             tabletClient.Send(Categories.SelectionMode);
             DeactivateAll();
             modePanel.SetActive(true);
+        }
+
+        private void OnConnected()
+        {
+            SelectionMode();
         }
 
         private void OnModelSelected()
