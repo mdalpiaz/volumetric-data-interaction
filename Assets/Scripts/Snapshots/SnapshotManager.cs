@@ -119,6 +119,17 @@ namespace Snapshots
             return snapshot;
         }
 
+        public void DetachAllSnapshots()
+        {
+            foreach (var s in Snapshots)
+            {
+                if (s.IsAttached)
+                {
+                    s.Detach();
+                }
+            }
+        }
+
         /// <summary>
         /// Delete all Snapshots.
         /// </summary>

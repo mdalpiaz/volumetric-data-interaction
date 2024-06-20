@@ -327,6 +327,11 @@ namespace Networking.Tablet
             }
         }
 
+        private void DetachAllSnapshots()
+        {
+            SnapshotManager.Instance.DetachAllSnapshots();
+        }
+
         private void OnHoldBegin()
         {
             if (Selected == null)
