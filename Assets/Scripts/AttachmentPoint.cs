@@ -27,7 +27,7 @@ public class AttachmentPoint : MonoBehaviour
         snapshot = s;
         meshRenderer.material.mainTexture = s.SnapshotTexture;
         s.gameObject.SetActive(false);
-        gameObject.SetActive(true);
+        meshRenderer.enabled = true;
     }
 
     public void Detach()
@@ -38,6 +38,6 @@ public class AttachmentPoint : MonoBehaviour
         }
 
         snapshot.gameObject.SetActive(true);
-        gameObject.SetActive(false);
+        meshRenderer.enabled = false;
     }
 }
