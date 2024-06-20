@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.3731193, g: 0.38073996, b: 0.35872698, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2611,7 +2611,7 @@ MonoBehaviour:
   tabletClient: {fileID: 1286321212}
   touchInput: {fileID: 2157202343130445133}
   networkingPanel: {fileID: 1089023898}
-  connectingPanel: {fileID: 0}
+  connectingPanel: {fileID: 390146163}
   modePanel: {fileID: 1454564009}
   slicingPanel: {fileID: 1172563401}
   modelSelectedPanel: {fileID: 1110561708}
