@@ -115,32 +115,32 @@ namespace Snapshots
             textureQuad.SetActive(true);
         }
 
-        private void SetOverlayTexture(bool isSelected)
-        {
-            if (isSelected)
-            {
-                var overlay = SnapshotManager.Instance.TabletOverlay.Main;
-                var snapshotQuad = Instantiate(textureQuad);
-                var cachedQuadTransform = snapshotQuad.transform;
-                var cachedQuadScale = cachedQuadTransform.localScale;
-                var scale = MaterialTools.GetAspectRatioSize(overlay.localScale, cachedQuadScale.y, cachedQuadScale.x); //new Vector3(1, 0.65f, 0.1f);
+        //private void SetOverlayTexture(bool isSelected)
+        //{
+        //    if (isSelected)
+        //    {
+        //        var overlay = SnapshotManager.Instance.TabletOverlay.Main;
+        //        var snapshotQuad = Instantiate(textureQuad);
+        //        var cachedQuadTransform = snapshotQuad.transform;
+        //        var cachedQuadScale = cachedQuadTransform.localScale;
+        //        var scale = MaterialTools.GetAspectRatioSize(overlay.localScale, cachedQuadScale.y, cachedQuadScale.x); //new Vector3(1, 0.65f, 0.1f);
             
-                cachedQuadTransform.SetParent(overlay);
-                cachedQuadTransform.localScale = scale;
-                cachedQuadTransform.SetLocalPositionAndRotation(new Vector3(0, 0, -0.1f), new Quaternion());
-                Destroy(tempNeighbourOverlay);
-                tempNeighbourOverlay = snapshotQuad;
-            }
-            else
-            {
-                Destroy(tempNeighbourOverlay);
-            }
-        }
+        //        cachedQuadTransform.SetParent(overlay);
+        //        cachedQuadTransform.localScale = scale;
+        //        cachedQuadTransform.SetLocalPositionAndRotation(new Vector3(0, 0, -0.1f), new Quaternion());
+        //        Destroy(tempNeighbourOverlay);
+        //        tempNeighbourOverlay = snapshotQuad;
+        //    }
+        //    else
+        //    {
+        //        Destroy(tempNeighbourOverlay);
+        //    }
+        //}
 
         private void HandleSelection(bool selected)
         {
             OriginPlane.SetActive(selected);
-            SetOverlayTexture(selected);
+            //SetOverlayTexture(selected);
         }
     }
 }
