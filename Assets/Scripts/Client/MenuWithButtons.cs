@@ -1,7 +1,6 @@
 #nullable enable
 
 using Networking.Tablet;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -36,8 +35,6 @@ namespace Client
         [SerializeField]
         private TMP_InputField ipInput = null!;
 
-        private Task? runningTask;
-
         private void OnEnable()
         {
             tabletClient.Connected += OnConnected;
@@ -56,14 +53,6 @@ namespace Client
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
             // touchInput.Swiped -= OnSwipe;
             touchInput.Scaled -= OnScale;
-        }
-
-        private async void OnDestroy()
-        {
-            if (runningTask != null)
-            {
-                await runningTask;
-            }
         }
 
         public void ConnectClicked()
