@@ -44,9 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b42ae5e7ad3aeb245b9a0974baf59071, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interfaceController: {fileID: 0}
+  tabletOverlay: {fileID: 0}
   tracker: {fileID: 0}
-  trackedCamera: {fileID: 0}
   snapshotPrefab: {fileID: 5156912489491877825, guid: 459146a4ea9ca8943a5ace18241f04e7,
     type: 3}
   originPlanePrefab: {fileID: 3348506593271230907, guid: 64e19bd99f1637d4b8c9751fd20c172b,

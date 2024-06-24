@@ -102,7 +102,7 @@ namespace Snapshots
 
             AudioManager.Instance.PlayCameraSound();
 
-            var snapshot = Instantiate(snapshotPrefab).GetComponent<Snapshot>();
+            var snapshot = Instantiate(snapshotPrefab, transform).GetComponent<Snapshot>();
             snapshot.ID = id;
             snapshot.SetIntersectionChild(texture, intersectionPoints.LowerLeft, model);
 
