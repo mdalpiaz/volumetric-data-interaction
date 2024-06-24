@@ -11,30 +11,30 @@ namespace Selection
     /// </summary>
     public class Selectable : MonoBehaviour
     {
-        private bool _isHighlighted;
-        private bool _isSelected;
+        private bool isHighlighted;
+        private bool isSelected;
 
         public event Action<bool>? HighlightChanged;
         public event Action<bool>? SelectChanged;
 
         private bool IsHighlighted
         {
-            get => _isHighlighted;
+            get => isHighlighted;
             set
             {
-                if (_isHighlighted == value)
+                if (isHighlighted == value)
                 {
                     return;
                 }
                 
-                _isHighlighted = value;
-                HighlightChanged?.Invoke(_isHighlighted);
+                isHighlighted = value;
+                HighlightChanged?.Invoke(isHighlighted);
             }
         }
         
         public bool IsSelected
         {
-            get => _isSelected;
+            get => isSelected;
             set
             {
                 if (!value && IsHighlighted)
@@ -42,13 +42,13 @@ namespace Selection
                     IsHighlighted = false;
                 }
                 
-                if (_isSelected == value)
+                if (isSelected == value)
                 {
                     return;
                 }
 
-                _isSelected = value;
-                SelectChanged?.Invoke(_isSelected);
+                isSelected = value;
+                SelectChanged?.Invoke(isSelected);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Selection
 
         public void RerunHighlightEvent()
         {
-            HighlightChanged?.Invoke(_isHighlighted);
+            HighlightChanged?.Invoke(isHighlighted);
         }
     }
 }

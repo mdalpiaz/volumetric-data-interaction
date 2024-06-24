@@ -10,6 +10,8 @@ using UnityEngine;
 namespace Model
 {
     [RequireComponent(typeof(Selectable))]
+    [RequireComponent(typeof(SelectableMaterialChanger))]
+    [RequireComponent(typeof(BoxCollider))]
     public class Model : MonoBehaviour
     {
         [SerializeField]
