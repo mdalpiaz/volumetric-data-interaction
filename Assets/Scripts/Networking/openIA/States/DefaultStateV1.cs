@@ -278,7 +278,7 @@ namespace Networking.openIA.States
 
             if (id == 0)
             {
-                ModelManager.Instance.CurrentModel.transform.localRotation = Quaternion.LookRotation(normal, up);
+                ModelManager.Instance.CurrentModel.transform.rotation = Quaternion.LookRotation(normal, up);
                 return;
             }
 
@@ -287,7 +287,9 @@ namespace Networking.openIA.States
             {
                 viewer = OpenIAWebSocketClient.Instance.CreateViewer(id);
             }
-            viewer.transform.localRotation = Quaternion.LookRotation(normal, up);
+            var convertedNormal = model.transform.TransformDirection(normal);
+            var convertedUp = model.transform.TransformDirection(up);
+            viewer.transform.rotation = Quaternion.LookRotation(convertedNormal, convertedUp);
         }
     }
 }
