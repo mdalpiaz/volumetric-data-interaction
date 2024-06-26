@@ -140,67 +140,74 @@ namespace Networking.Tablet
                     }
                     await tabletStream.ReadAllAsync(commandIdentifier, 0, 1);
                     Debug.Log($"Received command {commandIdentifier[0]}");
-                    switch (commandIdentifier[0])
+                    try
                     {
-                        case Categories.Scale:
-                            {
-                                var buffer = new byte[ScaleCommand.Size];
-                                buffer[0] = commandIdentifier[0];
-                                await tabletStream.ReadAllAsync(buffer, 1, sizeof(float));
-                                var scaleCommand = ScaleCommand.FromByteArray(buffer);
-                                OnScale(scaleCommand.Value);
-                                break;
-                            }
-                        case Categories.SelectionMode:
-                            {
-                                OnSelectionMode();
-                                break;
-                            }
-                        case Categories.SlicingMode:
-                            {
-                                OnSlicingMode();
-                                break;
-                            }
-                        case Categories.Select:
-                            {
-                                OnSelect();
-                                break;
-                            }
-                        case Categories.Deselect:
-                            {
-                                OnDeselect();
-                                break;
-                            }
-                        case Categories.Slice:
-                            {
-                                OnSlice();
-                                break;
-                            }
-                        case Categories.RemoveSnapshot:
-                            {
-                                OnRemoveSnapshot();
-                                break;
-                            }
-                        case Categories.ToggleAttached:
-                            {
-                                OnToggleAttached();
-                                break;
-                            }
-                        case Categories.HoldBegin:
-                            {
-                                OnHoldBegin();
-                                break;
-                            }
-                        case Categories.HoldEnd:
-                            {
-                                OnHoldEnd();
-                                break;
-                            }
-                        case Categories.SendToScreen:
-                            {
-                                await OnSendToScreen();
-                                break;
-                            }
+                        switch (commandIdentifier[0])
+                        {
+                            case Categories.Scale:
+                                {
+                                    var buffer = new byte[ScaleCommand.Size];
+                                    buffer[0] = commandIdentifier[0];
+                                    await tabletStream.ReadAllAsync(buffer, 1, sizeof(float));
+                                    var scaleCommand = ScaleCommand.FromByteArray(buffer);
+                                    OnScale(scaleCommand.Value);
+                                    break;
+                                }
+                            case Categories.SelectionMode:
+                                {
+                                    OnSelectionMode();
+                                    break;
+                                }
+                            case Categories.SlicingMode:
+                                {
+                                    OnSlicingMode();
+                                    break;
+                                }
+                            case Categories.Select:
+                                {
+                                    OnSelect();
+                                    break;
+                                }
+                            case Categories.Deselect:
+                                {
+                                    OnDeselect();
+                                    break;
+                                }
+                            case Categories.Slice:
+                                {
+                                    OnSlice();
+                                    break;
+                                }
+                            case Categories.RemoveSnapshot:
+                                {
+                                    OnRemoveSnapshot();
+                                    break;
+                                }
+                            case Categories.ToggleAttached:
+                                {
+                                    OnToggleAttached();
+                                    break;
+                                }
+                            case Categories.HoldBegin:
+                                {
+                                    OnHoldBegin();
+                                    break;
+                                }
+                            case Categories.HoldEnd:
+                                {
+                                    OnHoldEnd();
+                                    break;
+                                }
+                            case Categories.SendToScreen:
+                                {
+                                    await OnSendToScreen();
+                                    break;
+                                }
+                        }
+                    }
+                    catch
+                    {
+                        continue;
                     }
                 }
                 catch
