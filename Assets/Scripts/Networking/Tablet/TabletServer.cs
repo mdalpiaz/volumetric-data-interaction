@@ -47,8 +47,17 @@ namespace Networking.Tablet
             get => selected;
             set
             {
-                Unselect();
+                if (selected != null)
+                {
+                    selected.IsSelected = false;
+                }
+
                 selected = value;
+
+                if (selected != null)
+                {
+                    selected.IsSelected = true;
+                }
             }
         }
 
@@ -59,10 +68,15 @@ namespace Networking.Tablet
             {
                 if (highlighted != null)
                 {
-                    highlighted.IsSelected = false;
+                    highlighted.IsHighlighted = false;
                 }
 
                 highlighted = value;
+
+                if (highlighted != null)
+                {
+                    highlighted.IsHighlighted = true;
+                }
             }
         }
 
@@ -113,6 +127,26 @@ namespace Networking.Tablet
         {
             ray.SetActive(false);
             Selected = ModelManager.Instance.CurrentModel.Selectable;
+        }
+
+        private void Update()
+        {
+            if (!ray.activeInHierarchy)
+            {
+                return;
+            }
+
+            if (Physics.Raycast(tablet.transform.position, tablet.transform.up, out var hit, 100.0f, Layers.Selectable))
+            {
+                if (hit.transform.gameObject.TryGetComponent<Selectable>(out var selectable))
+                {
+                    Highlighted = selectable;
+                }
+            }
+            else
+            {
+                Highlighted = null;
+            }
         }
 
         private async void OnDisable()
@@ -242,9 +276,6 @@ namespace Networking.Tablet
             }
 
             Selected = Highlighted;
-            Selected.IsSelected = true;
-
-            Highlighted = null;
 
             if (tabletStream == null)
             {
@@ -264,19 +295,7 @@ namespace Networking.Tablet
 
         private void OnDeselect()
         {
-            if (Highlighted != null)
-            {
-                Highlighted.IsSelected = false;
-            }
-            else if (Selected != null)
-            {
-                Selected.IsSelected = false;
-            }
-
-            // manually set to null, as "IsSelected = null" can cause stack overflows through the constant calls to Unselect()
-            selected = null;
-            Highlighted = null;
-
+            Selected = null;
             ray.SetActive(true);
         }
 
@@ -390,22 +409,6 @@ namespace Networking.Tablet
             }
 
             tabletStream?.WriteByte(Categories.SnapshotRemoved);
-        }
-
-        private void Unselect()
-        {
-            if (Highlighted != null)
-            {
-                Highlighted.IsSelected = false;
-            }
-            else if (Selected != null)
-            {
-                Selected.IsSelected = false;
-            }
-
-            // manually set to null, as "IsSelected = null" can cause stack overflows through the constant calls to Unselect()
-            selected = null;
-            Highlighted = null;
         }
     }
 }
