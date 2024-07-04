@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1785436871502139960}
   - component: {fileID: 3866142289524952428}
   - component: {fileID: -1084544105426968753}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Snapshot
   m_TagString: Snapshot
   m_Icon: {fileID: 0}
