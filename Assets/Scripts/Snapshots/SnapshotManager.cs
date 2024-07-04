@@ -158,7 +158,6 @@ namespace Snapshots
                 Debug.LogWarning($"Trying to remove untracked Snapshot!");
                 return false;
             }
-            s.Selectable.IsSelected = false;
             Destroy(s.gameObject);
             SnapshotRemoved?.Invoke(s.ID);
             return true;
