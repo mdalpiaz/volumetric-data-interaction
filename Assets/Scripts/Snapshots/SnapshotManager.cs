@@ -112,7 +112,6 @@ namespace Snapshots
             originPlane.SetActive(false);
 
             snapshot.OriginPlane = originPlane;
-            snapshot.Selectable.IsSelected = false;
 
             Snapshots.Add(snapshot);
 
@@ -143,7 +142,6 @@ namespace Snapshots
 
             foreach (var s in Snapshots)
             {
-                s.Selectable.IsSelected = false;
                 Destroy(s.gameObject);
             }
 
