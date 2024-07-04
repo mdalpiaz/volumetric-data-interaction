@@ -9,14 +9,14 @@ namespace Selection
     public class SelectableMaterialChanger : MonoBehaviour
     {
         [SerializeField]
-        private Material selectedMaterial;
+        private Material selectedMaterial = null!;
         
         [SerializeField]
-        private Material highlightedMaterial;
+        private Material highlightedMaterial = null!;
         
-        private Selectable selectable;
-        private MeshRenderer meshRenderer;
-        private Material defaultMaterial;
+        private Selectable selectable = null!;
+        private MeshRenderer meshRenderer = null!;
+        private Material defaultMaterial = null!;
         
         private void Awake()
         {
