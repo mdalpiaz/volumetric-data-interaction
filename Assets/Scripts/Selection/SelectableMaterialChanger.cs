@@ -1,5 +1,6 @@
+#nullable enable
+
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Selection
 {
@@ -7,7 +8,6 @@ namespace Selection
     [RequireComponent(typeof(MeshRenderer))]
     public class SelectableMaterialChanger : MonoBehaviour
     {
-        [FormerlySerializedAs("greenMaterial")]
         [SerializeField]
         private Material selectedMaterial;
         
@@ -37,9 +37,25 @@ namespace Selection
             selectable.SelectChanged -= OnSelectChanged;
         }
         
-        private void OnHighlightChanged(bool isHighlighted) => SetMaterial(isHighlighted ? highlightedMaterial : defaultMaterial);
+        private void OnHighlightChanged(bool _) => UpdateTexture();
 
-        private void OnSelectChanged(bool isSelected) => SetMaterial(isSelected ? selectedMaterial : defaultMaterial);
+        private void OnSelectChanged(bool _) => UpdateTexture();
+
+        private void UpdateTexture()
+        {
+            if (selectable.IsSelected)
+            {
+                SetMaterial(selectedMaterial);
+            }
+            else if (selectable.IsHighlighted)
+            {
+                SetMaterial(highlightedMaterial);
+            }
+            else
+            {
+                SetMaterial(defaultMaterial);
+            }
+        }
 
         private void SetMaterial(Material mat)
         {
