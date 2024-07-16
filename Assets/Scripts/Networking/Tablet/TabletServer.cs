@@ -126,7 +126,7 @@ namespace Networking.Tablet
         private void Start()
         {
             ray.SetActive(false);
-            Selected = ModelManager.Instance.CurrentModel.Selectable;
+            //Selected = ModelManager.Instance.CurrentModel.Selectable;
         }
 
         private void Update()
