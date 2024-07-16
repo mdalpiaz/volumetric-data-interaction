@@ -137,14 +137,15 @@ namespace Networking.Tablet
             ray.SetActive(false);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             if (!ray.activeInHierarchy)
             {
                 return;
             }
 
-            if (Physics.Raycast(tablet.transform.position, tablet.transform.up, out var hit, 100.0f, Layers.Selectable))
+            var tabTran = tablet.transform;
+            if (Physics.Raycast(tabTran.position, tabTran.up, out var hit, 100.0f, Layers.Selectable))
             {
                 if (hit.transform.gameObject.TryGetComponent<Selectable>(out var selectable))
                 {
