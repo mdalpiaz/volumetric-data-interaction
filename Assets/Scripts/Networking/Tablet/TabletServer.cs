@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Extensions;
-using Model;
 using Networking.Screens;
 using Slicing;
 using Selection;
@@ -47,6 +46,11 @@ namespace Networking.Tablet
             get => selected;
             set
             {
+                if (selected == value)
+                {
+                    return;
+                }
+
                 if (selected != null)
                 {
                     selected.IsSelected = false;
@@ -66,6 +70,11 @@ namespace Networking.Tablet
             get => highlighted;
             set
             {
+                if (highlighted == value)
+                {
+                    return;
+                }
+
                 if (highlighted != null)
                 {
                     highlighted.IsHighlighted = false;
