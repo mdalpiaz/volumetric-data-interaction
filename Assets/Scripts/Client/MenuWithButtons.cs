@@ -12,9 +12,6 @@ namespace Client
         private TabletClient tabletClient = null!;
 
         [SerializeField]
-        private TouchInput touchInput = null!;
-
-        [SerializeField]
         private GameObject networkingPanel = null!;
 
         [SerializeField]
@@ -41,8 +38,6 @@ namespace Client
             tabletClient.ModelSelected += OnModelSelected;
             tabletClient.SnapshotSelected += OnSnapshotSelected;
             tabletClient.SnapshotRemoved += OnSnapshotRemoved;
-            // touchInput.Swiped += OnSwipe;
-            touchInput.Scaled += OnScale;
         }
 
         private void OnDisable()
@@ -51,8 +46,6 @@ namespace Client
             tabletClient.ModelSelected -= OnModelSelected;
             tabletClient.SnapshotSelected -= OnSnapshotSelected;
             tabletClient.SnapshotRemoved -= OnSnapshotRemoved;
-            // touchInput.Swiped -= OnSwipe;
-            touchInput.Scaled -= OnScale;
         }
 
         public void ConnectClicked()
@@ -157,13 +150,13 @@ namespace Client
             }
         }
 
-        private void OnScale(float scale)
-        {
-            if (modelSelectedPanel.activeInHierarchy)
-            {
-                tabletClient.Send(new ScaleCommand(scale));
-            }
-        }
+        //private void OnScale(float scale)
+        //{
+        //    if (modelSelectedPanel.activeInHierarchy)
+        //    {
+        //        tabletClient.Send(new ScaleCommand(scale));
+        //    }
+        //}
 
         private void DeactivateAll()
         {

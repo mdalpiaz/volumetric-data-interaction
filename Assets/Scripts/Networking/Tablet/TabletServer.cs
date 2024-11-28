@@ -187,15 +187,6 @@ namespace Networking.Tablet
                     {
                         switch (commandIdentifier[0])
                         {
-                            case Categories.Scale:
-                                {
-                                    var buffer = new byte[ScaleCommand.Size];
-                                    buffer[0] = commandIdentifier[0];
-                                    await tabletStream.ReadAllAsync(buffer, 1, sizeof(float));
-                                    var scaleCommand = ScaleCommand.FromByteArray(buffer);
-                                    OnScale(scaleCommand.Value);
-                                    break;
-                                }
                             case Categories.SelectionMode:
                                 {
                                     OnSelectionMode();
@@ -258,11 +249,6 @@ namespace Networking.Tablet
                     break;
                 }
             }
-        }
-
-        private void OnScale(float value)
-        {
-            Debug.LogWarning("Scaling is not implemented");
         }
 
         private void OnSelectionMode()
