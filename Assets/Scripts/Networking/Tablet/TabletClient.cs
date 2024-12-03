@@ -99,11 +99,6 @@ namespace Networking.Tablet
             receivingThread.Start();
             Debug.Log("Thread started");
         }
-
-        public void Send(ICommand cmd)
-        {
-            stream.Write(cmd.ToByteArray());
-        }
         
         public void Send(byte command)
         {

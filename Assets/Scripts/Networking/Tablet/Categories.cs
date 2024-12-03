@@ -2,7 +2,6 @@ namespace Networking.Tablet
 {
     public static class Categories
     {
-        public const byte Scale = 2;
         public const byte SelectionMode = 7;
         public const byte SelectionModeSnapshotsAttached = 22;
         public const byte SlicingMode = 8;
