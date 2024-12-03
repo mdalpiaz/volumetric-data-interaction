@@ -164,3 +164,9 @@ Every gameobject needed was supplied with custom editor buttons to trigger actio
 - SnapshotManager: This gameobject handles snapshots and can be used to toggle attachment of snapshots to the tablet.
 
 Selection can be done with the objects themselves. Every object which contains the `Selectable` component (Snapshots, Model) have a custom button to select them.
+
+## Credits
+
+Base Version of this software was developed by [Janine Mayer](https://github.com/jdmayer).
+
+[CrossSectionShader](https://github.com/Dandarawy/Unity3DCrossSectionShader)
