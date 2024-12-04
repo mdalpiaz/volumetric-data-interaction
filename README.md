@@ -168,5 +168,3 @@ Selection can be done with the objects themselves. Every object which contains t
 ## Credits
 
 Base Version of this software was developed by [Janine Mayer](https://github.com/jdmayer).
-
-[CrossSectionShader](https://github.com/Dandarawy/Unity3DCrossSectionShader)
